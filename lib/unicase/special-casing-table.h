@@ -1,4 +1,4 @@
-/* ANSI-C code produced by gperf version 3.0.4 */
+/* ANSI-C code produced by gperf version 3.1 */
 /* Command-line: gperf -m 10 ./unicase/special-casing-table.gperf  */
 /* Computed positions: -k'1-3' */
 
@@ -19,7 +19,7 @@ inline
 #endif
 /*ARGSUSED*/
 static unsigned int
-gl_unicase_special_hash (register const char *str, register unsigned int len)
+gl_unicase_special_hash (register const char *str, register size_t len)
 {
   static const unsigned char asso_values[] =
     {
@@ -53,14 +53,8 @@ gl_unicase_special_hash (register const char *str, register unsigned int len)
   return asso_values[(unsigned char)str[2]+1] + asso_values[(unsigned char)str[1]] + asso_values[(unsigned char)str[0]];
 }
 
-#ifdef __GNUC__
-__inline
-#if defined __GNUC_STDC_INLINE__ || defined __GNUC_GNU_INLINE__
-__attribute__ ((__gnu_inline__))
-#endif
-#endif
 const struct special_casing_rule *
-gl_unicase_special_lookup (register const char *str, register unsigned int len)
+gl_unicase_special_lookup (register const char *str, register size_t len)
 {
   static const unsigned char lengthtable[] =
     {
@@ -324,9 +318,9 @@ gl_unicase_special_lookup (register const char *str, register unsigned int len)
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      register int key = gl_unicase_special_hash (str, len);
+      register unsigned int key = gl_unicase_special_hash (str, len);
 
-      if (key <= MAX_HASH_VALUE && key >= 0)
+      if (key <= MAX_HASH_VALUE)
         if (len == lengthtable[key])
           {
             register const char *s = wordlist[key].code;

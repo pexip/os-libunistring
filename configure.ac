@@ -22,7 +22,7 @@ AC_CONFIG_SRCDIR([lib/unistring/version.in.h])
 AC_CONFIG_AUX_DIR([build-aux])
 . $srcdir/version.sh
 gl_INIT_PACKAGE([libunistring], [$VERSION_NUMBER])
-AM_INIT_AUTOMAKE([silent-rules])
+AM_INIT_AUTOMAKE([silent-rules dist-xz])
 AM_CONFIG_HEADER([config.h])
 
 dnl Override automake's tar command used for creating distributions.
@@ -130,10 +130,16 @@ i\
 0
 q
 '
+sed_extract_subminor='/^[0-9][0-9]*[.][0-9][0-9]*[.][0-9]/{s/^[0-9]*[.][0-9]*[.]\([0-9]*\).*/\1/p;q;}
+i\
+0
+q
+'
 changequote([,])
 version_major=`echo "${VERSION}" | sed -n -e "$sed_extract_major"`
 version_minor=`echo "${VERSION}" | sed -n -e "$sed_extract_minor"`
-HEXVERSION=0x`$AWK 'BEGIN { printf("%02d%02d"',"$version_major","$version_minor"') }'`
+version_subminor=`echo "${VERSION}" | sed -n -e "$sed_extract_subminor"`
+HEXVERSION=0x`$AWK 'BEGIN { printf("%02X%02X%02X"',"$version_major","$version_minor","$version_subminor"') }'`
 AC_SUBST([HEXVERSION])
 
 dnl Check for tools needed for formatting the documentation.

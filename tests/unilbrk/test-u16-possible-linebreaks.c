@@ -1,5 +1,5 @@
 /* Test of line breaking of UTF-16 strings.
-   Copyright (C) 2008-2010 Free Software Foundation, Inc.
+   Copyright (C) 2008-2018 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2008.  */
 
@@ -51,7 +51,7 @@ main ()
           ASSERT (p[i] == (i == 60 ? UC_BREAK_MANDATORY :
                            i == 5
                            || i == 11 || i == 25
-                           || i == 27 || i == 29 || i == 30 || i == 35
+                           || i == 29 || i == 30
                            || i == 45 || i == 51
                            || i == 52 || i == 53 || i == 55 || i == 56
                            || i == 58 || i == 59 ? UC_BREAK_POSSIBLE :
@@ -70,7 +70,7 @@ main ()
           ASSERT (p[i] == (i == 60 ? UC_BREAK_MANDATORY :
                            i == 5
                            || i == 11 || i == 25
-                           || i == 27 || i == 29 || i == 30 || i == 35
+                           || i == 29 || i == 30
                            || i == 37 || i == 45 || i == 51
                            || i == 52 || i == 53 || i == 55 || i == 56
                            || i == 58 || i == 59 ? UC_BREAK_POSSIBLE :
@@ -78,6 +78,21 @@ main ()
         }
       free (p);
     }
+  }
+
+  /* Test that a break is possible after a zero-width space followed by some
+     regular spaces (rule LB8 in Unicode TR#14 revision 26).  */
+  {
+    static const uint16_t input[4] = { 'x', 0x200B, ' ', 'y' };
+    char *p = (char *) malloc (SIZEOF (input));
+    size_t i;
+
+    u16_possible_linebreaks (input, SIZEOF (input), "UTF-8", p);
+    for (i = 0; i < 4; i++)
+      {
+        ASSERT (p[i] == (i == 3 ? UC_BREAK_POSSIBLE : UC_BREAK_PROHIBITED));
+      }
+    free (p);
   }
 
   return 0;

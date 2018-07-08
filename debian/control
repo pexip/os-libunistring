@@ -1,19 +1,19 @@
 Source: libunistring
 Priority: optional
-Maintainer: Andreas Rottmann <rotty@debian.org>
-Build-Depends: cdbs (>= 0.4.93~), debhelper (>= 9.20160403~), autotools-dev, dh-autoreconf
-Standards-Version: 3.9.8
+Maintainer: Jörg Frings-Fürst <debian@jff.email>
+Build-Depends:
+ debhelper (>= 11),
+Standards-Version: 4.1.5
 Section: libs
-Homepage: http://www.gnu.org/software/libunistring/
-Vcs-Git: https://anonscm.debian.org/git/collab-maint/libunistring.git
-Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/libunistring.git/
-
+Homepage: https://www.gnu.org/software/libunistring/
+Vcs-Git: git://jff.email/opt/git/libunistring.git
+Vcs-Browser: https://jff.email/cgit/libunistring.git
 
 Package: libunistring-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libunistring0 (= ${binary:Version}), ${misc:Depends}
+Depends: libunistring2 (= ${binary:Version}), ${misc:Depends}
 Description: Unicode string library for C - development files
  The 'libunistring' library implements Unicode strings (in the UTF-8,
  UTF-16, and UTF-32 encodings), together with functions for Unicode
@@ -26,7 +26,7 @@ Description: Unicode string library for C - development files
  and link against libunistring, as well as the documentation in Info
  and HTML format.
 
-Package: libunistring0
+Package: libunistring2
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}

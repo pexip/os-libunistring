@@ -1,20 +1,29 @@
 /* Compare UTF-8/UTF-16/UTF-32 strings using the collation rules of the current
    locale.
-   Copyright (C) 2009-2010 Free Software Foundation, Inc.
+   Copyright (C) 2009-2018 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
-   This program is free software: you can redistribute it and/or modify it
-   under the terms of the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 int
 FUNC (const UNIT *s1, const UNIT *s2)
@@ -23,14 +32,19 @@ FUNC (const UNIT *s1, const UNIT *s2)
      When it fails, it sets errno, but also returns a meaningful return value,
      for the sake of callers which ignore errno.  */
   int final_errno = errno;
+  const char *encoding = locale_charset ();
   char *sl1;
   char *sl2;
   int result;
 
-  sl1 = U_STRCONV_TO_LOCALE (s1);
+  /* Pass iconveh_error here, not iconveh_question_mark.  Otherwise the
+     conversion to locale encoding can do transliteration or map some
+     characters to question marks, leading to results that depend on the
+     iconv() implementation and are not obvious.  */
+  sl1 = U_STRCONV_TO_ENCODING (s1, encoding, iconveh_error);
   if (sl1 != NULL)
     {
-      sl2 = U_STRCONV_TO_LOCALE (s2);
+      sl2 = U_STRCONV_TO_ENCODING (s2, encoding, iconveh_error);
       if (sl2 != NULL)
         {
           /* Compare sl1 and sl2.  */
@@ -41,10 +55,10 @@ FUNC (const UNIT *s1, const UNIT *s2)
               /* strcoll succeeded.  */
               free (sl1);
               free (sl2);
-              /* The conversion to locale encoding can do transliteration or
-                 map some characters to question marks.  Therefore sl1 and sl2
-                 may be equal when s1 and s2 were in fact different.  Return a
-                 nonzero result in this case.  */
+              /* The conversion to locale encoding can drop Unicode TAG
+                 characters.  Therefore sl1 and sl2 may be equal when s1
+                 and s2 were in fact different.  Return a nonzero result
+                 in this case.  */
               if (result == 0)
                 result = U_STRCMP (s1, s2);
             }
@@ -68,7 +82,7 @@ FUNC (const UNIT *s1, const UNIT *s2)
   else
     {
       final_errno = errno;
-      sl2 = U_STRCONV_TO_LOCALE (s2);
+      sl2 = U_STRCONV_TO_ENCODING (s2, encoding, iconveh_error);
       if (sl2 != NULL)
         {
           /* s2 could be converted to locale encoding, s1 not.  */

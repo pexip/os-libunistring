@@ -1,5 +1,5 @@
 /* Test of u8_mbsnlen() function.
-   Copyright (C) 2010 Free Software Foundation, Inc.
+   Copyright (C) 2010-2018 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2010.  */
 
@@ -55,6 +55,65 @@ main ()
         size_t len = u8_mbsnlen (input, n);
         ASSERT (len == expected[n]);
       }
+  }
+
+  /* Test behaviour required by ISO 10646-1, sections R.7 and 2.3c, namely,
+     that a "malformed sequence" is interpreted in the same way as
+     "a character that is outside the adopted subset".
+     Reference:
+       Markus Kuhn: UTF-8 decoder capability and stress test
+       <https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt>
+       <https://www.w3.org/2001/06/utf-8-wrong/UTF-8-test.html>
+   */
+  /* 3.1. Test that each unexpected continuation byte is signalled as a
+     malformed sequence of its own.  */
+  {
+    static const uint8_t input[] = { '"', 0x80, 0xBF, 0x80, 0xBF, '"' };
+    ASSERT (u8_mbsnlen (input, 6) == 6);
+  }
+  /* 3.2. Lonely start characters.  */
+  {
+    ucs4_t c;
+    uint8_t input[2];
+
+    for (c = 0xC0; c <= 0xFF; c++)
+      {
+        input[0] = c;
+        input[1] = ' ';
+
+        ASSERT (u8_mbsnlen (input, 2) == 2);
+      }
+  }
+  /* 3.3. Sequences with last continuation byte missing.  */
+  /* 3.3.1. 2-byte sequence with last byte missing.  */
+  {
+    static const uint8_t input[] = { '"', 0xC0, '"' };
+    ASSERT (u8_mbsnlen (input, 3) == 3);
+  }
+  /* 3.3.6. 2-byte sequence with last byte missing.  */
+  {
+    static const uint8_t input[] = { '"', 0xDF, '"' };
+    ASSERT (u8_mbsnlen (input, 3) == 3);
+  }
+  /* 3.3.2. 3-byte sequence with last byte missing.  */
+  {
+    static const uint8_t input[] = { '"', 0xE0, 0x80, '"' };
+    ASSERT (u8_mbsnlen (input, 4) == 3);
+  }
+  /* 3.3.7. 3-byte sequence with last byte missing.  */
+  {
+    static const uint8_t input[] = { '"', 0xEF, 0xBF, '"' };
+    ASSERT (u8_mbsnlen (input, 4) == 3);
+  }
+  /* 3.3.3. 4-byte sequence with last byte missing.  */
+  {
+    static const uint8_t input[] = { '"', 0xF0, 0x80, 0x80, '"' };
+    ASSERT (u8_mbsnlen (input, 5) == 3);
+  }
+  /* 3.3.8. 4-byte sequence with last byte missing.  */
+  {
+    static const uint8_t input[] = { '"', 0xF7, 0xBF, 0xBF, '"' };
+    ASSERT (u8_mbsnlen (input, 5) == 3);
   }
 
   return 0;

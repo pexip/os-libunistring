@@ -1,19 +1,28 @@
 /* Canonical composition of Unicode characters.
-   Copyright (C) 2002, 2006, 2009-2010 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006, 2009, 2011-2018 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
-   This program is free software: you can redistribute it and/or modify it
-   under the terms of the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -22,14 +31,14 @@
 
 #include <string.h>
 
-struct composition_rule { char codes[4]; unsigned short combined; };
+struct composition_rule { char codes[6]; unsigned int combined; };
 
 #include "composition-table.h"
 
 ucs4_t
 uc_composition (ucs4_t uc1, ucs4_t uc2)
 {
-  if (uc1 < 0x10000 && uc2 < 0x10000)
+  if (uc1 < 0x12000 && uc2 < 0x12000)
     {
       if (uc2 >= 0x1161 && uc2 < 0x1161 + 21
           && uc1 >= 0x1100 && uc1 < 0x1100 + 19)
@@ -67,15 +76,17 @@ uc_composition (ucs4_t uc1, ucs4_t uc2)
                 }
             }
 #else
-          char codes[4];
+          char codes[6];
           const struct composition_rule *rule;
 
-          codes[0] = (uc1 >> 8) & 0xff;
-          codes[1] = uc1 & 0xff;
-          codes[2] = (uc2 >> 8) & 0xff;
-          codes[3] = uc2 & 0xff;
+          codes[0] = (uc1 >> 16) & 0xff;
+          codes[1] = (uc1 >> 8) & 0xff;
+          codes[2] = uc1 & 0xff;
+          codes[3] = (uc2 >> 16) & 0xff;
+          codes[4] = (uc2 >> 8) & 0xff;
+          codes[5] = uc2 & 0xff;
 
-          rule = gl_uninorm_compose_lookup (codes, 4);
+          rule = gl_uninorm_compose_lookup (codes, 6);
           if (rule != NULL)
             return rule->combined;
 #endif

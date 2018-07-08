@@ -1,6 +1,6 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Properties of Unicode characters.  */
-/* Generated automatically by gen-ctype.c for Unicode 5.1.0.  */
+/* Generated automatically by gen-uni-tables.c for Unicode 9.0.0.  */
 #define header_0 16
 #define header_2 9
 #define header_3 127
@@ -11,7 +11,7 @@ struct
     int header[1];
     int level1[1];
     short level2[1 << 7];
-    /*unsigned*/ int level3[9 << 4];
+    /*unsigned*/ int level3[11 << 4];
   }
 u_property_bidi_eur_num_terminator =
 {
@@ -20,22 +20,22 @@ u_property_bidi_eur_num_terminator =
   {
         2 +   128 * sizeof (short) / sizeof (int) +     0,
        -1,
-       -1,
         2 +   128 * sizeof (short) / sizeof (int) +    16,
         2 +   128 * sizeof (short) / sizeof (int) +    32,
         2 +   128 * sizeof (short) / sizeof (int) +    48,
-       -1,
         2 +   128 * sizeof (short) / sizeof (int) +    64,
-       -1,
-       -1,
        -1,
         2 +   128 * sizeof (short) / sizeof (int) +    80,
        -1,
        -1,
        -1,
-       -1,
         2 +   128 * sizeof (short) / sizeof (int) +    96,
+       -1,
+       -1,
+       -1,
+       -1,
         2 +   128 * sizeof (short) / sizeof (int) +   112,
+        2 +   128 * sizeof (short) / sizeof (int) +   128,
        -1,
        -1,
        -1,
@@ -102,6 +102,7 @@ u_property_bidi_eur_num_terminator =
        -1,
        -1,
        -1,
+        2 +   128 * sizeof (short) / sizeof (int) +   144,
        -1,
        -1,
        -1,
@@ -144,14 +145,17 @@ u_property_bidi_eur_num_terminator =
        -1,
        -1,
        -1,
-       -1,
-        2 +   128 * sizeof (short) / sizeof (int) +   128
+        2 +   128 * sizeof (short) / sizeof (int) +   160
   },
   {
     0x00000000, 0x00000038, 0x00000000, 0x00000000,
     0x00000000, 0x0003003C, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00008000, 0x00000000, 0x00000000, 0x00000000,
     0x00000600, 0x00000000, 0x00000000, 0x00000400,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
@@ -159,7 +163,7 @@ u_property_bidi_eur_num_terminator =
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
-    0x00000000, 0x00000000, 0x00000000, 0x000C0000,
+    0x00000000, 0x00000000, 0x00000000, 0x080C0000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00020000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
@@ -173,10 +177,14 @@ u_property_bidi_eur_num_terminator =
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x08000000, 0x00000000,
     0x00000000, 0x001F0000, 0x00000000, 0x00000000,
-    0x00000000, 0x003FFFFF, 0x00000000, 0x00000000,
+    0x00000000, 0x7FFFFFFF, 0x00000000, 0x00000000,
     0x00000000, 0x00004000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00080000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x03000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,
     0x00000000, 0x00000000, 0x00000000, 0x00000000,

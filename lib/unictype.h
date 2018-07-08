@@ -1,18 +1,28 @@
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Unicode character classification and properties.
-   Copyright (C) 2002, 2005-2010 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005-2018 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify it
-   under the terms of the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _UNICTYPE_H
 #define _UNICTYPE_H
@@ -64,6 +74,7 @@ uc_general_category_t;
 enum
 {
   UC_CATEGORY_MASK_L  = 0x0000001f,
+  UC_CATEGORY_MASK_LC = 0x00000007,
   UC_CATEGORY_MASK_Lu = 0x00000001,
   UC_CATEGORY_MASK_Ll = 0x00000002,
   UC_CATEGORY_MASK_Lt = 0x00000004,
@@ -104,6 +115,7 @@ enum
 
 /* Predefined General category values.  */
 extern LIBUNISTRING_DLL_VARIABLE const uc_general_category_t UC_CATEGORY_L;
+extern LIBUNISTRING_DLL_VARIABLE const uc_general_category_t UC_CATEGORY_LC;
 extern LIBUNISTRING_DLL_VARIABLE const uc_general_category_t UC_CATEGORY_Lu;
 extern LIBUNISTRING_DLL_VARIABLE const uc_general_category_t UC_CATEGORY_Ll;
 extern LIBUNISTRING_DLL_VARIABLE const uc_general_category_t UC_CATEGORY_Lt;
@@ -145,6 +157,7 @@ extern const uc_general_category_t _UC_CATEGORY_NONE;
 
 /* Alias names for predefined General category values.  */
 #define UC_LETTER                    UC_CATEGORY_L
+#define UC_CASED_LETTER              UC_CATEGORY_LC
 #define UC_UPPERCASE_LETTER          UC_CATEGORY_Lu
 #define UC_LOWERCASE_LETTER          UC_CATEGORY_Ll
 #define UC_TITLECASE_LETTER          UC_CATEGORY_Lt
@@ -205,24 +218,35 @@ extern uc_general_category_t
 
 /* Return the name of a general category.  */
 extern const char *
-       uc_general_category_name (uc_general_category_t category);
+       uc_general_category_name (uc_general_category_t category)
+       _UC_ATTRIBUTE_PURE;
 
-/* Return the general category given by name, e.g. "Lu".  */
+/* Return the long name of a general category.  */
+extern const char *
+       uc_general_category_long_name (uc_general_category_t category)
+       _UC_ATTRIBUTE_PURE;
+
+/* Return the general category given by name, e.g. "Lu", or by long name,
+   e.g. "Uppercase Letter".  */
 extern uc_general_category_t
-       uc_general_category_byname (const char *category_name);
+       uc_general_category_byname (const char *category_name)
+       _UC_ATTRIBUTE_PURE;
 
 /* Return the general category of a Unicode character.  */
 extern uc_general_category_t
-       uc_general_category (ucs4_t uc);
+       uc_general_category (ucs4_t uc)
+       _UC_ATTRIBUTE_PURE;
 
 /* Test whether a Unicode character belongs to a given category.
    The CATEGORY argument can be the combination of several predefined
    general categories.  */
 extern bool
-       uc_is_general_category (ucs4_t uc, uc_general_category_t category);
+       uc_is_general_category (ucs4_t uc, uc_general_category_t category)
+       _UC_ATTRIBUTE_PURE;
 /* Likewise.  This function uses a big table comprising all categories.  */
 extern bool
-       uc_is_general_category_withtable (ucs4_t uc, uint32_t bitmask);
+       uc_is_general_category_withtable (ucs4_t uc, uint32_t bitmask)
+       _UC_ATTRIBUTE_CONST;
 
 /* ========================================================================= */
 
@@ -240,6 +264,7 @@ enum
   UC_CCC_VR   =   9, /* Virama */
   UC_CCC_ATBL = 200, /* Attached Below Left */
   UC_CCC_ATB  = 202, /* Attached Below */
+  UC_CCC_ATA  = 214, /* Attached Above */
   UC_CCC_ATAR = 216, /* Attached Above Right */
   UC_CCC_BL   = 218, /* Below Left */
   UC_CCC_B    = 220, /* Below */
@@ -256,11 +281,29 @@ enum
 
 /* Return the canonical combining class of a Unicode character.  */
 extern int
-       uc_combining_class (ucs4_t uc);
+       uc_combining_class (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+
+/* Return the name of a canonical combining class.  */
+extern const char *
+       uc_combining_class_name (int ccc)
+       _UC_ATTRIBUTE_CONST;
+
+/* Return the long name of a canonical combining class.  */
+extern const char *
+       uc_combining_class_long_name (int ccc)
+       _UC_ATTRIBUTE_CONST;
+
+/* Return the canonical combining class given by name, e.g. "BL", or by long
+   name, e.g. "Below Left".  */
+extern int
+       uc_combining_class_byname (const char *ccc_name)
+       _UC_ATTRIBUTE_PURE;
 
 /* ========================================================================= */
 
-/* Field 4 of Unicode Character Database: Bidirectional category.  */
+/* Field 4 of Unicode Character Database: Bidi class.
+   Before Unicode 4.0, this field was called "Bidirectional category".  */
 
 enum
 {
@@ -282,25 +325,54 @@ enum
   UC_BIDI_B,   /* Paragraph Separator */
   UC_BIDI_S,   /* Segment Separator */
   UC_BIDI_WS,  /* Whitespace */
-  UC_BIDI_ON   /* Other Neutral */
+  UC_BIDI_ON,  /* Other Neutral */
+  UC_BIDI_LRI, /* Left-to-Right Isolate */
+  UC_BIDI_RLI, /* Right-to-Left Isolate */
+  UC_BIDI_FSI, /* First Strong Isolate */
+  UC_BIDI_PDI  /* Pop Directional Isolate */
 };
 
-/* Return the name of a bidirectional category.  */
+/* Return the name of a bidi class.  */
 extern const char *
-       uc_bidi_category_name (int category);
+       uc_bidi_class_name (int bidi_class)
+       _UC_ATTRIBUTE_CONST;
+/* Same; obsolete function name.  */
+extern const char *
+       uc_bidi_category_name (int category)
+       _UC_ATTRIBUTE_CONST;
 
-/* Return the bidirectional category given by name, e.g. "LRE".  */
+/* Return the long name of a bidi class.  */
+extern const char *
+       uc_bidi_class_long_name (int bidi_class)
+       _UC_ATTRIBUTE_CONST;
+
+/* Return the bidi class given by name, e.g. "LRE", or by long name, e.g.
+   "Left-to-Right Embedding".  */
 extern int
-       uc_bidi_category_byname (const char *category_name);
-
-/* Return the bidirectional category of a Unicode character.  */
+       uc_bidi_class_byname (const char *bidi_class_name)
+       _UC_ATTRIBUTE_PURE;
+/* Same; obsolete function name.  */
 extern int
-       uc_bidi_category (ucs4_t uc);
+       uc_bidi_category_byname (const char *category_name)
+       _UC_ATTRIBUTE_PURE;
 
-/* Test whether a Unicode character belongs to a given bidirectional
-   category.  */
+/* Return the bidi class of a Unicode character.  */
+extern int
+       uc_bidi_class (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+/* Same; obsolete function name.  */
+extern int
+       uc_bidi_category (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+
+/* Test whether a Unicode character belongs to a given bidi class.  */
 extern bool
-       uc_is_bidi_category (ucs4_t uc, int category);
+       uc_is_bidi_class (ucs4_t uc, int bidi_class)
+       _UC_ATTRIBUTE_CONST;
+/* Same; obsolete function name.  */
+extern bool
+       uc_is_bidi_category (ucs4_t uc, int category)
+       _UC_ATTRIBUTE_CONST;
 
 /* ========================================================================= */
 
@@ -313,7 +385,8 @@ extern bool
 
 /* Return the decimal digit value of a Unicode character.  */
 extern int
-       uc_decimal_value (ucs4_t uc);
+       uc_decimal_value (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* ========================================================================= */
 
@@ -321,7 +394,8 @@ extern int
 
 /* Return the digit value of a Unicode character.  */
 extern int
-       uc_digit_value (ucs4_t uc);
+       uc_digit_value (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* ========================================================================= */
 
@@ -335,7 +409,8 @@ typedef struct
 }
 uc_fraction_t;
 extern uc_fraction_t
-       uc_numeric_value (ucs4_t uc);
+       uc_numeric_value (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* ========================================================================= */
 
@@ -359,6 +434,156 @@ extern bool
 
 /* Field 12, 13, 14 of Unicode Character Database: Uppercase mapping,
    lowercase mapping, titlecase mapping.  See "unicase.h".  */
+
+/* ========================================================================= */
+
+/* Field 2 of the file ArabicShaping.txt in the Unicode Character Database.  */
+
+/* Possible joining types.  */
+enum
+{
+  UC_JOINING_TYPE_U, /* Non_Joining */
+  UC_JOINING_TYPE_T, /* Transparent */
+  UC_JOINING_TYPE_C, /* Join_Causing */
+  UC_JOINING_TYPE_L, /* Left_Joining */
+  UC_JOINING_TYPE_R, /* Right_Joining */
+  UC_JOINING_TYPE_D  /* Dual_Joining */
+};
+
+/* Return the name of a joining type.  */
+extern const char *
+       uc_joining_type_name (int joining_type)
+       _UC_ATTRIBUTE_CONST;
+
+/* Return the long name of a joining type.  */
+extern const char *
+       uc_joining_type_long_name (int joining_type)
+       _UC_ATTRIBUTE_CONST;
+
+/* Return the joining type given by name, e.g. "D", or by long name, e.g.
+   "Dual Joining".  */
+extern int
+       uc_joining_type_byname (const char *joining_type_name)
+       _UC_ATTRIBUTE_PURE;
+
+/* Return the joining type of a Unicode character.  */
+extern int
+       uc_joining_type (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+
+/* ========================================================================= */
+
+/* Field 3 of the file ArabicShaping.txt in the Unicode Character Database.  */
+
+/* Possible joining groups.
+   This enumeration may be extended in the future.  */
+enum
+{
+  UC_JOINING_GROUP_NONE,                  /* No_Joining_Group */
+  UC_JOINING_GROUP_AIN,                   /* Ain */
+  UC_JOINING_GROUP_ALAPH,                 /* Alaph */
+  UC_JOINING_GROUP_ALEF,                  /* Alef */
+  UC_JOINING_GROUP_BEH,                   /* Beh */
+  UC_JOINING_GROUP_BETH,                  /* Beth */
+  UC_JOINING_GROUP_BURUSHASKI_YEH_BARREE, /* Burushaski_Yeh_Barree */
+  UC_JOINING_GROUP_DAL,                   /* Dal */
+  UC_JOINING_GROUP_DALATH_RISH,           /* Dalath_Rish */
+  UC_JOINING_GROUP_E,                     /* E */
+  UC_JOINING_GROUP_FARSI_YEH,             /* Farsi_Yeh */
+  UC_JOINING_GROUP_FE,                    /* Fe */
+  UC_JOINING_GROUP_FEH,                   /* Feh */
+  UC_JOINING_GROUP_FINAL_SEMKATH,         /* Final_Semkath */
+  UC_JOINING_GROUP_GAF,                   /* Gaf */
+  UC_JOINING_GROUP_GAMAL,                 /* Gamal */
+  UC_JOINING_GROUP_HAH,                   /* Hah */
+  UC_JOINING_GROUP_HE,                    /* He */
+  UC_JOINING_GROUP_HEH,                   /* Heh */
+  UC_JOINING_GROUP_HEH_GOAL,              /* Heh_Goal */
+  UC_JOINING_GROUP_HETH,                  /* Heth */
+  UC_JOINING_GROUP_KAF,                   /* Kaf */
+  UC_JOINING_GROUP_KAPH,                  /* Kaph */
+  UC_JOINING_GROUP_KHAPH,                 /* Khaph */
+  UC_JOINING_GROUP_KNOTTED_HEH,           /* Knotted_Heh */
+  UC_JOINING_GROUP_LAM,                   /* Lam */
+  UC_JOINING_GROUP_LAMADH,                /* Lamadh */
+  UC_JOINING_GROUP_MEEM,                  /* Meem */
+  UC_JOINING_GROUP_MIM,                   /* Mim */
+  UC_JOINING_GROUP_NOON,                  /* Noon */
+  UC_JOINING_GROUP_NUN,                   /* Nun */
+  UC_JOINING_GROUP_NYA,                   /* Nya */
+  UC_JOINING_GROUP_PE,                    /* Pe */
+  UC_JOINING_GROUP_QAF,                   /* Qaf */
+  UC_JOINING_GROUP_QAPH,                  /* Qaph */
+  UC_JOINING_GROUP_REH,                   /* Reh */
+  UC_JOINING_GROUP_REVERSED_PE,           /* Reversed_Pe */
+  UC_JOINING_GROUP_SAD,                   /* Sad */
+  UC_JOINING_GROUP_SADHE,                 /* Sadhe */
+  UC_JOINING_GROUP_SEEN,                  /* Seen */
+  UC_JOINING_GROUP_SEMKATH,               /* Semkath */
+  UC_JOINING_GROUP_SHIN,                  /* Shin */
+  UC_JOINING_GROUP_SWASH_KAF,             /* Swash_Kaf */
+  UC_JOINING_GROUP_SYRIAC_WAW,            /* Syriac_Waw */
+  UC_JOINING_GROUP_TAH,                   /* Tah */
+  UC_JOINING_GROUP_TAW,                   /* Taw */
+  UC_JOINING_GROUP_TEH_MARBUTA,           /* Teh_Marbuta */
+  UC_JOINING_GROUP_TEH_MARBUTA_GOAL,      /* Teh_Marbuta_Goal */
+  UC_JOINING_GROUP_TETH,                  /* Teth */
+  UC_JOINING_GROUP_WAW,                   /* Waw */
+  UC_JOINING_GROUP_YEH,                   /* Yeh */
+  UC_JOINING_GROUP_YEH_BARREE,            /* Yeh_Barree */
+  UC_JOINING_GROUP_YEH_WITH_TAIL,         /* Yeh_With_Tail */
+  UC_JOINING_GROUP_YUDH,                  /* Yudh */
+  UC_JOINING_GROUP_YUDH_HE,               /* Yudh_He */
+  UC_JOINING_GROUP_ZAIN,                  /* Zain */
+  UC_JOINING_GROUP_ZHAIN,                 /* Zhain */
+  UC_JOINING_GROUP_ROHINGYA_YEH,          /* Rohingya_Yeh */
+  UC_JOINING_GROUP_STRAIGHT_WAW,          /* Straight_Waw */
+  UC_JOINING_GROUP_MANICHAEAN_ALEPH,      /* Manichaean_Aleph */
+  UC_JOINING_GROUP_MANICHAEAN_BETH,       /* Manichaean_Beth */
+  UC_JOINING_GROUP_MANICHAEAN_GIMEL,      /* Manichaean_Gimel */
+  UC_JOINING_GROUP_MANICHAEAN_DALETH,     /* Manichaean_Daleth */
+  UC_JOINING_GROUP_MANICHAEAN_WAW,        /* Manichaean_Waw */
+  UC_JOINING_GROUP_MANICHAEAN_ZAYIN,      /* Manichaean_Zayin */
+  UC_JOINING_GROUP_MANICHAEAN_HETH,       /* Manichaean_Heth */
+  UC_JOINING_GROUP_MANICHAEAN_TETH,       /* Manichaean_Teth */
+  UC_JOINING_GROUP_MANICHAEAN_YODH,       /* Manichaean_Yodh */
+  UC_JOINING_GROUP_MANICHAEAN_KAPH,       /* Manichaean_Kaph */
+  UC_JOINING_GROUP_MANICHAEAN_LAMEDH,     /* Manichaean_Lamedh */
+  UC_JOINING_GROUP_MANICHAEAN_DHAMEDH,    /* Manichaean_Dhamedh */
+  UC_JOINING_GROUP_MANICHAEAN_THAMEDH,    /* Manichaean_Thamedh */
+  UC_JOINING_GROUP_MANICHAEAN_MEM,        /* Manichaean_Mem */
+  UC_JOINING_GROUP_MANICHAEAN_NUN,        /* Manichaean_Nun */
+  UC_JOINING_GROUP_MANICHAEAN_SAMEKH,     /* Manichaean_Aleph */
+  UC_JOINING_GROUP_MANICHAEAN_AYIN,       /* Manichaean_Ayin */
+  UC_JOINING_GROUP_MANICHAEAN_PE,         /* Manichaean_Pe */
+  UC_JOINING_GROUP_MANICHAEAN_SADHE,      /* Manichaean_Sadhe */
+  UC_JOINING_GROUP_MANICHAEAN_QOPH,       /* Manichaean_Qoph */
+  UC_JOINING_GROUP_MANICHAEAN_RESH,       /* Manichaean_Resh */
+  UC_JOINING_GROUP_MANICHAEAN_TAW,        /* Manichaean_Taw */
+  UC_JOINING_GROUP_MANICHAEAN_ONE,        /* Manichaean_One */
+  UC_JOINING_GROUP_MANICHAEAN_FIVE,       /* Manichaean_Five */
+  UC_JOINING_GROUP_MANICHAEAN_TEN,        /* Manichaean_Ten */
+  UC_JOINING_GROUP_MANICHAEAN_TWENTY,     /* Manichaean_Twenty */
+  UC_JOINING_GROUP_MANICHAEAN_HUNDRED,    /* Manichaean_Hundred */
+  UC_JOINING_GROUP_AFRICAN_FEH,           /* African_Feh */
+  UC_JOINING_GROUP_AFRICAN_QAF,           /* African_Qaf */
+  UC_JOINING_GROUP_AFRICAN_NOON           /* African_Noon */
+};
+
+/* Return the name of a joining group.  */
+extern const char *
+       uc_joining_group_name (int joining_group)
+       _UC_ATTRIBUTE_CONST;
+
+/* Return the joining group given by name, e.g. "Teh_Marbuta".  */
+extern int
+       uc_joining_group_byname (const char *joining_group_name)
+       _UC_ATTRIBUTE_PURE;
+
+/* Return the joining group of a Unicode character.  */
+extern int
+       uc_joining_group (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* ========================================================================= */
 
@@ -392,6 +617,13 @@ extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_OTHER_UPPERCASE
 extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_LOWERCASE;
 extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_OTHER_LOWERCASE;
 extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_TITLECASE;
+extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_CASED;
+extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_CASE_IGNORABLE;
+extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_CHANGES_WHEN_LOWERCASED;
+extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_CHANGES_WHEN_UPPERCASED;
+extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_CHANGES_WHEN_TITLECASED;
+extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_CHANGES_WHEN_CASEFOLDED;
+extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_CHANGES_WHEN_CASEMAPPED;
 extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_SOFT_DOTTED;
 /* Identifiers.  */
 extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_PROPERTY_ID_START;
@@ -472,85 +704,178 @@ extern uc_property_t
 /* Test whether a Unicode character has a given property.  */
 extern bool
        uc_is_property (ucs4_t uc, uc_property_t property);
-extern bool uc_is_property_white_space (ucs4_t uc);
-extern bool uc_is_property_alphabetic (ucs4_t uc);
-extern bool uc_is_property_other_alphabetic (ucs4_t uc);
-extern bool uc_is_property_not_a_character (ucs4_t uc);
-extern bool uc_is_property_default_ignorable_code_point (ucs4_t uc);
-extern bool uc_is_property_other_default_ignorable_code_point (ucs4_t uc);
-extern bool uc_is_property_deprecated (ucs4_t uc);
-extern bool uc_is_property_logical_order_exception (ucs4_t uc);
-extern bool uc_is_property_variation_selector (ucs4_t uc);
-extern bool uc_is_property_private_use (ucs4_t uc);
-extern bool uc_is_property_unassigned_code_value (ucs4_t uc);
-extern bool uc_is_property_uppercase (ucs4_t uc);
-extern bool uc_is_property_other_uppercase (ucs4_t uc);
-extern bool uc_is_property_lowercase (ucs4_t uc);
-extern bool uc_is_property_other_lowercase (ucs4_t uc);
-extern bool uc_is_property_titlecase (ucs4_t uc);
-extern bool uc_is_property_soft_dotted (ucs4_t uc);
-extern bool uc_is_property_id_start (ucs4_t uc);
-extern bool uc_is_property_other_id_start (ucs4_t uc);
-extern bool uc_is_property_id_continue (ucs4_t uc);
-extern bool uc_is_property_other_id_continue (ucs4_t uc);
-extern bool uc_is_property_xid_start (ucs4_t uc);
-extern bool uc_is_property_xid_continue (ucs4_t uc);
-extern bool uc_is_property_pattern_white_space (ucs4_t uc);
-extern bool uc_is_property_pattern_syntax (ucs4_t uc);
-extern bool uc_is_property_join_control (ucs4_t uc);
-extern bool uc_is_property_grapheme_base (ucs4_t uc);
-extern bool uc_is_property_grapheme_extend (ucs4_t uc);
-extern bool uc_is_property_other_grapheme_extend (ucs4_t uc);
-extern bool uc_is_property_grapheme_link (ucs4_t uc);
-extern bool uc_is_property_bidi_control (ucs4_t uc);
-extern bool uc_is_property_bidi_left_to_right (ucs4_t uc);
-extern bool uc_is_property_bidi_hebrew_right_to_left (ucs4_t uc);
-extern bool uc_is_property_bidi_arabic_right_to_left (ucs4_t uc);
-extern bool uc_is_property_bidi_european_digit (ucs4_t uc);
-extern bool uc_is_property_bidi_eur_num_separator (ucs4_t uc);
-extern bool uc_is_property_bidi_eur_num_terminator (ucs4_t uc);
-extern bool uc_is_property_bidi_arabic_digit (ucs4_t uc);
-extern bool uc_is_property_bidi_common_separator (ucs4_t uc);
-extern bool uc_is_property_bidi_block_separator (ucs4_t uc);
-extern bool uc_is_property_bidi_segment_separator (ucs4_t uc);
-extern bool uc_is_property_bidi_whitespace (ucs4_t uc);
-extern bool uc_is_property_bidi_non_spacing_mark (ucs4_t uc);
-extern bool uc_is_property_bidi_boundary_neutral (ucs4_t uc);
-extern bool uc_is_property_bidi_pdf (ucs4_t uc);
-extern bool uc_is_property_bidi_embedding_or_override (ucs4_t uc);
-extern bool uc_is_property_bidi_other_neutral (ucs4_t uc);
-extern bool uc_is_property_hex_digit (ucs4_t uc);
-extern bool uc_is_property_ascii_hex_digit (ucs4_t uc);
-extern bool uc_is_property_ideographic (ucs4_t uc);
-extern bool uc_is_property_unified_ideograph (ucs4_t uc);
-extern bool uc_is_property_radical (ucs4_t uc);
-extern bool uc_is_property_ids_binary_operator (ucs4_t uc);
-extern bool uc_is_property_ids_trinary_operator (ucs4_t uc);
-extern bool uc_is_property_zero_width (ucs4_t uc);
-extern bool uc_is_property_space (ucs4_t uc);
-extern bool uc_is_property_non_break (ucs4_t uc);
-extern bool uc_is_property_iso_control (ucs4_t uc);
-extern bool uc_is_property_format_control (ucs4_t uc);
-extern bool uc_is_property_dash (ucs4_t uc);
-extern bool uc_is_property_hyphen (ucs4_t uc);
-extern bool uc_is_property_punctuation (ucs4_t uc);
-extern bool uc_is_property_line_separator (ucs4_t uc);
-extern bool uc_is_property_paragraph_separator (ucs4_t uc);
-extern bool uc_is_property_quotation_mark (ucs4_t uc);
-extern bool uc_is_property_sentence_terminal (ucs4_t uc);
-extern bool uc_is_property_terminal_punctuation (ucs4_t uc);
-extern bool uc_is_property_currency_symbol (ucs4_t uc);
-extern bool uc_is_property_math (ucs4_t uc);
-extern bool uc_is_property_other_math (ucs4_t uc);
-extern bool uc_is_property_paired_punctuation (ucs4_t uc);
-extern bool uc_is_property_left_of_pair (ucs4_t uc);
-extern bool uc_is_property_combining (ucs4_t uc);
-extern bool uc_is_property_composite (ucs4_t uc);
-extern bool uc_is_property_decimal_digit (ucs4_t uc);
-extern bool uc_is_property_numeric (ucs4_t uc);
-extern bool uc_is_property_diacritic (ucs4_t uc);
-extern bool uc_is_property_extender (ucs4_t uc);
-extern bool uc_is_property_ignorable_control (ucs4_t uc);
+extern bool uc_is_property_white_space (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_alphabetic (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_other_alphabetic (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_not_a_character (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_default_ignorable_code_point (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_other_default_ignorable_code_point (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_deprecated (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_logical_order_exception (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_variation_selector (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_private_use (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_unassigned_code_value (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_uppercase (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_other_uppercase (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_lowercase (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_other_lowercase (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_titlecase (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_cased (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_case_ignorable (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_changes_when_lowercased (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_changes_when_uppercased (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_changes_when_titlecased (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_changes_when_casefolded (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_changes_when_casemapped (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_soft_dotted (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_id_start (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_other_id_start (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_id_continue (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_other_id_continue (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_xid_start (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_xid_continue (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_pattern_white_space (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_pattern_syntax (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_join_control (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_grapheme_base (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_grapheme_extend (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_other_grapheme_extend (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_grapheme_link (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_control (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_left_to_right (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_hebrew_right_to_left (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_arabic_right_to_left (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_european_digit (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_eur_num_separator (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_eur_num_terminator (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_arabic_digit (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_common_separator (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_block_separator (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_segment_separator (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_whitespace (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_non_spacing_mark (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_boundary_neutral (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_pdf (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_embedding_or_override (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_bidi_other_neutral (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_hex_digit (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_ascii_hex_digit (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_ideographic (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_unified_ideograph (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_radical (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_ids_binary_operator (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_ids_trinary_operator (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_zero_width (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_space (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_non_break (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_iso_control (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_format_control (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_dash (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_hyphen (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_punctuation (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_line_separator (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_paragraph_separator (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_quotation_mark (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_sentence_terminal (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_terminal_punctuation (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_currency_symbol (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_math (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_other_math (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_paired_punctuation (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_left_of_pair (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_combining (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_composite (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_decimal_digit (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_numeric (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_diacritic (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_extender (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
+extern bool uc_is_property_ignorable_control (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* ========================================================================= */
 
@@ -573,15 +898,18 @@ uc_script_t;
 
 /* Return the script of a Unicode character.  */
 extern const uc_script_t *
-       uc_script (ucs4_t uc);
+       uc_script (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Return the script given by name, e.g. "HAN".  */
 extern const uc_script_t *
-       uc_script_byname (const char *script_name);
+       uc_script_byname (const char *script_name)
+       _UC_ATTRIBUTE_PURE;
 
 /* Test whether a Unicode character belongs to a given script.  */
 extern bool
-       uc_is_script (ucs4_t uc, const uc_script_t *script);
+       uc_is_script (ucs4_t uc, const uc_script_t *script)
+       _UC_ATTRIBUTE_PURE;
 
 /* Get the list of all scripts.  */
 extern void
@@ -601,11 +929,13 @@ uc_block_t;
 
 /* Return the block a character belongs to.  */
 extern const uc_block_t *
-       uc_block (ucs4_t uc);
+       uc_block (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test whether a Unicode character belongs to a given block.  */
 extern bool
-       uc_is_block (ucs4_t uc, const uc_block_t *block);
+       uc_is_block (ucs4_t uc, const uc_block_t *block)
+       _UC_ATTRIBUTE_PURE;
 
 /* Get the list of all blocks.  */
 extern void
@@ -617,11 +947,13 @@ extern void
 
 /* Test whether a Unicode character is considered whitespace in ISO C 99.  */
 extern bool
-       uc_is_c_whitespace (ucs4_t uc);
+       uc_is_c_whitespace (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test whether a Unicode character is considered whitespace in Java.  */
 extern bool
-       uc_is_java_whitespace (ucs4_t uc);
+       uc_is_java_whitespace (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 enum
 {
@@ -634,12 +966,14 @@ enum
 /* Return the categorization of a Unicode character w.r.t. the ISO C 99
    identifier syntax.  */
 extern int
-       uc_c_ident_category (ucs4_t uc);
+       uc_c_ident_category (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Return the categorization of a Unicode character w.r.t. the Java
    identifier syntax.  */
 extern int
-       uc_java_ident_category (ucs4_t uc);
+       uc_java_ident_category (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* ========================================================================= */
 
@@ -651,65 +985,77 @@ extern int
 
 /* Test for any character for which 'uc_is_alpha' or 'uc_is_digit' is true.  */
 extern bool
-       uc_is_alnum (ucs4_t uc);
+       uc_is_alnum (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test for any character for which 'uc_is_upper' or 'uc_is_lower' is true,
    or any character that is one of a locale-specific set of characters for
    which none of 'uc_is_cntrl', 'uc_is_digit', 'uc_is_punct', or 'uc_is_space'
    is true.  */
 extern bool
-       uc_is_alpha (ucs4_t uc);
+       uc_is_alpha (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test for any control character.  */
 extern bool
-       uc_is_cntrl (ucs4_t uc);
+       uc_is_cntrl (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test for any character that corresponds to a decimal-digit character.  */
 extern bool
-       uc_is_digit (ucs4_t uc);
+       uc_is_digit (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test for any character for which 'uc_is_print' is true and 'uc_is_space'
    is false.  */
 extern bool
-       uc_is_graph (ucs4_t uc);
+       uc_is_graph (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test for any character that corresponds to a lowercase letter or is one
    of a locale-specific set of characters for which none of 'uc_is_cntrl',
    'uc_is_digit', 'uc_is_punct', or 'uc_is_space' is true.  */
 extern bool
-       uc_is_lower (ucs4_t uc);
+       uc_is_lower (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test for any printing character.  */
 extern bool
-       uc_is_print (ucs4_t uc);
+       uc_is_print (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test for any printing character that is one of a locale-specific set of
    characters for which neither 'uc_is_space' nor 'uc_is_alnum' is true.  */
 extern bool
-       uc_is_punct (ucs4_t uc);
+       uc_is_punct (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test for any character that corresponds to a locale-specific set of
    characters for which none of 'uc_is_alnum', 'uc_is_graph', or 'uc_is_punct'
    is true.  */
 extern bool
-       uc_is_space (ucs4_t uc);
+       uc_is_space (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test for any character that corresponds to an uppercase letter or is one
    of a locale-specific set of character for which none of 'uc_is_cntrl',
    'uc_is_digit', 'uc_is_punct', or 'uc_is_space' is true.  */
 extern bool
-       uc_is_upper (ucs4_t uc);
+       uc_is_upper (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* Test for any character that corresponds to a hexadecimal-digit
    character.  */
 extern bool
-       uc_is_xdigit (ucs4_t uc);
+       uc_is_xdigit (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* GNU extension. */
 /* Test for any character that corresponds to a standard blank character or
    a locale-specific set of characters for which 'uc_is_alnum' is false.  */
 extern bool
-       uc_is_blank (ucs4_t uc);
+       uc_is_blank (ucs4_t uc)
+       _UC_ATTRIBUTE_CONST;
 
 /* ========================================================================= */
 
