@@ -1,18 +1,18 @@
 /* Exporting symbols from Cygwin shared libraries.
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2011-2012 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
+   it under the terms of the GNU Lesser General Public License as published by
    the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* There are four ways to build shared libraries on Cygwin:
@@ -87,14 +87,18 @@
    Note: --export-all-symbols is the default when no other symbol is explicitly
    exported.  This means, the use of an explicit export on the variables has
    the effect of no longer exporting the functions! - until the option
-   --export-all-symbols is used.  */
+   --export-all-symbols is used.
+
+   See <http://www.haible.de/bruno/woe32dll.html> for more details.  */
+
+#if defined __GNUC__ /* GCC compiler, GNU toolchain */
 
  /* IMP(x) is a symbol that contains the address of x.  */
-#define IMP(x) _imp__##x
+# define IMP(x) _imp__##x
 
  /* Ensure that the variable x is exported from the library, and that a
     pseudo-variable IMP(x) is available.  */
-#define VARIABLE(x) \
+# define VARIABLE(x) \
  /* Export x without redefining x.  This code was found by compiling a  \
     snippet:                                                            \
       extern __declspec(dllexport) int x; int x = 42;  */               \
@@ -104,3 +108,9 @@
  /* Allocate a pseudo-variable IMP(x).  */                              \
  extern int x;                                                          \
  void * IMP(x) = &x;
+
+#else /* non-GNU compiler, non-GNU toolchain */
+
+# define VARIABLE(x) /* nothing */
+
+#endif

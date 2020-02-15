@@ -1,20 +1,28 @@
 /* Determine a canonical name for the current locale's character encoding.
 
-   Copyright (C) 2000-2006, 2008-2010 Free Software Foundation, Inc.
+   Copyright (C) 2000-2006, 2008-2018 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public License along
-   with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>.  */
 
@@ -30,11 +38,12 @@
 #include <stdlib.h>
 
 #if defined __APPLE__ && defined __MACH__ && HAVE_LANGINFO_CODESET
-# define DARWIN7 /* Darwin 7 or newer, i.e. MacOS X 10.3 or newer */
+# define DARWIN7 /* Darwin 7 or newer, i.e. Mac OS X 10.3 or newer */
 #endif
 
-#if defined _WIN32 || defined __WIN32__
-# define WIN32_NATIVE
+#if defined _WIN32 && !defined __CYGWIN__
+# define WINDOWS_NATIVE
+# include <locale.h>
 #endif
 
 #if defined __EMX__
@@ -44,7 +53,7 @@
 # endif
 #endif
 
-#if !defined WIN32_NATIVE
+#if !defined WINDOWS_NATIVE
 # include <unistd.h>
 # if HAVE_LANGINFO_CODESET
 #  include <langinfo.h>
@@ -57,7 +66,7 @@
 #  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 # endif
-#elif defined WIN32_NATIVE
+#elif defined WINDOWS_NATIVE
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 #endif
@@ -66,10 +75,16 @@
 # include <os2.h>
 #endif
 
+/* For MB_CUR_MAX_L */
+#if defined DARWIN7
+# include <xlocale.h>
+#endif
+
 #if ENABLE_RELOCATABLE
 # include "relocatable.h"
 #else
 # define relocate(pathname) (pathname)
+# define relocate2(pathname,allocatedp) (*(allocatedp) = NULL, (pathname))
 #endif
 
 /* Get LIBDIR.  */
@@ -82,8 +97,8 @@
 # define O_NOFOLLOW 0
 #endif
 
-#if defined _WIN32 || defined __WIN32__ || defined __CYGWIN__ || defined __EMX__ || defined __DJGPP__
-  /* Win32, Cygwin, OS/2, DOS */
+#if defined _WIN32 || defined __CYGWIN__ || defined __EMX__ || defined __DJGPP__
+  /* Native Windows, Cygwin, OS/2, DOS */
 # define ISSLASH(C) ((C) == '/' || (C) == '\\')
 #endif
 
@@ -123,7 +138,8 @@ get_charset_aliases (void)
   cp = charset_aliases;
   if (cp == NULL)
     {
-#if !(defined DARWIN7 || defined VMS || defined WIN32_NATIVE || defined __CYGWIN__)
+#if !(defined DARWIN7 || defined VMS || defined WINDOWS_NATIVE || defined __CYGWIN__ || defined OS2)
+      char *malloc_dir = NULL;
       const char *dir;
       const char *base = "charset.alias";
       char *file_name;
@@ -132,7 +148,7 @@ get_charset_aliases (void)
          necessary for running the testsuite before "make install".  */
       dir = getenv ("CHARSETALIASDIR");
       if (dir == NULL || dir[0] == '\0')
-        dir = relocate (LIBDIR);
+        dir = relocate2 (LIBDIR, &malloc_dir);
 
       /* Concatenate dir and base into freshly allocated file_name.  */
       {
@@ -148,6 +164,8 @@ get_charset_aliases (void)
             memcpy (file_name + dir_len + add_slash, base, base_len + 1);
           }
       }
+
+      free (malloc_dir);
 
       if (file_name == NULL)
         /* Out of memory.  Treat the file as empty.  */
@@ -228,8 +246,7 @@ get_charset_aliases (void)
                         {
                           /* Out of memory. */
                           res_size = 0;
-                          if (old_res_ptr != NULL)
-                            free (old_res_ptr);
+                          free (old_res_ptr);
                           break;
                         }
                       strcpy (res_ptr + res_size - (l2 + 1) - (l1 + 1), buf1);
@@ -254,8 +271,10 @@ get_charset_aliases (void)
 # if defined DARWIN7
       /* To avoid the trouble of installing a file that is shared by many
          GNU packages -- many packaging systems have problems with this --,
-         simply inline the aliases here.  */
-      cp = "ISO8859-1" "\0" "ISO-8859-1" "\0"
+         simply inline the aliases here.
+         For speed, map the most frequent case first.  */
+      cp = "UTF-8" "\0" "UTF-8" "\0"
+           "ISO8859-1" "\0" "ISO-8859-1" "\0"
            "ISO8859-2" "\0" "ISO-8859-2" "\0"
            "ISO8859-4" "\0" "ISO-8859-4" "\0"
            "ISO8859-5" "\0" "ISO-8859-5" "\0"
@@ -309,7 +328,7 @@ get_charset_aliases (void)
            "DECKOREAN" "\0" "EUC-KR" "\0";
 # endif
 
-# if defined WIN32_NATIVE || defined __CYGWIN__
+# if defined WINDOWS_NATIVE || defined __CYGWIN__
       /* To avoid the troubles of installing a separate file in the same
          directory as the DLL and of retrieving the DLL's directory at
          runtime, simply inline the aliases here.  */
@@ -338,6 +357,36 @@ get_charset_aliases (void)
            "CP54936" "\0" "GB18030" "\0"
            "CP65001" "\0" "UTF-8" "\0";
 # endif
+# if defined OS2
+      /* To avoid the troubles of installing a separate file in the same
+         directory as the DLL and of retrieving the DLL's directory at
+         runtime, simply inline the aliases here.  */
+
+      /* The list of encodings is taken from "List of OS/2 Codepages"
+         by Alex Taylor:
+         <http://altsan.org/os2/toolkits/uls/index.html#codepages>.
+         See also "IBM Globalization - Code page identifiers":
+         <https://www-01.ibm.com/software/globalization/cp/cp_cpgid.html>.  */
+      cp = "CP813" "\0" "ISO-8859-7" "\0"
+           "CP878" "\0" "KOI8-R" "\0"
+           "CP819" "\0" "ISO-8859-1" "\0"
+           "CP912" "\0" "ISO-8859-2" "\0"
+           "CP913" "\0" "ISO-8859-3" "\0"
+           "CP914" "\0" "ISO-8859-4" "\0"
+           "CP915" "\0" "ISO-8859-5" "\0"
+           "CP916" "\0" "ISO-8859-8" "\0"
+           "CP920" "\0" "ISO-8859-9" "\0"
+           "CP921" "\0" "ISO-8859-13" "\0"
+           "CP923" "\0" "ISO-8859-15" "\0"
+           "CP954" "\0" "EUC-JP" "\0"
+           "CP964" "\0" "EUC-TW" "\0"
+           "CP970" "\0" "EUC-KR" "\0"
+           "CP1089" "\0" "ISO-8859-6" "\0"
+           "CP1208" "\0" "UTF-8" "\0"
+           "CP1381" "\0" "GB2312" "\0"
+           "CP1386" "\0" "GBK" "\0"
+           "CP3372" "\0" "EUC-JP" "\0";
+# endif
 #endif
 
       charset_aliases = cp;
@@ -361,7 +410,7 @@ locale_charset (void)
   const char *codeset;
   const char *aliases;
 
-#if !(defined WIN32_NATIVE || defined OS2)
+#if !(defined WINDOWS_NATIVE || defined OS2)
 
 # if HAVE_LANGINFO_CODESET
 
@@ -369,10 +418,9 @@ locale_charset (void)
   codeset = nl_langinfo (CODESET);
 
 #  ifdef __CYGWIN__
-  /* Cygwin 1.5.x does not have locales.  nl_langinfo (CODESET) always
-     returns "US-ASCII".  As long as this is not fixed, return the suffix
-     of the locale name from the environment variables (if present) or
-     the codepage as a number.  */
+  /* Cygwin < 1.7 does not have locales.  nl_langinfo (CODESET) always
+     returns "US-ASCII".  Return the suffix of the locale name from the
+     environment variables (if present) or the codepage as a number.  */
   if (codeset != NULL && strcmp (codeset, "US-ASCII") == 0)
     {
       const char *locale;
@@ -409,10 +457,10 @@ locale_charset (void)
             }
         }
 
-      /* Woe32 has a function returning the locale's codepage as a number:
-         GetACP().  This encoding is used by Cygwin, unless the user has set
-         the environment variable CYGWIN=codepage:oem (which very few people
-         do).
+      /* The Windows API has a function returning the locale's codepage as a
+         number: GetACP().  This encoding is used by Cygwin, unless the user
+         has set the environment variable CYGWIN=codepage:oem (which very few
+         people do).
          Output directed to console windows needs to be converted (to
          GetOEMCP() if the console is using a raster font, or to
          GetConsoleOutputCP() if it is using a TrueType font).  Cygwin does
@@ -455,18 +503,38 @@ locale_charset (void)
 
 # endif
 
-#elif defined WIN32_NATIVE
+#elif defined WINDOWS_NATIVE
 
   static char buf[2 + 10 + 1];
 
-  /* Woe32 has a function returning the locale's codepage as a number:
-     GetACP().
-     When the output goes to a console window, it needs to be provided in
-     GetOEMCP() encoding if the console is using a raster font, or in
-     GetConsoleOutputCP() encoding if it is using a TrueType font.
-     But in GUI programs and for output sent to files and pipes, GetACP()
-     encoding is the best bet.  */
-  sprintf (buf, "CP%u", GetACP ());
+  /* The Windows API has a function returning the locale's codepage as
+     a number, but the value doesn't change according to what the
+     'setlocale' call specified.  So we use it as a last resort, in
+     case the string returned by 'setlocale' doesn't specify the
+     codepage.  */
+  char *current_locale = setlocale (LC_ALL, NULL);
+  char *pdot;
+
+  /* If they set different locales for different categories,
+     'setlocale' will return a semi-colon separated list of locale
+     values.  To make sure we use the correct one, we choose LC_CTYPE.  */
+  if (strchr (current_locale, ';'))
+    current_locale = setlocale (LC_CTYPE, NULL);
+
+  pdot = strrchr (current_locale, '.');
+  if (pdot && 2 + strlen (pdot + 1) + 1 <= sizeof (buf))
+    sprintf (buf, "CP%s", pdot + 1);
+  else
+    {
+      /* The Windows API has a function returning the locale's codepage as a
+        number: GetACP().
+        When the output goes to a console window, it needs to be provided in
+        GetOEMCP() encoding if the console is using a raster font, or in
+        GetConsoleOutputCP() encoding if it is using a TrueType font.
+        But in GUI programs and for output sent to files and pipes, GetACP()
+        encoding is the best bet.  */
+      sprintf (buf, "CP%u", GetACP ());
+    }
   codeset = buf;
 
 #elif defined OS2
@@ -475,6 +543,8 @@ locale_charset (void)
   static char buf[2 + 10 + 1];
   ULONG cp[3];
   ULONG cplen;
+
+  codeset = NULL;
 
   /* Allow user to override the codeset, as set in the operating system,
      with standard language environment variables.  */
@@ -507,10 +577,12 @@ locale_charset (void)
             }
         }
 
-      /* Resolve through the charset.alias file.  */
-      codeset = locale;
+      /* For the POSIX locale, don't use the system's codepage.  */
+      if (strcmp (locale, "C") == 0 || strcmp (locale, "POSIX") == 0)
+        codeset = "";
     }
-  else
+
+  if (codeset == NULL)
     {
       /* OS/2 has a function returning the locale's codepage as a number.  */
       if (DosQueryCp (sizeof (cp), cp, &cplen))
@@ -544,6 +616,13 @@ locale_charset (void)
      thus GNU libiconv would call this function a second time.  */
   if (codeset[0] == '\0')
     codeset = "ASCII";
+
+#ifdef DARWIN7
+  /* Mac OS X sets MB_CUR_MAX to 1 when LC_ALL=C, and "UTF-8"
+     (the default codeset) does not work when MB_CUR_MAX is 1.  */
+  if (strcmp (codeset, "UTF-8") == 0 && MB_CUR_MAX_L (uselocale (NULL)) <= 1)
+    codeset = "ASCII";
+#endif
 
   return codeset;
 }

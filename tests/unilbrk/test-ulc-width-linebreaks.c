@@ -1,5 +1,5 @@
 /* Test of line breaking of strings.
-   Copyright (C) 2008-2010 Free Software Foundation, Inc.
+   Copyright (C) 2008-2018 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2008.  */
 
@@ -42,7 +42,7 @@ main ()
     for (i = 0; i < 36; i++)
       {
         ASSERT (p[i] == (i == 35 ? UC_BREAK_MANDATORY :
-                         i == 11 || i == 21 || i == 31 ? UC_BREAK_POSSIBLE :
+                         i == 11 || i == 16 || i == 31 ? UC_BREAK_POSSIBLE :
                          UC_BREAK_PROHIBITED));
       }
     free (p);

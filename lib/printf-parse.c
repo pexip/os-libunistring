@@ -1,19 +1,27 @@
 /* Formatted output to strings.
-   Copyright (C) 1999-2000, 2002-2003, 2006-2010 Free Software Foundation, Inc.
+   Copyright (C) 1999-2000, 2002-2003, 2006-2018 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public License along
-   with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 /* This file can be parametrized with the following macros:
      CHAR_T             The element type of the format string.
@@ -63,6 +71,9 @@
 /* malloc(), realloc(), free().  */
 #include <stdlib.h>
 
+/* memcpy().  */
+#include <string.h>
+
 /* errno.  */
 #include <errno.h>
 
@@ -80,23 +91,20 @@ STATIC
 int
 PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
 {
-  const CHAR_T *cp = format;            /* pointer into format */
+  const CHAR_T *cp = format;    /* pointer into format */
   size_t arg_posn = 0;          /* number of regular arguments consumed */
-  size_t d_allocated;                   /* allocated elements of d->dir */
-  size_t a_allocated;                   /* allocated elements of a->arg */
+  size_t d_allocated;           /* allocated elements of d->dir */
+  size_t a_allocated;           /* allocated elements of a->arg */
   size_t max_width_length = 0;
   size_t max_precision_length = 0;
 
   d->count = 0;
-  d_allocated = 1;
-  d->dir = (DIRECTIVE *) malloc (d_allocated * sizeof (DIRECTIVE));
-  if (d->dir == NULL)
-    /* Out of memory.  */
-    goto out_of_memory_1;
+  d_allocated = N_DIRECT_ALLOC_DIRECTIVES;
+  d->dir = d->direct_alloc_dir;
 
   a->count = 0;
-  a_allocated = 0;
-  a->arg = NULL;
+  a_allocated = N_DIRECT_ALLOC_ARGUMENTS;
+  a->arg = a->direct_alloc_arg;
 
 #define REGISTER_ARG(_index_,_type_) \
   {                                                                     \
@@ -113,12 +121,14 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
         if (size_overflow_p (memory_size))                              \
           /* Overflow, would lead to out of memory.  */                 \
           goto out_of_memory;                                           \
-        memory = (argument *) (a->arg                                   \
+        memory = (argument *) (a->arg != a->direct_alloc_arg            \
                                ? realloc (a->arg, memory_size)          \
                                : malloc (memory_size));                 \
         if (memory == NULL)                                             \
           /* Out of memory.  */                                         \
           goto out_of_memory;                                           \
+        if (a->arg == a->direct_alloc_arg)                              \
+          memcpy (memory, a->arg, a->count * sizeof (argument));        \
         a->arg = memory;                                                \
       }                                                                 \
     while (a->count <= n)                                               \
@@ -206,6 +216,13 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
                   dp->flags |= FLAG_ZERO;
                   cp++;
                 }
+#if __GLIBC__ >= 2 && !defined __UCLIBC__
+              else if (*cp == 'I')
+                {
+                  dp->flags |= FLAG_LOCALIZED;
+                  cp++;
+                }
+#endif
               else
                 break;
             }
@@ -393,7 +410,7 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
                       cp++;
                     }
 #if defined __APPLE__ && defined __MACH__
-                  /* On MacOS X 10.3, PRIdMAX is defined as "qd".
+                  /* On Mac OS X 10.3, PRIdMAX is defined as "qd".
                      We cannot change it to "lld" because PRIdMAX must also
                      be understood by the system's printf routines.  */
                   else if (*cp == 'q')
@@ -411,8 +428,8 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
                       cp++;
                     }
 #endif
-#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
-                  /* On native Win32, PRIdMAX is defined as "I64d".
+#if defined _WIN32 && ! defined __CYGWIN__
+                  /* On native Windows, PRIdMAX is defined as "I64d".
                      We cannot change it to "lld" because PRIdMAX must also
                      be understood by the system's printf routines.  */
                   else if (*cp == 'I' && cp[1] == '6' && cp[2] == '4')
@@ -581,10 +598,14 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
               if (size_overflow_p (memory_size))
                 /* Overflow, would lead to out of memory.  */
                 goto out_of_memory;
-              memory = (DIRECTIVE *) realloc (d->dir, memory_size);
+              memory = (DIRECTIVE *) (d->dir != d->direct_alloc_dir
+                                      ? realloc (d->dir, memory_size)
+                                      : malloc (memory_size));
               if (memory == NULL)
                 /* Out of memory.  */
                 goto out_of_memory;
+              if (d->dir == d->direct_alloc_dir)
+                memcpy (memory, d->dir, d->count * sizeof (DIRECTIVE));
               d->dir = memory;
             }
         }
@@ -603,19 +624,18 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
   return 0;
 
 error:
-  if (a->arg)
+  if (a->arg != a->direct_alloc_arg)
     free (a->arg);
-  if (d->dir)
+  if (d->dir != d->direct_alloc_dir)
     free (d->dir);
   errno = EINVAL;
   return -1;
 
 out_of_memory:
-  if (a->arg)
+  if (a->arg != a->direct_alloc_arg)
     free (a->arg);
-  if (d->dir)
+  if (d->dir != d->direct_alloc_dir)
     free (d->dir);
-out_of_memory_1:
   errno = ENOMEM;
   return -1;
 }

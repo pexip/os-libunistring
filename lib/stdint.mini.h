@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2002, 2004-2009 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2002, 2004-2010 Free Software Foundation, Inc.
    Written by Paul Eggert, Bruno Haible, Sam Steingold, Peter Burwood.
    This file is part of gnulib.
 
@@ -13,8 +13,7 @@
    GNU Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
 
 /*
  * Subset of ISO C 99 <stdint.h> for platforms that lack it.
@@ -121,7 +120,6 @@ typedef unsigned int unistring_uint32_t;
 /* Avoid collision with Solaris 2.5.1 <pthread.h> etc.  */
 #define _UINT8_T
 #define _UINT32_T
-#define _UINT64_T
 
 
 #endif /* _UNISTRING_STDINT_H */

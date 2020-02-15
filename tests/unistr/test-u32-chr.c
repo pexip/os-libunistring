@@ -1,5 +1,5 @@
 /* Test of u32_chr() function.
-   Copyright (C) 2010 Free Software Foundation, Inc.
+   Copyright (C) 2010-2018 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2010.  */
 
@@ -21,11 +21,14 @@
 #include "unistr.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "zerosize-ptr.h"
 #include "macros.h"
 
 #define UNIT uint32_t
+#define U_UCTOMB(s, uc, n) (*(s) = (uc), 1)
+#define U32_TO_U(s, n, result, length) (*(length) = (n), (s))
 #define U_CHR u32_chr
 #define U_SET u32_set
 #include "test-chr.h"

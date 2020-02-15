@@ -1,6 +1,6 @@
 # Version number and release date.
-VERSION_NUMBER=0.9.3
-RELEASE_DATE=2010-05-02      # in "date +%Y-%m-%d" format
+VERSION_NUMBER=0.9.10
+RELEASE_DATE=2018-05-17      # in "date +%Y-%m-%d" format
 
 # Version of gnulib that was used in this release.
-GNULIB_GIT_COMMIT=28f3679a51f29cdaa8cb6c8211fa6ecaad3a852c
+GNULIB_GIT_COMMIT=b35c22af02271c8dd9844b98db17702b8bf2bd93

@@ -4,7 +4,7 @@
 # also regenerates all aclocal.m4, config.h.in, Makefile.in, configure files
 # with new versions of autoconf or automake.
 #
-# This script requires autoconf-2.63 and automake-1.11 in the PATH.
+# This script requires autoconf-2.63..2.69 and automake-1.11..1.16 in the PATH.
 # It also requires either
 #   - the GNULIB_TOOL environment variable pointing to the gnulib-tool script
 #     in a gnulib checkout, or
@@ -12,7 +12,7 @@
 # It also requires
 #   - the gperf program.
 
-# Copyright (C) 2003-2009 Free Software Foundation, Inc.
+# Copyright (C) 2003-2018 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,6 +43,8 @@ while :; do
   esac
 done
 
+TEXINFO_VERSION=4.13
+
 if test $skip_gnulib = false; then
   # texinfo.tex
   # The most recent snapshot of it is available in the gnulib repository.
@@ -51,7 +53,7 @@ if test $skip_gnulib = false; then
   # but that is too old (does not support @arrow{}). So take the version which
   # matches the latest stable texinfo release.
   if test ! -f build-aux/texinfo.tex; then
-    { wget -q --timeout=5 -O build-aux/texinfo.tex.tmp 'http://cvs.savannah.gnu.org/viewvc/*checkout*/texinfo/doc/texinfo.tex?root=texinfo&pathrev=texinfo_4_13' \
+    { wget -q --timeout=5 -O build-aux/texinfo.tex.tmp 'http://cvs.savannah.gnu.org/viewvc/*checkout*/texinfo/doc/texinfo.tex?root=texinfo&pathrev=texinfo_'`echo $TEXINFO_VERSION | sed -e 's/[.]/_/g'` \
         && mv build-aux/texinfo.tex.tmp build-aux/texinfo.tex; \
     } || rm -f build-aux/texinfo.tex.tmp
   fi
@@ -71,12 +73,6 @@ if test $skip_gnulib = false; then
   fi
   # Skip the gnulib-tool step if gnulib-tool was not found.
   if test -n "$GNULIB_TOOL"; then
-    if test -f m4/gnulib-cache.m4; then
-      mv -f m4/gnulib-cache.m4 m4/gnulib-cache.m4~
-    fi
-    if test -f lib/Makefile.gnulib; then
-      mv -f lib/Makefile.gnulib lib/Makefile.gnulib~
-    fi
     GNULIB_MODULES='
       unitypes
       unistr/base
@@ -284,10 +280,10 @@ if test $skip_gnulib = false; then
       uniname/base
       uniname/uniname
       unictype/base
-      unictype/bidicategory-all
+      unictype/bidiclass-all
       unictype/block-all
       unictype/category-all
-      unictype/combining-class
+      unictype/combining-class-all
       unictype/ctype-alnum
       unictype/ctype-alpha
       unictype/ctype-blank
@@ -302,6 +298,8 @@ if test $skip_gnulib = false; then
       unictype/ctype-xdigit
       unictype/decimal-digit
       unictype/digit
+      unictype/joininggroup-all
+      unictype/joiningtype-all
       unictype/mirror
       unictype/numeric
       unictype/property-all
@@ -318,6 +316,20 @@ if test $skip_gnulib = false; then
       uniwidth/u32-strwidth
       uniwidth/u32-width
       uniwidth/width
+      unigbrk/base
+      unigbrk/u8-grapheme-breaks
+      unigbrk/u8-grapheme-next
+      unigbrk/u8-grapheme-prev
+      unigbrk/u16-grapheme-breaks
+      unigbrk/u16-grapheme-next
+      unigbrk/u16-grapheme-prev
+      unigbrk/u32-grapheme-breaks
+      unigbrk/u32-grapheme-next
+      unigbrk/u32-grapheme-prev
+      unigbrk/uc-gbrk-prop
+      unigbrk/uc-is-grapheme-break
+      unigbrk/ulc-grapheme-breaks
+      unigbrk/uc-grapheme-breaks
       uniwbrk/base
       uniwbrk/u8-wordbreaks
       uniwbrk/u16-wordbreaks
@@ -374,6 +386,8 @@ if test $skip_gnulib = false; then
       unicase/u8-is-lowercase
       unicase/u8-is-titlecase
       unicase/u8-is-uppercase
+      unicase/u8-prefix-context
+      unicase/u8-suffix-context
       unicase/u8-tolower
       unicase/u8-totitle
       unicase/u8-toupper
@@ -390,6 +404,8 @@ if test $skip_gnulib = false; then
       unicase/u16-is-lowercase
       unicase/u16-is-titlecase
       unicase/u16-is-uppercase
+      unicase/u16-prefix-context
+      unicase/u16-suffix-context
       unicase/u16-tolower
       unicase/u16-totitle
       unicase/u16-toupper
@@ -406,6 +422,8 @@ if test $skip_gnulib = false; then
       unicase/u32-is-lowercase
       unicase/u32-is-titlecase
       unicase/u32-is-uppercase
+      unicase/u32-prefix-context
+      unicase/u32-suffix-context
       unicase/u32-tolower
       unicase/u32-totitle
       unicase/u32-toupper
@@ -415,28 +433,29 @@ if test $skip_gnulib = false; then
       relocatable-lib-lgpl
     '
     $GNULIB_TOOL --lib=libunistring --source-base=lib --m4-base=gnulib-m4 --tests-base=tests \
-      --with-tests --lgpl --makefile-name=Makefile.gnulib --libtool --local-dir=gnulib-local \
+      --with-tests --lgpl=3orGPLv2 --makefile-name=Makefile.gnulib --libtool --local-dir=gnulib-local \
       --import $GNULIB_MODULES
     # Change lib/unistr.h to be usable standalone.
-    sed -e 's/ifdef GNULIB_[A-Za-z0-9_]*/if 1/' -e 's/defined GNULIB_[A-Za-z0-9_]*/1/g' \
+    sed -e 's/if GNULIB_[A-Za-z0-9_]* || .*/if 1/g' \
+        -e 's/if GNULIB_[A-Za-z0-9_]*/if 1/g' \
         -e 's/HAVE_INLINE/UNISTRING_HAVE_INLINE/g' \
-        < lib/unistr.h \
-        > lib/unistr.h.tmp \
-    && mv lib/unistr.h.tmp lib/unistr.h
+        < lib/unistr.in.h \
+        > lib/unistr.in.h.tmp \
+    && mv lib/unistr.in.h.tmp lib/unistr.in.h
     # Change lib/unictype.h and lib/uninorm.h for shared libraries on Woe32 systems.
     sed -e 's/extern const uc_general_category_t UC_/extern LIBUNISTRING_DLL_VARIABLE const uc_general_category_t UC_/' \
         -e 's/extern const uc_property_t UC_/extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_/' \
-        < lib/unictype.h \
-        > lib/unictype.h.tmp \
-    && mv lib/unictype.h.tmp lib/unictype.h
+        < lib/unictype.in.h \
+        > lib/unictype.in.h.tmp \
+    && mv lib/unictype.in.h.tmp lib/unictype.in.h
     sed -e 's/extern const struct unicode_normalization_form /extern LIBUNISTRING_DLL_VARIABLE const struct unicode_normalization_form /' \
-        < lib/uninorm.h \
-        > lib/uninorm.h.tmp \
-    && mv lib/uninorm.h.tmp lib/uninorm.h
+        < lib/uninorm.in.h \
+        > lib/uninorm.in.h.tmp \
+    && mv lib/uninorm.in.h.tmp lib/uninorm.in.h
     sed -e 's/extern const casing_/extern LIBUNISTRING_DLL_VARIABLE const casing_/' \
-        < lib/unicase.h \
-        > lib/unicase.h.tmp \
-    && mv lib/unicase.h.tmp lib/unicase.h
+        < lib/unicase.in.h \
+        > lib/unicase.in.h.tmp \
+    && mv lib/unicase.in.h.tmp lib/unicase.in.h
     $GNULIB_TOOL --copy-file build-aux/config.guess; chmod a+x build-aux/config.guess
     $GNULIB_TOOL --copy-file build-aux/config.sub;   chmod a+x build-aux/config.sub
     # If we got no texinfo.tex so far, take the snapshot from gnulib.
@@ -449,4 +468,8 @@ fi
 build-aux/fixaclocal aclocal -I m4 -I gnulib-m4
 autoconf
 autoheader && touch config.h.in
+# Make sure we get new versions of files brought in by automake.
+(cd build-aux && rm -f ar-lib compile depcomp install-sh mdate-sh missing test-driver)
 automake --add-missing --copy
+# Get rid of autom4te.cache directory.
+rm -rf autom4te.cache
