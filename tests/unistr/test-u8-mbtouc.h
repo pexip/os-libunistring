@@ -1,5 +1,5 @@
 /* Test of u8_mbtouc() and u8_mbtouc_unsafe() functions.
-   Copyright (C) 2010 Free Software Foundation, Inc.
+   Copyright (C) 2010-2018 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2010.  */
 
@@ -166,14 +166,14 @@ test_function (int (*my_u8_mbtouc) (ucs4_t *, const uint8_t *, size_t))
     static const uint8_t input[] = { 0xF3, 0xD0, 0xBF };
     uc = 0xBADFACE;
     ret = my_u8_mbtouc (&uc, input, 3);
-    ASSERT (ret == 1 || ret == 3);
+    ASSERT (ret == 1);
     ASSERT (uc == 0xFFFD);
   }
   {
     static const uint8_t input[] = { 0xF3, 0x8F, 0xD0 };
     uc = 0xBADFACE;
     ret = my_u8_mbtouc (&uc, input, 3);
-    ASSERT (ret == 1 || ret == 3);
+    ASSERT (ret == 2);
     ASSERT (uc == 0xFFFD);
   }
 }

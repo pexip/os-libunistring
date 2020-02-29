@@ -11,6 +11,7 @@ It consists of the following parts:
   uniname.h    character names
   unictype.h   character classification and properties
   uniwidth.h   string width when using nonproportional fonts
+  unigbrk.h    grapheme cluster breaks
   uniwbrk.h    word breaks
   unilbrk.h    line breaking algorithm
   uninorm.h    normalization (composition and decomposition)
@@ -36,7 +37,7 @@ Installation
 
 As usual for GNU packages:
 
-    $ ./configure --prefix=/usr/local
+    $ ./configure --prefix=[[PREFIX]]     where [[PREFIX]] is e.g. $HOME/local
     $ make
     $ make install
 
@@ -44,8 +45,22 @@ As usual for GNU packages:
 Copyright
 ---------
 
-The libunistring library and its header files are under the GNU LGPL, see
-file COPYING.LIB.  This license is based on the GNU GPL, see file COPYING.
+The libunistring library and its header files are dual-licensed under
+"the GNU LGPLv3+ or the GNU GPLv2". This means, you can use it under either
+  - the terms of the GNU Lesser General Public License (LGPL) version 3 or
+    (at your option) any later version, or
+  - the terms of the GNU General Public License (GPL) version 2, or
+  - the same dual license "the GNU LGPLv3+ or the GNU GPLv2".
+
+You find the GNU LGPL version 3 in the file COPYING.LIB.  This license is
+based on the GNU GPL version 3, see file COPYING.
+
+You can find the GNU GPL version 2 at
+<https://www.gnu.org/licenses/old-licenses/gpl-2.0.html>.
+
+Note: This dual license makes it possible for the libunistring library
+to be used by packages under GPLv2 or GPLv2+ licenses, in particular. See
+the table in <https://www.gnu.org/licenses/gpl-faq.html#AllCompatibility>.
 
 The documentation is under another license; see in the documentation.
 
@@ -53,12 +68,12 @@ The documentation is under another license; see in the documentation.
 Download
 --------
 
-    http://ftp.gnu.org/gnu/libunistring/libunistring-0.9.3.tar.gz
+    https://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.gz
 
 Homepage
 --------
 
-    http://www.gnu.org/software/libunistring/
+    https://www.gnu.org/software/libunistring/
 
 Bug reports to
 --------------

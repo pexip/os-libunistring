@@ -1,19 +1,27 @@
 /* vsprintf with automatic memory allocation.
-   Copyright (C) 1999, 2002-2010 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002-2018 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public License along
-   with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   You should have received a copy of the GNU General Public License along
+   with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 /* This file can be parametrized with the following macros:
      VASNPRINTF         The name of the function being defined.
@@ -88,6 +96,8 @@
 /* Checked size_t computations.  */
 #include "xsize.h"
 
+#include "verify.h"
+
 #if (NEED_PRINTF_DOUBLE || NEED_PRINTF_LONG_DOUBLE) && !defined IN_LIBINTL
 # include <math.h>
 # include "float+.h"
@@ -115,6 +125,14 @@
 # include "isnanl-nolibm.h"
 # include "printf-frexpl.h"
 # include "fpucw.h"
+#endif
+
+#ifndef FALLTHROUGH
+# if __GNUC__ < 7
+#  define FALLTHROUGH ((void) 0)
+# else
+#  define FALLTHROUGH __attribute__ ((__fallthrough__))
+# endif
 #endif
 
 /* Default parameters.  */
@@ -155,6 +173,7 @@
 #   define SNPRINTF snwprintf
 #  else
 #   define SNPRINTF _snwprintf
+#   define USE_MSVC__SNPRINTF 1
 #  endif
 # else
    /* Unix.  */
@@ -180,7 +199,9 @@
     /* Here we need to call the native snprintf, not rpl_snprintf.  */
 #   undef snprintf
 #  else
+    /* MSVC versions < 14 did not have snprintf, only _snprintf.  */
 #   define SNPRINTF _snprintf
+#   define USE_MSVC__SNPRINTF 1
 #  endif
 # else
    /* Unix.  */
@@ -194,7 +215,7 @@
 
 /* GCC >= 4.0 with -Wall emits unjustified "... may be used uninitialized"
    warnings in this file.  Use -Dlint to suppress them.  */
-#ifdef lint
+#if defined GCC_LINT || defined lint
 # define IF_LINT(Code) Code
 #else
 # define IF_LINT(Code) /* empty */
@@ -207,7 +228,7 @@
 #undef remainder
 #define remainder rem
 
-#if (!USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99) && !WIDE_CHAR_VERSION
+#if (!USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || USE_MSVC__SNPRINTF) && !WIDE_CHAR_VERSION
 # if (HAVE_STRNLEN && !defined _AIX)
 #  define local_strnlen strnlen
 # else
@@ -223,7 +244,7 @@ local_strnlen (const char *string, size_t maxlen)
 # endif
 #endif
 
-#if (((!USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99) && WIDE_CHAR_VERSION) || ((!USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || (NEED_PRINTF_DIRECTIVE_LS && !defined IN_LIBINTL)) && !WIDE_CHAR_VERSION && DCHAR_IS_TCHAR)) && HAVE_WCHAR_T
+#if (((!USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || USE_MSVC__SNPRINTF) && WIDE_CHAR_VERSION) || ((!USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || USE_MSVC__SNPRINTF || (NEED_PRINTF_DIRECTIVE_LS && !defined IN_LIBINTL)) && !WIDE_CHAR_VERSION && DCHAR_IS_TCHAR)) && HAVE_WCHAR_T
 # if HAVE_WCSLEN
 #  define local_wcslen wcslen
 # else
@@ -246,7 +267,7 @@ local_wcslen (const wchar_t *s)
 # endif
 #endif
 
-#if (!USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99) && HAVE_WCHAR_T && WIDE_CHAR_VERSION
+#if (!USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || USE_MSVC__SNPRINTF) && HAVE_WCHAR_T && WIDE_CHAR_VERSION
 # if HAVE_WCSNLEN
 #  define local_wcsnlen wcsnlen
 # else
@@ -274,10 +295,10 @@ decimal_point_char (void)
 {
   const char *point;
   /* Determine it in a multithread-safe way.  We know nl_langinfo is
-     multithread-safe on glibc systems and MacOS X systems, but is not required
+     multithread-safe on glibc systems and Mac OS X systems, but is not required
      to be multithread-safe by POSIX.  sprintf(), however, is multithread-safe.
      localeconv() is rarely multithread-safe.  */
-#  if HAVE_NL_LANGINFO && (__GLIBC__ || (defined __APPLE__ && defined __MACH__))
+#  if HAVE_NL_LANGINFO && (__GLIBC__ || defined __UCLIBC__ || (defined __APPLE__ && defined __MACH__))
   point = nl_langinfo (RADIXCHAR);
 #  elif 1
   char pointbuf[5];
@@ -322,11 +343,11 @@ is_infinite_or_zerol (long double x)
 
 typedef unsigned int mp_limb_t;
 # define GMP_LIMB_BITS 32
-typedef int mp_limb_verify[2 * (sizeof (mp_limb_t) * CHAR_BIT == GMP_LIMB_BITS) - 1];
+verify (sizeof (mp_limb_t) * CHAR_BIT == GMP_LIMB_BITS);
 
 typedef unsigned long long mp_twolimb_t;
 # define GMP_TWOLIMB_BITS 64
-typedef int mp_twolimb_verify[2 * (sizeof (mp_twolimb_t) * CHAR_BIT == GMP_TWOLIMB_BITS) - 1];
+verify (sizeof (mp_twolimb_t) * CHAR_BIT == GMP_TWOLIMB_BITS);
 
 /* Representation of a bignum >= 0.  */
 typedef struct
@@ -551,32 +572,61 @@ divide (mpn_t a, mpn_t b, mpn_t *q)
       size_t s;
       {
         mp_limb_t msd = b_ptr[b_len - 1]; /* = b[n-1], > 0 */
-        s = 31;
-        if (msd >= 0x10000)
+        /* Determine s = GMP_LIMB_BITS - integer_length (msd).
+           Code copied from gnulib's integer_length.c.  */
+# if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)
+        s = __builtin_clz (msd);
+# else
+#  if defined DBL_EXPBIT0_WORD && defined DBL_EXPBIT0_BIT
+        if (GMP_LIMB_BITS <= DBL_MANT_BIT)
           {
-            msd = msd >> 16;
-            s -= 16;
+            /* Use 'double' operations.
+               Assumes an IEEE 754 'double' implementation.  */
+#   define DBL_EXP_MASK ((DBL_MAX_EXP - DBL_MIN_EXP) | 7)
+#   define DBL_EXP_BIAS (DBL_EXP_MASK / 2 - 1)
+#   define NWORDS \
+     ((sizeof (double) + sizeof (unsigned int) - 1) / sizeof (unsigned int))
+            union { double value; unsigned int word[NWORDS]; } m;
+
+            /* Use a single integer to floating-point conversion.  */
+            m.value = msd;
+
+            s = GMP_LIMB_BITS
+                - (((m.word[DBL_EXPBIT0_WORD] >> DBL_EXPBIT0_BIT) & DBL_EXP_MASK)
+                   - DBL_EXP_BIAS);
           }
-        if (msd >= 0x100)
+        else
+#   undef NWORDS
+#  endif
           {
-            msd = msd >> 8;
-            s -= 8;
+            s = 31;
+            if (msd >= 0x10000)
+              {
+                msd = msd >> 16;
+                s -= 16;
+              }
+            if (msd >= 0x100)
+              {
+                msd = msd >> 8;
+                s -= 8;
+              }
+            if (msd >= 0x10)
+              {
+                msd = msd >> 4;
+                s -= 4;
+              }
+            if (msd >= 0x4)
+              {
+                msd = msd >> 2;
+                s -= 2;
+              }
+            if (msd >= 0x2)
+              {
+                msd = msd >> 1;
+                s -= 1;
+              }
           }
-        if (msd >= 0x10)
-          {
-            msd = msd >> 4;
-            s -= 4;
-          }
-        if (msd >= 0x4)
-          {
-            msd = msd >> 2;
-            s -= 2;
-          }
-        if (msd >= 0x2)
-          {
-            msd = msd >> 1;
-            s -= 1;
-          }
+# endif
       }
       /* 0 <= s < GMP_LIMB_BITS.
          Copy b, shifting it left by s bits.  */
@@ -883,9 +933,9 @@ decode_long_double (long double x, int *ep, mpn_t *mp)
   y = frexpl (x, &exp);
   if (!(y >= 0.0L && y < 1.0L))
     abort ();
-  /* x = 2^exp * y = 2^(exp - LDBL_MANT_BIT) * (y * LDBL_MANT_BIT), and the
+  /* x = 2^exp * y = 2^(exp - LDBL_MANT_BIT) * (y * 2^LDBL_MANT_BIT), and the
      latter is an integer.  */
-  /* Convert the mantissa (y * LDBL_MANT_BIT) to a sequence of limbs.
+  /* Convert the mantissa (y * 2^LDBL_MANT_BIT) to a sequence of limbs.
      I'm not sure whether it's safe to cast a 'long double' value between
      2^31 and 2^32 to 'unsigned int', therefore play safe and cast only
      'long double' values between 0 and 2^16 (to 'unsigned int' or 'int',
@@ -933,11 +983,11 @@ decode_long_double (long double x, int *ep, mpn_t *mp)
         abort ();
       m.limbs[--i] = (hi << (GMP_LIMB_BITS / 2)) | lo;
     }
-#if 0 /* On FreeBSD 6.1/x86, 'long double' numbers sometimes have excess
-         precision.  */
+#  if 0 /* On FreeBSD 6.1/x86, 'long double' numbers sometimes have excess
+           precision.  */
   if (!(y == 0.0L))
     abort ();
-#endif
+#  endif
   /* Normalise.  */
   while (m.nlimbs > 0 && m.limbs[m.nlimbs - 1] == 0)
     m.nlimbs--;
@@ -971,9 +1021,9 @@ decode_double (double x, int *ep, mpn_t *mp)
   y = frexp (x, &exp);
   if (!(y >= 0.0 && y < 1.0))
     abort ();
-  /* x = 2^exp * y = 2^(exp - DBL_MANT_BIT) * (y * DBL_MANT_BIT), and the
+  /* x = 2^exp * y = 2^(exp - DBL_MANT_BIT) * (y * 2^DBL_MANT_BIT), and the
      latter is an integer.  */
-  /* Convert the mantissa (y * DBL_MANT_BIT) to a sequence of limbs.
+  /* Convert the mantissa (y * 2^DBL_MANT_BIT) to a sequence of limbs.
      I'm not sure whether it's safe to cast a 'double' value between
      2^31 and 2^32 to 'unsigned int', therefore play safe and cast only
      'double' values between 0 and 2^16 (to 'unsigned int' or 'int',
@@ -1487,7 +1537,7 @@ is_borderline (const char *digits, size_t precision)
 
 #endif
 
-#if !USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99
+#if !USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || USE_MSVC__SNPRINTF
 
 /* Use a different function name, to make it possible that the 'wchar_t'
    parametrization and the 'char' parametrization get compiled in the same
@@ -1500,7 +1550,7 @@ is_borderline (const char *digits, size_t precision)
 
 /* Returns the number of TCHAR_T units needed as temporary space for the result
    of sprintf or SNPRINTF of a single conversion directive.  */
-static inline size_t
+static size_t
 MAX_ROOM_NEEDED (const arguments *ap, size_t arg_index, FCHAR_T conversion,
                  arg_type type, int flags, size_t width, int has_precision,
                  size_t precision, int pad_ourselves)
@@ -1751,8 +1801,9 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
     return NULL;
 
 #define CLEANUP() \
-  free (d.dir);                                                         \
-  if (a.arg)                                                            \
+  if (d.dir != d.direct_alloc_dir)                                      \
+    free (d.dir);                                                       \
+  if (a.arg != a.direct_alloc_arg)                                      \
     free (a.arg);
 
   if (PRINTF_FETCHARGS (args, &a) < 0)
@@ -1855,7 +1906,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
             else
               {
                 do
-                  result[length++] = (unsigned char) *cp++;
+                  result[length++] = *cp++;
                 while (--n > 0);
               }
           }
@@ -1926,15 +1977,14 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                         if (!(a.arg[dp->width_arg_index].type == TYPE_INT))
                           abort ();
                         arg = a.arg[dp->width_arg_index].a.a_int;
+                        width = arg;
                         if (arg < 0)
                           {
                             /* "A negative field width is taken as a '-' flag
                                 followed by a positive field width."  */
                             flags |= FLAG_LEFT;
-                            width = (unsigned int) (-arg);
+                            width = -width;
                           }
-                        else
-                          width = arg;
                       }
                     else
                       {
@@ -2042,8 +2092,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                           characters = 0;
                         }
 
-                      if (has_width && width > characters
-                          && !(dp->flags & FLAG_LEFT))
+                      if (characters < width && !(dp->flags & FLAG_LEFT))
                         {
                           size_t n = width - characters;
                           ENSURE_ALLOCATION (xsum (length, n));
@@ -2096,8 +2145,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                       }
 # endif
 
-                      if (has_width && width > characters
-                          && (dp->flags & FLAG_LEFT))
+                      if (characters < width && (dp->flags & FLAG_LEFT))
                         {
                           size_t n = width - characters;
                           ENSURE_ALLOCATION (xsum (length, n));
@@ -2170,8 +2218,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                           characters = 0;
                         }
 
-                      if (has_width && width > characters
-                          && !(dp->flags & FLAG_LEFT))
+                      if (characters < width && !(dp->flags & FLAG_LEFT))
                         {
                           size_t n = width - characters;
                           ENSURE_ALLOCATION (xsum (length, n));
@@ -2224,8 +2271,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                       }
 # endif
 
-                      if (has_width && width > characters
-                          && (dp->flags & FLAG_LEFT))
+                      if (characters < width && (dp->flags & FLAG_LEFT))
                         {
                           size_t n = width - characters;
                           ENSURE_ALLOCATION (xsum (length, n));
@@ -2298,8 +2344,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                           characters = 0;
                         }
 
-                      if (has_width && width > characters
-                          && !(dp->flags & FLAG_LEFT))
+                      if (characters < width && !(dp->flags & FLAG_LEFT))
                         {
                           size_t n = width - characters;
                           ENSURE_ALLOCATION (xsum (length, n));
@@ -2352,8 +2397,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                       }
 # endif
 
-                      if (has_width && width > characters
-                          && (dp->flags & FLAG_LEFT))
+                      if (characters < width && (dp->flags & FLAG_LEFT))
                         {
                           size_t n = width - characters;
                           ENSURE_ALLOCATION (xsum (length, n));
@@ -2368,7 +2412,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                   }
               }
 #endif
-#if (!USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || (NEED_PRINTF_DIRECTIVE_LS && !defined IN_LIBINTL)) && HAVE_WCHAR_T
+#if (!USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || USE_MSVC__SNPRINTF || (NEED_PRINTF_DIRECTIVE_LS && !defined IN_LIBINTL)) && HAVE_WCHAR_T
             else if (dp->conversion == 's'
 # if WIDE_CHAR_VERSION
                      && a.arg[dp->arg_index].type != TYPE_WIDE_STRING
@@ -2404,15 +2448,14 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                         if (!(a.arg[dp->width_arg_index].type == TYPE_INT))
                           abort ();
                         arg = a.arg[dp->width_arg_index].a.a_int;
+                        width = arg;
                         if (arg < 0)
                           {
                             /* "A negative field width is taken as a '-' flag
                                 followed by a positive field width."  */
                             flags |= FLAG_LEFT;
-                            width = (unsigned int) (-arg);
+                            width = -width;
                           }
-                        else
-                          width = arg;
                       }
                     else
                       {
@@ -2542,8 +2585,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                       characters = 0;
                     }
 
-                  if (has_width && width > characters
-                      && !(dp->flags & FLAG_LEFT))
+                  if (characters < width && !(dp->flags & FLAG_LEFT))
                     {
                       size_t n = width - characters;
                       ENSURE_ALLOCATION (xsum (length, n));
@@ -2604,8 +2646,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                         }
                     }
 
-                  if (has_width && width > characters
-                      && (dp->flags & FLAG_LEFT))
+                  if (characters < width && (dp->flags & FLAG_LEFT))
                     {
                       size_t n = width - characters;
                       ENSURE_ALLOCATION (xsum (length, n));
@@ -2621,7 +2662,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                   size_t characters;
 #  if !DCHAR_IS_TCHAR
                   /* This code assumes that TCHAR_T is 'char'.  */
-                  typedef int TCHAR_T_verify[2 * (sizeof (TCHAR_T) == 1) - 1];
+                  verify (sizeof (TCHAR_T) == 1);
                   TCHAR_T *tmpsrc;
                   DCHAR_T *tmpdst;
                   size_t tmpdst_len;
@@ -2782,7 +2823,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                   if (has_width)
                     {
 #  if ENABLE_UNISTDIO
-                      /* Outside POSIX, it's preferrable to compare the width
+                      /* Outside POSIX, it's preferable to compare the width
                          against the number of _characters_ of the converted
                          value.  */
                       w = DCHAR_MBSNLEN (result + length, characters);
@@ -2796,8 +2837,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                     /* w doesn't matter.  */
                     w = 0;
 
-                  if (has_width && width > w
-                      && !(dp->flags & FLAG_LEFT))
+                  if (w < width && !(dp->flags & FLAG_LEFT))
                     {
                       size_t n = width - w;
                       ENSURE_ALLOCATION (xsum (length, n));
@@ -2880,8 +2920,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                   length += tmpdst_len;
 #  endif
 
-                  if (has_width && width > w
-                      && (dp->flags & FLAG_LEFT))
+                  if (w < width && (dp->flags & FLAG_LEFT))
                     {
                       size_t n = width - w;
                       ENSURE_ALLOCATION (xsum (length, n));
@@ -2889,8 +2928,8 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                       length += n;
                     }
                 }
-              }
 # endif
+              }
 #endif
 #if (NEED_PRINTF_DIRECTIVE_A || NEED_PRINTF_LONG_DOUBLE || NEED_PRINTF_DOUBLE) && !defined IN_LIBINTL
             else if ((dp->conversion == 'a' || dp->conversion == 'A')
@@ -2908,17 +2947,16 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
               {
                 arg_type type = a.arg[dp->arg_index].type;
                 int flags = dp->flags;
-                int has_width;
                 size_t width;
                 int has_precision;
                 size_t precision;
                 size_t tmp_length;
+                size_t count;
                 DCHAR_T tmpbuf[700];
                 DCHAR_T *tmp;
                 DCHAR_T *pad_ptr;
                 DCHAR_T *p;
 
-                has_width = 0;
                 width = 0;
                 if (dp->width_start != dp->width_end)
                   {
@@ -2929,15 +2967,14 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                         if (!(a.arg[dp->width_arg_index].type == TYPE_INT))
                           abort ();
                         arg = a.arg[dp->width_arg_index].a.a_int;
+                        width = arg;
                         if (arg < 0)
                           {
                             /* "A negative field width is taken as a '-' flag
                                 followed by a positive field width."  */
                             flags |= FLAG_LEFT;
-                            width = (unsigned int) (-arg);
+                            width = -width;
                           }
-                        else
-                          width = arg;
                       }
                     else
                       {
@@ -2947,7 +2984,6 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                           width = xsum (xtimes (width, 10), *digitp++ - '0');
                         while (digitp != dp->width_end);
                       }
-                    has_width = 1;
                   }
 
                 has_precision = 0;
@@ -3323,11 +3359,14 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                     abort ();
 # endif
                   }
+
                 /* The generated string now extends from tmp to p, with the
                    zero padding insertion point being at pad_ptr.  */
-                if (has_width && p - tmp < width)
+                count = p - tmp;
+
+                if (count < width)
                   {
-                    size_t pad = width - (p - tmp);
+                    size_t pad = width - count;
                     DCHAR_T *end = p + pad;
 
                     if (flags & FLAG_LEFT)
@@ -3360,28 +3399,26 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                     p = end;
                   }
 
-                {
-                  size_t count = p - tmp;
+                count = p - tmp;
 
-                  if (count >= tmp_length)
-                    /* tmp_length was incorrectly calculated - fix the
-                       code above!  */
-                    abort ();
+                if (count >= tmp_length)
+                  /* tmp_length was incorrectly calculated - fix the
+                     code above!  */
+                  abort ();
 
-                  /* Make room for the result.  */
-                  if (count >= allocated - length)
-                    {
-                      size_t n = xsum (length, count);
+                /* Make room for the result.  */
+                if (count >= allocated - length)
+                  {
+                    size_t n = xsum (length, count);
 
-                      ENSURE_ALLOCATION (n);
-                    }
+                    ENSURE_ALLOCATION (n);
+                  }
 
-                  /* Append the result.  */
-                  memcpy (result + length, tmp, count * sizeof (DCHAR_T));
-                  if (tmp != tmpbuf)
-                    free (tmp);
-                  length += count;
-                }
+                /* Append the result.  */
+                memcpy (result + length, tmp, count * sizeof (DCHAR_T));
+                if (tmp != tmpbuf)
+                  free (tmp);
+                length += count;
               }
 #endif
 #if (NEED_PRINTF_INFINITE_DOUBLE || NEED_PRINTF_DOUBLE || NEED_PRINTF_INFINITE_LONG_DOUBLE || NEED_PRINTF_LONG_DOUBLE) && !defined IN_LIBINTL
@@ -3415,8 +3452,8 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                 arg_type type = a.arg[dp->arg_index].type;
 # endif
                 int flags = dp->flags;
-                int has_width;
                 size_t width;
+                size_t count;
                 int has_precision;
                 size_t precision;
                 size_t tmp_length;
@@ -3425,7 +3462,6 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                 DCHAR_T *pad_ptr;
                 DCHAR_T *p;
 
-                has_width = 0;
                 width = 0;
                 if (dp->width_start != dp->width_end)
                   {
@@ -3436,15 +3472,14 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                         if (!(a.arg[dp->width_arg_index].type == TYPE_INT))
                           abort ();
                         arg = a.arg[dp->width_arg_index].a.a_int;
+                        width = arg;
                         if (arg < 0)
                           {
                             /* "A negative field width is taken as a '-' flag
                                 followed by a positive field width."  */
                             flags |= FLAG_LEFT;
-                            width = (unsigned int) (-arg);
+                            width = -width;
                           }
-                        else
-                          width = arg;
                       }
                     else
                       {
@@ -3454,7 +3489,6 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                           width = xsum (xtimes (width, 10), *digitp++ - '0');
                         while (digitp != dp->width_end);
                       }
-                    has_width = 1;
                   }
 
                 has_precision = 0;
@@ -3894,9 +3928,9 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                                            digits without trailing zeroes.  */
                                         if (exponent >= 0)
                                           {
-                                            size_t count = exponent + 1;
+                                            size_t ecount = exponent + 1;
                                             /* Note: count <= precision = ndigits.  */
-                                            for (; count > 0; count--)
+                                            for (; ecount > 0; ecount--)
                                               *p++ = digits[--ndigits];
                                             if ((flags & FLAG_ALT) || ndigits > nzeroes)
                                               {
@@ -3910,10 +3944,10 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                                           }
                                         else
                                           {
-                                            size_t count = -exponent - 1;
+                                            size_t ecount = -exponent - 1;
                                             *p++ = '0';
                                             *p++ = decimal_point_char ();
-                                            for (; count > 0; count--)
+                                            for (; ecount > 0; ecount--)
                                               *p++ = '0';
                                             while (ndigits > nzeroes)
                                               {
@@ -4218,7 +4252,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                                   static const wchar_t decimal_format[] =
                                     /* Produce the same number of exponent digits
                                        as the native printf implementation.  */
-#    if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#    if defined _WIN32 && ! defined __CYGWIN__
                                     { '%', '+', '.', '3', 'd', '\0' };
 #    else
                                     { '%', '+', '.', '2', 'd', '\0' };
@@ -4232,7 +4266,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                                   static const char decimal_format[] =
                                     /* Produce the same number of exponent digits
                                        as the native printf implementation.  */
-#    if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#    if defined _WIN32 && ! defined __CYGWIN__
                                     "%+.3d";
 #    else
                                     "%+.2d";
@@ -4364,9 +4398,9 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                                            digits without trailing zeroes.  */
                                         if (exponent >= 0)
                                           {
-                                            size_t count = exponent + 1;
-                                            /* Note: count <= precision = ndigits.  */
-                                            for (; count > 0; count--)
+                                            size_t ecount = exponent + 1;
+                                            /* Note: ecount <= precision = ndigits.  */
+                                            for (; ecount > 0; ecount--)
                                               *p++ = digits[--ndigits];
                                             if ((flags & FLAG_ALT) || ndigits > nzeroes)
                                               {
@@ -4380,10 +4414,10 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                                           }
                                         else
                                           {
-                                            size_t count = -exponent - 1;
+                                            size_t ecount = -exponent - 1;
                                             *p++ = '0';
                                             *p++ = decimal_point_char ();
-                                            for (; count > 0; count--)
+                                            for (; ecount > 0; ecount--)
                                               *p++ = '0';
                                             while (ndigits > nzeroes)
                                               {
@@ -4411,7 +4445,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                                           static const wchar_t decimal_format[] =
                                             /* Produce the same number of exponent digits
                                                as the native printf implementation.  */
-#    if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#    if defined _WIN32 && ! defined __CYGWIN__
                                             { '%', '+', '.', '3', 'd', '\0' };
 #    else
                                             { '%', '+', '.', '2', 'd', '\0' };
@@ -4425,7 +4459,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                                           static const char decimal_format[] =
                                             /* Produce the same number of exponent digits
                                                as the native printf implementation.  */
-#    if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#    if defined _WIN32 && ! defined __CYGWIN__
                                             "%+.3d";
 #    else
                                             "%+.2d";
@@ -4483,7 +4517,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                                 *p++ = '+';
                                 /* Produce the same number of exponent digits as
                                    the native printf implementation.  */
-#   if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#   if defined _WIN32 && ! defined __CYGWIN__
                                 *p++ = '0';
 #   endif
                                 *p++ = '0';
@@ -4511,9 +4545,11 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 
                 /* The generated string now extends from tmp to p, with the
                    zero padding insertion point being at pad_ptr.  */
-                if (has_width && p - tmp < width)
+                count = p - tmp;
+
+                if (count < width)
                   {
-                    size_t pad = width - (p - tmp);
+                    size_t pad = width - count;
                     DCHAR_T *end = p + pad;
 
                     if (flags & FLAG_LEFT)
@@ -4546,39 +4582,39 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                     p = end;
                   }
 
-                {
-                  size_t count = p - tmp;
+                count = p - tmp;
 
-                  if (count >= tmp_length)
-                    /* tmp_length was incorrectly calculated - fix the
-                       code above!  */
-                    abort ();
+                if (count >= tmp_length)
+                  /* tmp_length was incorrectly calculated - fix the
+                     code above!  */
+                  abort ();
 
-                  /* Make room for the result.  */
-                  if (count >= allocated - length)
-                    {
-                      size_t n = xsum (length, count);
+                /* Make room for the result.  */
+                if (count >= allocated - length)
+                  {
+                    size_t n = xsum (length, count);
 
-                      ENSURE_ALLOCATION (n);
-                    }
+                    ENSURE_ALLOCATION (n);
+                  }
 
-                  /* Append the result.  */
-                  memcpy (result + length, tmp, count * sizeof (DCHAR_T));
-                  if (tmp != tmpbuf)
-                    free (tmp);
-                  length += count;
-                }
+                /* Append the result.  */
+                memcpy (result + length, tmp, count * sizeof (DCHAR_T));
+                if (tmp != tmpbuf)
+                  free (tmp);
+                length += count;
               }
 #endif
             else
               {
                 arg_type type = a.arg[dp->arg_index].type;
                 int flags = dp->flags;
-#if !USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_LEFTADJUST || NEED_PRINTF_FLAG_ZERO || NEED_PRINTF_UNBOUNDED_PRECISION
+#if !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_LEFTADJUST || NEED_PRINTF_FLAG_ZERO || NEED_PRINTF_UNBOUNDED_PRECISION
                 int has_width;
+#endif
+#if !USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || USE_MSVC__SNPRINTF || !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_LEFTADJUST || NEED_PRINTF_FLAG_ZERO || NEED_PRINTF_UNBOUNDED_PRECISION
                 size_t width;
 #endif
-#if !USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || NEED_PRINTF_UNBOUNDED_PRECISION
+#if !USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || USE_MSVC__SNPRINTF || NEED_PRINTF_UNBOUNDED_PRECISION
                 int has_precision;
                 size_t precision;
 #endif
@@ -4597,14 +4633,17 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                 TCHAR_T *fbp;
                 unsigned int prefix_count;
                 int prefixes[2] IF_LINT (= { 0 });
+                int orig_errno;
 #if !USE_SNPRINTF
                 size_t tmp_length;
                 TCHAR_T tmpbuf[700];
                 TCHAR_T *tmp;
 #endif
 
-#if !USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_LEFTADJUST || NEED_PRINTF_FLAG_ZERO || NEED_PRINTF_UNBOUNDED_PRECISION
+#if !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_LEFTADJUST || NEED_PRINTF_FLAG_ZERO || NEED_PRINTF_UNBOUNDED_PRECISION
                 has_width = 0;
+#endif
+#if !USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || USE_MSVC__SNPRINTF || !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_LEFTADJUST || NEED_PRINTF_FLAG_ZERO || NEED_PRINTF_UNBOUNDED_PRECISION
                 width = 0;
                 if (dp->width_start != dp->width_end)
                   {
@@ -4615,15 +4654,14 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                         if (!(a.arg[dp->width_arg_index].type == TYPE_INT))
                           abort ();
                         arg = a.arg[dp->width_arg_index].a.a_int;
+                        width = arg;
                         if (arg < 0)
                           {
                             /* "A negative field width is taken as a '-' flag
                                 followed by a positive field width."  */
                             flags |= FLAG_LEFT;
-                            width = (unsigned int) (-arg);
+                            width = -width;
                           }
-                        else
-                          width = arg;
                       }
                     else
                       {
@@ -4633,11 +4671,13 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                           width = xsum (xtimes (width, 10), *digitp++ - '0');
                         while (digitp != dp->width_end);
                       }
+#if !DCHAR_IS_TCHAR || ENABLE_UNISTDIO || NEED_PRINTF_FLAG_LEFTADJUST || NEED_PRINTF_FLAG_ZERO || NEED_PRINTF_UNBOUNDED_PRECISION
                     has_width = 1;
+#endif
                   }
 #endif
 
-#if !USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || NEED_PRINTF_UNBOUNDED_PRECISION
+#if !USE_SNPRINTF || !HAVE_SNPRINTF_RETVAL_C99 || USE_MSVC__SNPRINTF || NEED_PRINTF_UNBOUNDED_PRECISION
                 has_precision = 0;
                 precision = 6;
                 if (dp->precision_start != dp->precision_end)
@@ -4751,6 +4791,10 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                   *fbp++ = ' ';
                 if (flags & FLAG_ALT)
                   *fbp++ = '#';
+#if __GLIBC__ >= 2 && !defined __UCLIBC__
+                if (flags & FLAG_LOCALIZED)
+                  *fbp++ = 'I';
+#endif
                 if (!pad_ourselves)
                   {
                     if (flags & FLAG_ZERO)
@@ -4769,7 +4813,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                           {
                             const FCHAR_T *mp = dp->width_start;
                             do
-                              *fbp++ = (unsigned char) *mp++;
+                              *fbp++ = *mp++;
                             while (--n > 0);
                           }
                       }
@@ -4790,7 +4834,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                           {
                             const FCHAR_T *mp = dp->precision_start;
                             do
-                              *fbp++ = (unsigned char) *mp++;
+                              *fbp++ = *mp++;
                             while (--n > 0);
                           }
                       }
@@ -4801,16 +4845,16 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 #if HAVE_LONG_LONG_INT
                   case TYPE_LONGLONGINT:
                   case TYPE_ULONGLONGINT:
-# if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+# if defined _WIN32 && ! defined __CYGWIN__
                     *fbp++ = 'I';
                     *fbp++ = '6';
                     *fbp++ = '4';
                     break;
 # else
                     *fbp++ = 'l';
-                    /*FALLTHROUGH*/
 # endif
 #endif
+                    FALLTHROUGH;
                   case TYPE_LONGINT:
                   case TYPE_ULONGINT:
 #if HAVE_WINT_T
@@ -4834,20 +4878,31 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 #endif
                   *fbp = dp->conversion;
 #if USE_SNPRINTF
-# if !(__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 3) || ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__))
+# if ! (((__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 3))        \
+         && !defined __UCLIBC__)                                            \
+        || (defined __APPLE__ && defined __MACH__)                          \
+        || (defined _WIN32 && ! defined __CYGWIN__))
                 fbp[1] = '%';
                 fbp[2] = 'n';
                 fbp[3] = '\0';
 # else
                 /* On glibc2 systems from glibc >= 2.3 - probably also older
-                   ones - we know that snprintf's returns value conforms to
-                   ISO C 99: the gl_SNPRINTF_DIRECTIVE_N test passes.
+                   ones - we know that snprintf's return value conforms to
+                   ISO C 99: the tests gl_SNPRINTF_RETVAL_C99 and
+                   gl_SNPRINTF_TRUNCATION_C99 pass.
                    Therefore we can avoid using %n in this situation.
                    On glibc2 systems from 2004-10-18 or newer, the use of %n
                    in format strings in writable memory may crash the program
                    (if compiled with _FORTIFY_SOURCE=2), so we should avoid it
                    in this situation.  */
-                /* On native Win32 systems (such as mingw), we can avoid using
+                /* On Mac OS X 10.3 or newer, we know that snprintf's return
+                   value conforms to ISO C 99: the tests gl_SNPRINTF_RETVAL_C99
+                   and gl_SNPRINTF_TRUNCATION_C99 pass.
+                   Therefore we can avoid using %n in this situation.
+                   On Mac OS X 10.13 or newer, the use of %n in format strings
+                   in writable memory by default crashes the program, so we
+                   should avoid it in this situation.  */
+                /* On native Windows systems (such as mingw), we can avoid using
                    %n because:
                      - Although the gl_SNPRINTF_TRUNCATION_C99 test fails,
                        snprintf does not write more than the specified number
@@ -4856,11 +4911,11 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                      - Although the gl_SNPRINTF_RETVAL_C99 test fails, snprintf
                        allows us to recognize the case of an insufficient
                        buffer size: it returns -1 in this case.
-                   On native Win32 systems (such as mingw) where the OS is
+                   On native Windows systems (such as mingw) where the OS is
                    Windows Vista, the use of %n in format strings by default
                    crashes the program. See
-                     <http://gcc.gnu.org/ml/gcc/2007-06/msg00122.html> and
-                     <http://msdn2.microsoft.com/en-us/library/ms175782(VS.80).aspx>
+                     <https://gcc.gnu.org/ml/gcc/2007-06/msg00122.html> and
+                     <https://msdn.microsoft.com/en-us/library/ms175782.aspx>
                    So we should avoid %n in this situation.  */
                 fbp[1] = '\0';
 # endif
@@ -4899,6 +4954,8 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                    via %n.  */
                 *(TCHAR_T *) (result + length) = '\0';
 #endif
+
+                orig_errno = errno;
 
                 for (;;)
                   {
@@ -5100,7 +5157,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                             /* Look at the snprintf() return value.  */
                             if (retcount < 0)
                               {
-# if !HAVE_SNPRINTF_RETVAL_C99
+# if !HAVE_SNPRINTF_RETVAL_C99 || USE_MSVC__SNPRINTF
                                 /* HP-UX 10.20 snprintf() is doubly deficient:
                                    It doesn't understand the '%n' directive,
                                    *and* it returns -1 (rather than the length
@@ -5114,7 +5171,8 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                                 size_t tmp_length =
                                   MAX_ROOM_NEEDED (&a, dp->arg_index,
                                                    dp->conversion, type, flags,
-                                                   width, has_precision,
+                                                   width,
+                                                   has_precision,
                                                    precision, pad_ourselves);
 
                                 if (maxlen < tmp_length)
@@ -5151,18 +5209,21 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                         /* SNPRINTF or sprintf failed.  Save and use the errno
                            that it has set, if any.  */
                         int saved_errno = errno;
+                        if (saved_errno == 0)
+                          {
+                            if (dp->conversion == 'c' || dp->conversion == 's')
+                              saved_errno = EILSEQ;
+                            else
+                              saved_errno = EINVAL;
+                          }
 
                         if (!(result == resultbuf || result == NULL))
                           free (result);
                         if (buf_malloced != NULL)
                           free (buf_malloced);
                         CLEANUP ();
-                        errno =
-                          (saved_errno != 0
-                           ? saved_errno
-                           : (dp->conversion == 'c' || dp->conversion == 's'
-                              ? EILSEQ
-                              : EINVAL));
+
+                        errno = saved_errno;
                         return NULL;
                       }
 
@@ -5284,8 +5345,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                         DCHAR_T *tmpdst;
                         size_t tmpdst_len;
                         /* This code assumes that TCHAR_T is 'char'.  */
-                        typedef int TCHAR_T_verify
-                                    [2 * (sizeof (TCHAR_T) == 1) - 1];
+                        verify (sizeof (TCHAR_T) == 1);
 # if USE_SNPRINTF
                         tmpsrc = (TCHAR_T *) (result + length);
 # else
@@ -5352,7 +5412,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                             tmpsrc += count;
                             tmpdst += count;
                             for (n = count; n > 0; n--)
-                              *--tmpdst = (unsigned char) *--tmpsrc;
+                              *--tmpdst = *--tmpsrc;
                           }
                       }
 #endif
@@ -5378,7 +5438,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                       {
                         size_t w;
 # if ENABLE_UNISTDIO
-                        /* Outside POSIX, it's preferrable to compare the width
+                        /* Outside POSIX, it's preferable to compare the width
                            against the number of _characters_ of the converted
                            value.  */
                         w = DCHAR_MBSNLEN (result + length, count);
@@ -5498,6 +5558,9 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                     length += count;
                     break;
                   }
+                errno = orig_errno;
+#undef pad_ourselves
+#undef prec_ourselves
               }
           }
       }

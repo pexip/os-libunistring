@@ -1,19 +1,28 @@
 /* Character set conversion with error handling and autodetection.
-   Copyright (C) 2002, 2005, 2007, 2009, 2010 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2005, 2007, 2009-2018 Free Software Foundation, Inc.
    Written by Bruno Haible.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -226,7 +235,9 @@ mem_iconveha (const char *src, size_t srclen,
 
   /* When using GNU libc >= 2.2 or GNU libiconv >= 1.5,
      we want to use transliteration.  */
-#if (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2) || __GLIBC__ > 2 || _LIBICONV_VERSION >= 0x0105
+#if (((__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2) || __GLIBC__ > 2) \
+     && !defined __UCLIBC__) \
+    || _LIBICONV_VERSION >= 0x0105
   if (transliterate)
     {
       int retval;
@@ -326,7 +337,9 @@ str_iconveha (const char *src,
 
   /* When using GNU libc >= 2.2 or GNU libiconv >= 1.5,
      we want to use transliteration.  */
-#if (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2) || __GLIBC__ > 2 || _LIBICONV_VERSION >= 0x0105
+#if (((__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2) || __GLIBC__ > 2) \
+     && !defined __UCLIBC__) \
+    || _LIBICONV_VERSION >= 0x0105
   if (transliterate)
     {
       char *result;

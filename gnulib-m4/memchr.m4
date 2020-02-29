@@ -1,26 +1,34 @@
-# memchr.m4 serial 8
-dnl Copyright (C) 2002-2004, 2009-2010 Free Software Foundation, Inc.
+# memchr.m4 serial 13
+dnl Copyright (C) 2002-2004, 2009-2018 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
 
 AC_DEFUN_ONCE([gl_FUNC_MEMCHR],
 [
+  AC_REQUIRE([AC_CANONICAL_HOST]) dnl for cross-compiles
+
   dnl Check for prerequisites for memory fence checks.
   gl_FUNC_MMAP_ANON
   AC_CHECK_HEADERS_ONCE([sys/mman.h])
   AC_CHECK_FUNCS_ONCE([mprotect])
 
-  dnl These days, we assume memchr is present.  But just in case...
   AC_REQUIRE([gl_HEADER_STRING_H_DEFAULTS])
-  AC_CHECK_FUNCS_ONCE([memchr])
-  if test $ac_cv_func_memchr = yes; then
+  m4_ifdef([gl_FUNC_MEMCHR_OBSOLETE], [
+    dnl These days, we assume memchr is present.  But if support for old
+    dnl platforms is desired:
+    AC_CHECK_FUNCS_ONCE([memchr])
+    if test $ac_cv_func_memchr = no; then
+      HAVE_MEMCHR=0
+    fi
+  ])
+  if test $HAVE_MEMCHR = 1; then
     # Detect platform-specific bugs in some versions of glibc:
     # memchr should not dereference anything with length 0
-    #   http://bugzilla.redhat.com/499689
+    #   https://bugzilla.redhat.com/show_bug.cgi?id=499689
     # memchr should not dereference overestimated length after a match
-    #   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=521737
-    #   http://sourceware.org/bugzilla/show_bug.cgi?id=10162
+    #   https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=521737
+    #   https://sourceware.org/bugzilla/show_bug.cgi?id=10162
     # Assume that memchr works on platforms that lack mprotect.
     AC_CACHE_CHECK([whether memchr works], [gl_cv_func_memchr_works],
       [AC_RUN_IFELSE([AC_LANG_PROGRAM([[
@@ -35,6 +43,7 @@ AC_DEFUN_ONCE([gl_FUNC_MEMCHR],
 # endif
 #endif
 ]], [[
+  int result = 0;
   char *fence = NULL;
 #if HAVE_SYS_MMAN_H && HAVE_MPROTECT
 # if HAVE_MAP_ANONYMOUS
@@ -58,24 +67,29 @@ AC_DEFUN_ONCE([gl_FUNC_MEMCHR],
   if (fence)
     {
       if (memchr (fence, 0, 0))
-        return 1;
+        result |= 1;
       strcpy (fence - 9, "12345678");
       if (memchr (fence - 9, 0, 79) != fence - 1)
-        return 2;
+        result |= 2;
+      if (memchr (fence - 1, 0, 3) != fence - 1)
+        result |= 4;
     }
-  return 0;
-]])], [gl_cv_func_memchr_works=yes], [gl_cv_func_memchr_works=no],
-      [dnl Be pessimistic for now.
-       gl_cv_func_memchr_works="guessing no"])])
-    if test "$gl_cv_func_memchr_works" != yes; then
-      REPLACE_MEMCHR=1
-    fi
-  else
-    HAVE_MEMCHR=0
-  fi
-  if test $HAVE_MEMCHR = 0 || test $REPLACE_MEMCHR = 1; then
-    AC_LIBOBJ([memchr])
-    gl_PREREQ_MEMCHR
+  return result;
+]])],
+         [gl_cv_func_memchr_works=yes],
+         [gl_cv_func_memchr_works=no],
+         [case "$host_os" in
+                    # Guess yes on native Windows.
+            mingw*) gl_cv_func_memchr_works="guessing yes" ;;
+                    # Be pessimistic for now.
+            *)      gl_cv_func_memchr_works="guessing no" ;;
+          esac
+         ])
+      ])
+    case "$gl_cv_func_memchr_works" in
+      *yes) ;;
+      *) REPLACE_MEMCHR=1 ;;
+    esac
   fi
 ])
 

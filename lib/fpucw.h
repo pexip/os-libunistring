@@ -1,19 +1,28 @@
-/* Manipulating the FPU control word.
-   Copyright (C) 2007-2010 Free Software Foundation, Inc.
+/* Manipulating the FPU control word.  -*- coding: utf-8 -*-
+   Copyright (C) 2007-2018 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2007.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _FPUCW_H
 #define _FPUCW_H
@@ -30,17 +39,18 @@
 
    On some platforms, such as NetBSD, the default precision is set to
    "double precision".  This means that 'long double' instructions will operate
-   only as 'double', i.e. lead wrong results.
+   only as 'double', i.e. lead to wrong results.  Similarly on FreeBSD 6.4, at
+   least for the division of 'long double' numbers.
 
    The FPU control word is under control of the application, i.e. it is
    not required to be set either way by the ABI.  (In fact, the i386 ABI
-   http://refspecs.freestandards.org/elf/abi386-4.pdf page 3-12 = page 38
+   https://www.linux-mips.org/pub/linux/mips/doc/ABI/abi386-4.pdf page 3-12 = page 38
    is not clear about it.  But in any case, gcc treats the control word
    like a "preserved" register: it emits code that assumes that the control
    word is preserved across calls, and it restores the control word at the
    end of functions that modify it.)
 
-   See Vincent Lefèvre's page http://www.vinc17.org/research/extended.en.html
+   See Vincent Lefèvre's page https://www.vinc17.net/research/extended.en.html
    for a good explanation.
    See http://www.uwsg.iu.edu/hypermail/linux/kernel/0103.0/0453.html for
    some argumentation which setting should be the default.  */

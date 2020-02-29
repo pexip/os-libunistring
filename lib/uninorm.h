@@ -1,19 +1,29 @@
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Normalization forms (composition and decomposition) of Unicode strings.
-   Copyright (C) 2001-2002, 2009-2010 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2009-2018 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
-   This program is free software: you can redistribute it and/or modify it
-   under the terms of the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _UNINORM_H
 #define _UNINORM_H
@@ -102,7 +112,8 @@ extern int
    Not all decompositions can be recombined using this function.  See the
    Unicode file CompositionExclusions.txt for details.  */
 extern ucs4_t
-       uc_composition (ucs4_t uc1, ucs4_t uc2);
+       uc_composition (ucs4_t uc1, ucs4_t uc2)
+       _UC_ATTRIBUTE_CONST;
 
 
 /* An object of type uninorm_t denotes a Unicode normalization form.  */
@@ -137,7 +148,9 @@ extern LIBUNISTRING_DLL_VARIABLE const struct unicode_normalization_form uninorm
 
 /* Return the decomposing variant of a normalization form.
    This maps NFC,NFD -> NFD and NFKC,NFKD -> NFKD.  */
-extern uninorm_t uninorm_decomposing_form (uninorm_t nf);
+extern uninorm_t
+       uninorm_decomposing_form (uninorm_t nf)
+       _UC_ATTRIBUTE_PURE;
 
 
 /* Return the specified normalization form of a string.  */

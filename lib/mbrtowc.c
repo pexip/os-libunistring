@@ -1,24 +1,38 @@
 /* Convert multibyte character to wide character.
-   Copyright (C) 1999-2002, 2005-2010 Free Software Foundation, Inc.
+   Copyright (C) 1999-2002, 2005-2018 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
 /* Specification.  */
 #include <wchar.h>
+
+#if C_LOCALE_MAYBE_EILSEQ
+# include "hard-locale.h"
+# include <locale.h>
+#endif
 
 #if GNULIB_defined_mbstate_t
 /* Implement mbrtowc() on top of mbtowc().  */
@@ -30,6 +44,13 @@
 # include "streq.h"
 # include "verify.h"
 
+#ifndef FALLTHROUGH
+# if __GNUC__ < 7
+#  define FALLTHROUGH ((void) 0)
+# else
+#  define FALLTHROUGH __attribute__ ((__fallthrough__))
+# endif
+#endif
 
 verify (sizeof (mbstate_t) >= 4);
 
@@ -39,9 +60,6 @@ size_t
 mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
 {
   char *pstate = (char *)ps;
-
-  if (pstate == NULL)
-    pstate = internal_state;
 
   if (s == NULL)
     {
@@ -54,6 +72,10 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
     return (size_t)(-2);
 
   /* Here n > 0.  */
+
+  if (pstate == NULL)
+    pstate = internal_state;
+
   {
     size_t nstate = pstate[0];
     char buf[4];
@@ -68,10 +90,10 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
         break;
       case 3:
         buf[2] = pstate[3];
-        /*FALLTHROUGH*/
+        FALLTHROUGH;
       case 2:
         buf[1] = pstate[2];
-        /*FALLTHROUGH*/
+        FALLTHROUGH;
       case 1:
         buf[0] = pstate[1];
         p = buf;
@@ -91,8 +113,8 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
 
     /* Here m > 0.  */
 
-# if __GLIBC__
-    /* Work around bug <http://sourceware.org/bugzilla/show_bug.cgi?id=9674> */
+# if __GLIBC__ || defined __UCLIBC__
+    /* Work around bug <https://sourceware.org/bugzilla/show_bug.cgi?id=9674> */
     mbtowc (NULL, NULL, 0);
 # endif
     {
@@ -127,7 +149,7 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
       {
         const char *encoding = locale_charset ();
 
-        if (STREQ (encoding, "UTF-8", 'U', 'T', 'F', '-', '8', 0, 0, 0, 0))
+        if (STREQ_OPT (encoding, "UTF-8", 'U', 'T', 'F', '-', '8', 0, 0, 0, 0))
           {
             /* Cf. unistr/u8-mblen.c.  */
             unsigned char c = (unsigned char) p[0];
@@ -184,7 +206,8 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
         /* As a reference for this code, you can use the GNU libiconv
            implementation.  Look for uses of the RET_TOOFEW macro.  */
 
-        if (STREQ (encoding, "EUC-JP", 'E', 'U', 'C', '-', 'J', 'P', 0, 0, 0))
+        if (STREQ_OPT (encoding,
+                       "EUC-JP", 'E', 'U', 'C', '-', 'J', 'P', 0, 0, 0))
           {
             if (m == 1)
               {
@@ -207,9 +230,12 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
               }
             goto invalid;
           }
-        if (STREQ (encoding, "EUC-KR", 'E', 'U', 'C', '-', 'K', 'R', 0, 0, 0)
-            || STREQ (encoding, "GB2312", 'G', 'B', '2', '3', '1', '2', 0, 0, 0)
-            || STREQ (encoding, "BIG5", 'B', 'I', 'G', '5', 0, 0, 0, 0, 0))
+        if (STREQ_OPT (encoding,
+                       "EUC-KR", 'E', 'U', 'C', '-', 'K', 'R', 0, 0, 0)
+            || STREQ_OPT (encoding,
+                          "GB2312", 'G', 'B', '2', '3', '1', '2', 0, 0, 0)
+            || STREQ_OPT (encoding,
+                          "BIG5", 'B', 'I', 'G', '5', 0, 0, 0, 0, 0))
           {
             if (m == 1)
               {
@@ -220,7 +246,8 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
               }
             goto invalid;
           }
-        if (STREQ (encoding, "EUC-TW", 'E', 'U', 'C', '-', 'T', 'W', 0, 0, 0))
+        if (STREQ_OPT (encoding,
+                       "EUC-TW", 'E', 'U', 'C', '-', 'T', 'W', 0, 0, 0))
           {
             if (m == 1)
               {
@@ -238,7 +265,8 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
               }
             goto invalid;
           }
-        if (STREQ (encoding, "GB18030", 'G', 'B', '1', '8', '0', '3', '0', 0, 0))
+        if (STREQ_OPT (encoding,
+                       "GB18030", 'G', 'B', '1', '8', '0', '3', '0', 0, 0))
           {
             if (m == 1)
               {
@@ -271,7 +299,7 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
               }
             goto invalid;
           }
-        if (STREQ (encoding, "SJIS", 'S', 'J', 'I', 'S', 0, 0, 0, 0, 0))
+        if (STREQ_OPT (encoding, "SJIS", 'S', 'J', 'I', 'S', 0, 0, 0, 0, 0))
           {
             if (m == 1)
               {
@@ -321,7 +349,10 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
 size_t
 rpl_mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
 {
-# if MBRTOWC_NULL_ARG_BUG || MBRTOWC_RETVAL_BUG
+  size_t ret;
+  wchar_t wc;
+
+# if MBRTOWC_NULL_ARG2_BUG || MBRTOWC_RETVAL_BUG || MBRTOWC_EMPTY_INPUT_BUG
   if (s == NULL)
     {
       pwc = NULL;
@@ -330,11 +361,19 @@ rpl_mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
     }
 # endif
 
+# if MBRTOWC_EMPTY_INPUT_BUG
+  if (n == 0)
+    return (size_t) -2;
+# endif
+
+  if (! pwc)
+    pwc = &wc;
+
 # if MBRTOWC_RETVAL_BUG
   {
     static mbstate_t internal_state;
 
-    /* Override mbrtowc's internal state.  We can not call mbsinit() on the
+    /* Override mbrtowc's internal state.  We cannot call mbsinit() on the
        hidden internal state, but we can call it on our variable.  */
     if (ps == NULL)
       ps = &internal_state;
@@ -345,8 +384,7 @@ rpl_mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
         size_t count = 0;
         for (; n > 0; s++, n--)
           {
-            wchar_t wc;
-            size_t ret = mbrtowc (&wc, s, 1, ps);
+            ret = mbrtowc (&wc, s, 1, ps);
 
             if (ret == (size_t)(-1))
               return (size_t)(-1);
@@ -354,8 +392,7 @@ rpl_mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
             if (ret != (size_t)(-2))
               {
                 /* The multibyte character has been completed.  */
-                if (pwc != NULL)
-                  *pwc = wc;
+                *pwc = wc;
                 return (wc == 0 ? 0 : count);
               }
           }
@@ -364,23 +401,23 @@ rpl_mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
   }
 # endif
 
-# if MBRTOWC_NUL_RETVAL_BUG
-  {
-    wchar_t wc;
-    size_t ret = mbrtowc (&wc, s, n, ps);
+  ret = mbrtowc (pwc, s, n, ps);
 
-    if (ret != (size_t)(-1) && ret != (size_t)(-2))
-      {
-        if (pwc != NULL)
-          *pwc = wc;
-        if (wc == 0)
-          ret = 0;
-      }
-    return ret;
-  }
-# else
-  return mbrtowc (pwc, s, n, ps);
+# if MBRTOWC_NUL_RETVAL_BUG
+  if (ret < (size_t) -2 && !*pwc)
+    return 0;
 # endif
+
+# if C_LOCALE_MAYBE_EILSEQ
+  if ((size_t) -2 <= ret && n != 0 && ! hard_locale (LC_CTYPE))
+    {
+      unsigned char uc = *s;
+      *pwc = uc;
+      return 1;
+    }
+# endif
+
+  return ret;
 }
 
 #endif

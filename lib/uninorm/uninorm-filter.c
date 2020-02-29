@@ -1,19 +1,28 @@
 /* Stream-based normalization of Unicode strings.
-   Copyright (C) 2009-2010 Free Software Foundation, Inc.
+   Copyright (C) 2009-2018 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
-   This program is free software: you can redistribute it and/or modify it
-   under the terms of the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of either:
 
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at your
+       option) any later version.
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at your
+       option) any later version.
+
+   or both in parallel, as here.
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -131,7 +140,7 @@ uninorm_filter_write (struct uninorm_filter *filter, ucs4_t uc_arg)
 
   {
     /* Cache sortbuf and sortbuf_count in local register variables.  */
-    struct ucs4_with_ccc * const sortbuf = filter->sortbuf;
+    struct ucs4_with_ccc *sortbuf = filter->sortbuf;
     size_t sortbuf_count = filter->sortbuf_count;
     int i;
 
@@ -241,14 +250,22 @@ uninorm_filter_write (struct uninorm_filter *filter, ucs4_t uc_arg)
             new_sortbuf =
               (struct ucs4_with_ccc *)
               malloc (2 * filter->sortbuf_allocated * sizeof (struct ucs4_with_ccc));
+            if (new_sortbuf == NULL)
+              {
+                /* errno is ENOMEM. */
+                filter->sortbuf_count = sortbuf_count;
+                return -1;
+              }
             memcpy (new_sortbuf, filter->sortbuf,
                     sortbuf_count * sizeof (struct ucs4_with_ccc));
             if (filter->sortbuf != filter->sortbuf_preallocated)
               free (filter->sortbuf);
             filter->sortbuf = new_sortbuf;
+            /* Update cache of filter->sortbuf.  */
+            sortbuf = filter->sortbuf;
           }
-        filter->sortbuf[sortbuf_count].code = uc;
-        filter->sortbuf[sortbuf_count].ccc = ccc;
+        sortbuf[sortbuf_count].code = uc;
+        sortbuf[sortbuf_count].ccc = ccc;
         sortbuf_count++;
       }
 

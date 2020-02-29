@@ -1,5 +1,5 @@
 /* Test the Unicode character type functions.
-   Copyright (C) 2007-2009 Free Software Foundation, Inc.
+   Copyright (C) 2007-2009, 2011 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -25,23 +25,23 @@
 int
 main ()
 {
-  ASSERT (uc_is_bidi_category ('x', UC_BIDI_L));
-  ASSERT (!uc_is_bidi_category ('x', UC_BIDI_R));
-  ASSERT (!uc_is_bidi_category ('x', UC_BIDI_EN));
+  ASSERT (uc_is_bidi_class ('x', UC_BIDI_L));
+  ASSERT (!uc_is_bidi_class ('x', UC_BIDI_R));
+  ASSERT (!uc_is_bidi_class ('x', UC_BIDI_EN));
 
-  ASSERT (uc_is_bidi_category (0x05D7, UC_BIDI_R));
-  ASSERT (!uc_is_bidi_category (0x05D7, UC_BIDI_L));
-  ASSERT (!uc_is_bidi_category (0x05D7, UC_BIDI_EN));
+  ASSERT (uc_is_bidi_class (0x05D7, UC_BIDI_R));
+  ASSERT (!uc_is_bidi_class (0x05D7, UC_BIDI_L));
+  ASSERT (!uc_is_bidi_class (0x05D7, UC_BIDI_EN));
 
-  ASSERT (uc_is_bidi_category ('7', UC_BIDI_EN));
-  ASSERT (!uc_is_bidi_category ('7', UC_BIDI_L));
-  ASSERT (!uc_is_bidi_category ('7', UC_BIDI_R));
+  ASSERT (uc_is_bidi_class ('7', UC_BIDI_EN));
+  ASSERT (!uc_is_bidi_class ('7', UC_BIDI_L));
+  ASSERT (!uc_is_bidi_class ('7', UC_BIDI_R));
 
   {
     unsigned int c;
 
     for (c = 0; c < 0x110000; c++)
-      ASSERT (uc_is_bidi_category (c, uc_bidi_category (c)));
+      ASSERT (uc_is_bidi_class (c, uc_bidi_class (c)));
   }
 
   return 0;

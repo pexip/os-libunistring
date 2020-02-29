@@ -1,5 +1,5 @@
 /* Convert wide character to unibyte character.
-   Copyright (C) 2008, 2009, 2010 Free Software Foundation, Inc.
+   Copyright (C) 2008, 2010-2018 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
    This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -30,8 +30,9 @@ wctob (wint_t wc)
 
   if (!(MB_CUR_MAX <= sizeof (buf)))
     abort ();
-  if (wctomb (buf, wc) == 1)
-    return (unsigned char) buf[0];
-  else
-    return EOF;
+  /* Handle the case where WEOF is a value that does not fit in a wchar_t.  */
+  if (wc == (wchar_t)wc)
+    if (wctomb (buf, (wchar_t)wc) == 1)
+      return (unsigned char) buf[0];
+  return EOF;
 }
