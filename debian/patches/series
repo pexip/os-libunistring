@@ -1,2 +1,3 @@
 0100-float-endian-detection.patch
 0700-multiarch-libc.patch
+0705-gcc-9.patch

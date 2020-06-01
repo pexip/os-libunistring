@@ -1,3 +1,42 @@
+libunistring (0.9.10-4) unstable; urgency=high
+
+  * Fix ftbfs with dh_missing (Closes: #961960).
+  * debian/changelog:
+    - Fix removed tag at 0.9.10-2.
+
+ -- Jörg Frings-Fürst <debian@jff.email>  Mon, 01 Jun 2020 17:48:44 +0200
+
+libunistring (0.9.10-3) unstable; urgency=medium
+
+  * Update symbols for non-glibc. (Closes: #956635)
+    - thanks to Helmut Grohne <helmut@subdivi.de>.
+  * Declare compliance with Debian Policy 4.5.0 (No changes needed).
+  * Migrate to debhelper-compat 13:
+    - Remove debian/compat.
+    - Bump minimum debhelper-compat version in debian/control to = 13.
+    - New debian/not_installed:
+      + Add usr/share/info/libunistring.info
+      + Add usr/lib/x86_64-linux-gnu/libunistring.la
+  * debian/control:
+    - Add Rules-Requires-Root: no.
+  * debian/copyright:
+    - Add year 2020 to myself.
+
+ -- Jörg Frings-Fürst <debian@jff.email>  Sun, 31 May 2020 15:08:22 +0200
+
+libunistring (0.9.10-2) unstable; urgency=medium
+
+  * New patch debian/patches/0705-gcc-9.patch:
+    - Fix gcc-9 issue (Closes: #925762, #920824).
+  * Migrate to debhelper 12:
+    - Change debian/compat to 12.
+    - Bump minimum debhelper version in debian/control to >= 12.
+  * Declare compliance with Debian Policy 4.4.0 (No changes needed).
+  * debian/copyright:
+    - Refresh copyright years for debian/* to 2019.
+
+ -- Jörg Frings-Fürst <debian@jff.email>  Thu, 11 Jul 2019 19:15:05 +0200
+
 libunistring (0.9.10-1) unstable; urgency=medium
 
   * New upstream release.
