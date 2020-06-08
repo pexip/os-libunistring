@@ -1,6 +1,7 @@
 libunistring (0.9.10-1pexip1) pexip; urgency=medium
 
   * Migrate to Buster
+  * skip test that is unreliable in docker
 
  -- Vincent Sanders <vince@pexip.com>  Sat, 29 Feb 2020 15:57:10 +0000
 
