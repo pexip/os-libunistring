@@ -1,3 +1,9 @@
+libunistring (0.9.10-4pexip2) pexip-bullseye; urgency=medium
+
+  * Main bullseye build
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Fri, 24 Jun 2022 13:56:03 +0100
+
 libunistring (0.9.10-4pexip1) pexip; urgency=medium
 
   * Initial bullseye build
