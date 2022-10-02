@@ -5,7 +5,7 @@ Index: trunk/lib/Makefile.am
 ===================================================================
 --- trunk.orig/lib/Makefile.am
 +++ trunk/lib/Makefile.am
-@@ -101,30 +101,15 @@ unistring/stdint.h : $(STDINT_H) stdint.
+@@ -103,30 +103,15 @@ unistring/stdint.h : $(STDINT_H) stdint.
  	  echo '#if __GLIBC__ >= 2'; \
  	  echo '#include <stdint.h>'; \
  	  echo '#else'; \

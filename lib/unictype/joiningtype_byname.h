@@ -29,7 +29,7 @@
 #error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gperf@gnu.org>."
 #endif
 
-#line 2 "./unictype/joiningtype_byname.gperf"
+#line 25 "./unictype/joiningtype_byname.gperf"
 struct named_joining_type { int name; int joining_type; };
 
 #define TOTAL_KEYWORDS 17
@@ -167,45 +167,45 @@ static const struct joining_type_stringpool_t joining_type_stringpool_contents =
 static const struct named_joining_type joining_type_names[] =
   {
     {-1},
-#line 16 "./unictype/joiningtype_byname.gperf"
+#line 39 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str1, UC_JOINING_TYPE_L},
-#line 17 "./unictype/joiningtype_byname.gperf"
+#line 40 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str2, UC_JOINING_TYPE_R},
-#line 19 "./unictype/joiningtype_byname.gperf"
+#line 42 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str3, UC_JOINING_TYPE_U},
-#line 14 "./unictype/joiningtype_byname.gperf"
+#line 37 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str4, UC_JOINING_TYPE_C},
-#line 15 "./unictype/joiningtype_byname.gperf"
+#line 38 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str5, UC_JOINING_TYPE_D},
     {-1},
-#line 18 "./unictype/joiningtype_byname.gperf"
+#line 41 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str7, UC_JOINING_TYPE_T},
     {-1}, {-1}, {-1},
-#line 25 "./unictype/joiningtype_byname.gperf"
+#line 48 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str11, UC_JOINING_TYPE_L},
-#line 24 "./unictype/joiningtype_byname.gperf"
+#line 47 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str12, UC_JOINING_TYPE_L},
-#line 27 "./unictype/joiningtype_byname.gperf"
+#line 50 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str13, UC_JOINING_TYPE_R},
-#line 26 "./unictype/joiningtype_byname.gperf"
+#line 49 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str14, UC_JOINING_TYPE_R},
-#line 23 "./unictype/joiningtype_byname.gperf"
+#line 46 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str15, UC_JOINING_TYPE_D},
-#line 22 "./unictype/joiningtype_byname.gperf"
+#line 45 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str16, UC_JOINING_TYPE_D},
-#line 28 "./unictype/joiningtype_byname.gperf"
+#line 51 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str17, UC_JOINING_TYPE_T},
-#line 30 "./unictype/joiningtype_byname.gperf"
+#line 53 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str18, UC_JOINING_TYPE_U},
-#line 29 "./unictype/joiningtype_byname.gperf"
+#line 52 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str19, UC_JOINING_TYPE_U},
-#line 21 "./unictype/joiningtype_byname.gperf"
+#line 44 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str20, UC_JOINING_TYPE_C},
-#line 20 "./unictype/joiningtype_byname.gperf"
+#line 43 "./unictype/joiningtype_byname.gperf"
     {(int)(size_t)&((struct joining_type_stringpool_t *)0)->joining_type_stringpool_str21, UC_JOINING_TYPE_C}
   };
 
-const struct named_joining_type *
+static const struct named_joining_type *
 uc_joining_type_lookup (register const char *str, register size_t len)
 {
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)

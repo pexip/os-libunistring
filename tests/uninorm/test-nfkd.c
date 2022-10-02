@@ -1,5 +1,5 @@
 /* Test of compatibility decomposition of Unicode strings.
-   Copyright (C) 2009-2018 Free Software Foundation, Inc.
+   Copyright (C) 2009-2022 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 #include "uninorm.h"
 
-#if !WOE32DLL
+#if !(((defined _WIN32 || defined __CYGWIN__) && (HAVE_LIBUNISTRING || WOE32DLL)) || defined __ANDROID__)
 /* Check that UNINORM_NFKD is defined and links.  */
 uninorm_t n = UNINORM_NFKD;
 #endif
@@ -33,7 +33,7 @@ int
 main ()
 {
   /* Check that UNINORM_NFKD is defined and links.  */
-  uninorm_t nf = UNINORM_NFKD;
+  volatile uninorm_t nf = UNINORM_NFKD;
   (void) nf;
 
   test_u32_nfkd ();

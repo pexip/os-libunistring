@@ -1,5 +1,5 @@
 /* Test of uN_strchr() functions.
-   Copyright (C) 2008-2018 Free Software Foundation, Inc.
+   Copyright (C) 2008-2022 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -158,4 +158,6 @@ test_strchr (void)
 #endif
 
   free (input);
+  if (sizeof (UNIT) != sizeof (uint32_t))
+    free (input32);
 }

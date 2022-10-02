@@ -1,3 +1,53 @@
+libunistring (1.0-2) unstable; urgency=medium
+
+  * debian/libunistring2.symbols.hurd-i386:
+    - Refresh symbols (Closes: #1018232).
+  * debian/libunistring2.symbols:
+    - Refresh symbols.
+  * Replace upstream signing key.
+  * Declare compliance with Debian Policy 4.6.1.0 (No changes needed).
+
+ -- Jörg Frings-Fürst <debian@jff.email>  Sun, 02 Oct 2022 18:09:14 +0200
+
+libunistring (1.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Declare compliance with Debian Policy 4.6.0.1 (No changes needed).
+  * Refresh debian/libunistring2.symbols.
+  * debian/copyright:
+    - Refresh uploader copyright years.
+    - Add 2022 to myself.
+  * debian/patches:
+    - Refresh 0700-multiarch-libc.patch.
+    - In series comment out:
+      + 0005-fix_build_musl.patch
+      + 0705-gcc-9.patch
+      + 0010-AC_INIT.patch
+
+ -- Jörg Frings-Fürst <debian@jff.email>  Sat, 08 Jan 2022 18:08:42 +0100
+
+libunistring (0.9.10-6) unstable; urgency=medium
+
+  * New debian/patches/0010-AC_INIT.patch to fix AC_INIT handling
+    (Closes: #992281).
+
+ -- Jörg Frings-Fürst <debian@jff.email>  Mon, 16 Aug 2021 23:32:24 +0200
+
+libunistring (0.9.10-5) experimental; urgency=medium
+
+  * New debian/patches/0005-fix_build_musl.patch (Closes: #987609):
+    - Fix build on musl (Thanks to Helmut Grohne <helmut@subdivi.de>).
+  * Declare compliance with Debian Policy 4.5.1 (No changes needed).
+  * debian/copyright:
+    - Fix copyright format problems (Closes: #972501):
+      + Thanks to Bastian Germann <bage@linutronix.de>.
+    - Refresh copyright years for debian/* to 2021.
+  * debian/libunistring2.symbols,
+    debian/libunistring2.symbols.hurd-i386:
+    - Add Build-Depends-Package field.
+
+ -- Jörg Frings-Fürst <debian@jff.email>  Mon, 26 Apr 2021 19:52:59 +0200
+
 libunistring (0.9.10-4) unstable; urgency=high
 
   * Fix ftbfs with dh_missing (Closes: #961960).
