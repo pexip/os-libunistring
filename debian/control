@@ -10,7 +10,7 @@ Rules-Requires-Root: no
 Homepage: https://www.gnu.org/software/libunistring/
 Vcs-Git: git://jff.email/opt/git/libunistring.git
 Vcs-Browser: https://jff.email/cgit/libunistring.git
-XS-Pexip-Upstream: http://deb.debian.org/debian/ bullseye
+XS-Pexip-Upstream: http://deb.debian.org/debian/ bookworm
 
 Package: libunistring-dev
 Section: libdevel
