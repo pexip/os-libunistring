@@ -95,7 +95,7 @@ uc_locale_language_hash (register const char *str, register size_t len)
   return hval;
 }
 
-const char *
+static const char *
 uc_locale_languages_lookup (register const char *str, register size_t len)
 {
   struct stringpool_t
@@ -1026,7 +1026,7 @@ uc_locale_languages_lookup (register const char *str, register size_t len)
     }
   return 0;
 }
-#line 271 "./unicase/locale-languages.gperf"
+#line 295 "./unicase/locale-languages.gperf"
 
 /*
  * Local Variables:
