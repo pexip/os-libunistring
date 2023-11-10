@@ -4,7 +4,7 @@ Maintainer: Pexip AS <packaging@pexip.com>
 XSBC-Pexip-Original-Maintainer: Jörg Frings-Fürst <debian@jff.email>
 Build-Depends:
  debhelper-compat (= 13)
-Standards-Version: 4.5.0
+Standards-Version: 4.6.1.0
 Section: libs
 Rules-Requires-Root: no
 Homepage: https://www.gnu.org/software/libunistring/

@@ -1,4 +1,5 @@
 libunistring.so.2 libunistring2 #MINVER#
+* Build-Depends-Package: libunistring-dev
  UC_CATEGORY_C@Base 0.9.7
  UC_CATEGORY_Cc@Base 0.9.7
  UC_CATEGORY_Cf@Base 0.9.7
@@ -71,6 +72,12 @@ libunistring.so.2 libunistring2 #MINVER#
  UC_PROPERTY_DEFAULT_IGNORABLE_CODE_POINT@Base 0.9.7
  UC_PROPERTY_DEPRECATED@Base 0.9.7
  UC_PROPERTY_DIACRITIC@Base 0.9.7
+ UC_PROPERTY_EMOJI@Base 1.0
+ UC_PROPERTY_EMOJI_COMPONENT@Base 1.0
+ UC_PROPERTY_EMOJI_MODIFIER@Base 1.0
+ UC_PROPERTY_EMOJI_MODIFIER_BASE@Base 1.0
+ UC_PROPERTY_EMOJI_PRESENTATION@Base 1.0
+ UC_PROPERTY_EXTENDED_PICTOGRAPHIC@Base 1.0
  UC_PROPERTY_EXTENDER@Base 0.9.7
  UC_PROPERTY_FORMAT_CONTROL@Base 0.9.7
  UC_PROPERTY_GRAPHEME_BASE@Base 0.9.7
@@ -110,6 +117,7 @@ libunistring.so.2 libunistring2 #MINVER#
  UC_PROPERTY_PUNCTUATION@Base 0.9.7
  UC_PROPERTY_QUOTATION_MARK@Base 0.9.7
  UC_PROPERTY_RADICAL@Base 0.9.7
+ UC_PROPERTY_REGIONAL_INDICATOR@Base 1.0
  UC_PROPERTY_SENTENCE_TERMINAL@Base 0.9.7
  UC_PROPERTY_SOFT_DOTTED@Base 0.9.7
  UC_PROPERTY_SPACE@Base 0.9.7
@@ -151,11 +159,10 @@ libunistring.so.2 libunistring2 #MINVER#
  libunistring_gl_locale_name_posix@Base 0.9.7
  libunistring_gl_locale_name_thread@Base 0.9.7
  libunistring_gl_unicase_special_lookup@Base 0.9.7
- libunistring_gl_uninorm_compose_lookup@Base 0.9.7
  libunistring_gl_uninorm_decomp_chars_table@Base 0.9.7
  libunistring_gl_uninorm_decomp_index_table@Base 0.9.7
- libunistring_gl_uninorm_decompose_merge_sort_fromto@Base 0.9.7
  libunistring_gl_uninorm_decompose_merge_sort_inplace@Base 0.9.7
+ libunistring_glthread_once_multithreaded@Base 1.0
  libunistring_glthread_once_singlethreaded@Base 0.9.7
  libunistring_glthread_recursive_lock_init_multithreaded@Base 0.9.7
  (arch=gnu-any-any)libunistring_glthread_rwlock_init_for_glibc@Base 0.9.8
@@ -178,30 +185,28 @@ libunistring.so.2 libunistring2 #MINVER#
  libunistring_printf_frexp@Base 0.9.7
  libunistring_printf_frexpl@Base 0.9.7
  libunistring_rpl_mbrtowc@Base 0.9.7
+ libunistring_setlocale_null@Base 1.0
+ libunistring_setlocale_null_r@Base 1.0
  libunistring_str_cd_iconveh@Base 0.9.7
  libunistring_str_iconveh@Base 0.9.7
  libunistring_str_iconveha@Base 0.9.7
  libunistring_u16_casemap@Base 0.9.7
  libunistring_u16_is_invariant@Base 0.9.7
+ libunistring_u16_possible_linebreaks_loop@Base 1.0
  libunistring_u16_printf_parse@Base 0.9.7
  libunistring_u32_casemap@Base 0.9.7
  libunistring_u32_is_invariant@Base 0.9.7
+ libunistring_u32_possible_linebreaks_loop@Base 1.0
  libunistring_u32_printf_parse@Base 0.9.7
  libunistring_u8_casemap@Base 0.9.7
  libunistring_u8_is_invariant@Base 0.9.7
+ libunistring_u8_possible_linebreaks_loop@Base 1.0
  libunistring_u8_printf_parse@Base 0.9.7
+ libunistring_u8_width_linebreaks_internal@Base 1.0
  libunistring_u_printf_fetchargs@Base 0.9.7
- libunistring_uc_bidi_class_lookup@Base 0.9.7
- libunistring_uc_combining_class_lookup@Base 0.9.7
  libunistring_uc_compat_decomposition@Base 0.9.7
- libunistring_uc_general_category_lookup@Base 0.9.7
  libunistring_uc_is_case_ignorable@Base 0.9.7
  libunistring_uc_is_cased@Base 0.9.7
- libunistring_uc_joining_group_lookup@Base 0.9.7
- libunistring_uc_joining_type_lookup@Base 0.9.7
- libunistring_uc_locale_languages_lookup@Base 0.9.7
- libunistring_uc_property_lookup@Base 0.9.7
- libunistring_uc_script_lookup@Base 0.9.7
  libunistring_uc_tocasefold@Base 0.9.7
  libunistring_ulc_printf_parse@Base 0.9.7
  libunistring_uniconv_register_autodetect@Base 0.9.7
@@ -261,6 +266,7 @@ libunistring.so.2 libunistring2 #MINVER#
  u16_normcoll@Base 0.9.7
  u16_normxfrm@Base 0.9.7
  u16_possible_linebreaks@Base 0.9.7
+ u16_possible_linebreaks_v2@Base 1.0
  u16_prev@Base 0.9.7
  u16_set@Base 0.9.7
  u16_snprintf@Base 0.9.7
@@ -313,6 +319,7 @@ libunistring.so.2 libunistring2 #MINVER#
  u16_vsprintf@Base 0.9.7
  u16_width@Base 0.9.7
  u16_width_linebreaks@Base 0.9.7
+ u16_width_linebreaks_v2@Base 1.0
  u16_wordbreaks@Base 0.9.7
  u32_asnprintf@Base 0.9.7
  u32_asprintf@Base 0.9.7
@@ -357,6 +364,7 @@ libunistring.so.2 libunistring2 #MINVER#
  u32_normcoll@Base 0.9.7
  u32_normxfrm@Base 0.9.7
  u32_possible_linebreaks@Base 0.9.7
+ u32_possible_linebreaks_v2@Base 1.0
  u32_prev@Base 0.9.7
  u32_set@Base 0.9.7
  u32_snprintf@Base 0.9.7
@@ -408,6 +416,7 @@ libunistring.so.2 libunistring2 #MINVER#
  u32_vsprintf@Base 0.9.7
  u32_width@Base 0.9.7
  u32_width_linebreaks@Base 0.9.7
+ u32_width_linebreaks_v2@Base 1.0
  u32_wordbreaks@Base 0.9.7
  u8_asnprintf@Base 0.9.7
  u8_asprintf@Base 0.9.7
@@ -454,6 +463,7 @@ libunistring.so.2 libunistring2 #MINVER#
  u8_normcoll@Base 0.9.7
  u8_normxfrm@Base 0.9.7
  u8_possible_linebreaks@Base 0.9.7
+ u8_possible_linebreaks_v2@Base 1.0
  u8_prev@Base 0.9.7
  u8_set@Base 0.9.7
  u8_snprintf@Base 0.9.7
@@ -506,6 +516,7 @@ libunistring.so.2 libunistring2 #MINVER#
  u8_vsprintf@Base 0.9.7
  u8_width@Base 0.9.7
  u8_width_linebreaks@Base 0.9.7
+ u8_width_linebreaks_v2@Base 1.0
  u8_wordbreaks@Base 0.9.7
  uc_all_blocks@Base 0.9.7
  uc_all_scripts@Base 0.9.7
@@ -587,6 +598,12 @@ libunistring.so.2 libunistring2 #MINVER#
  uc_is_property_default_ignorable_code_point@Base 0.9.7
  uc_is_property_deprecated@Base 0.9.7
  uc_is_property_diacritic@Base 0.9.7
+ uc_is_property_emoji@Base 1.0
+ uc_is_property_emoji_component@Base 1.0
+ uc_is_property_emoji_modifier@Base 1.0
+ uc_is_property_emoji_modifier_base@Base 1.0
+ uc_is_property_emoji_presentation@Base 1.0
+ uc_is_property_extended_pictographic@Base 1.0
  uc_is_property_extender@Base 0.9.7
  uc_is_property_format_control@Base 0.9.7
  uc_is_property_grapheme_base@Base 0.9.7
@@ -626,6 +643,7 @@ libunistring.so.2 libunistring2 #MINVER#
  uc_is_property_punctuation@Base 0.9.7
  uc_is_property_quotation_mark@Base 0.9.7
  uc_is_property_radical@Base 0.9.7
+ uc_is_property_regional_indicator@Base 1.0
  uc_is_property_sentence_terminal@Base 0.9.7
  uc_is_property_soft_dotted@Base 0.9.7
  uc_is_property_space@Base 0.9.7
@@ -671,6 +689,7 @@ libunistring.so.2 libunistring2 #MINVER#
  ulc_fprintf@Base 0.9.7
  ulc_grapheme_breaks@Base 0.9.7
  ulc_possible_linebreaks@Base 0.9.7
+ ulc_possible_linebreaks_v2@Base 1.0
  ulc_snprintf@Base 0.9.7
  ulc_sprintf@Base 0.9.7
  ulc_vasnprintf@Base 0.9.7
@@ -679,6 +698,7 @@ libunistring.so.2 libunistring2 #MINVER#
  ulc_vsnprintf@Base 0.9.7
  ulc_vsprintf@Base 0.9.7
  ulc_width_linebreaks@Base 0.9.7
+ ulc_width_linebreaks_v2@Base 1.0
  ulc_wordbreaks@Base 0.9.7
  unicase_empty_prefix_context@Base 0.9.7
  unicase_empty_suffix_context@Base 0.9.7

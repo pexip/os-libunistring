@@ -1,0 +1,21 @@
+Description: Fix build for musl
+Author: Helmut Grohne <helmut@subdivi.de>
+Origin: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=987609
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=987609
+Forwarded: not-needed
+Last-Update: 2021-04-26
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+Index: trunk/lib/Makefile.gnulib
+===================================================================
+--- trunk.orig/lib/Makefile.gnulib
++++ trunk/lib/Makefile.gnulib
+@@ -461,7 +461,7 @@ install-exec-localcharset: all-local
+ 	  case '$(host_os)' in \
+ 	    darwin[56]*) \
+ 	      need_charset_alias=true ;; \
+-	    darwin* | cygwin* | mingw* | pw32* | cegcc*) \
++	    darwin* | cygwin* | mingw* | pw32* | cegcc* | linux-musl*) \
+ 	      need_charset_alias=false ;; \
+ 	    *) \
+ 	      need_charset_alias=true ;; \
