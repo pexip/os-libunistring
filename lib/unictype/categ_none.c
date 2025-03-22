@@ -1,5 +1,5 @@
 /* Categories of Unicode characters.
-   Copyright (C) 2007, 2009-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2024 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2007.
 
    This file is free software: you can redistribute it and/or modify
@@ -27,4 +27,4 @@ always_false (ucs4_t uc, uint32_t bitmask)
 }
 
 const uc_general_category_t _UC_CATEGORY_NONE =
-  { 0, 1, { &always_false } };
+  { 0, 1, { .lookup_fn = &always_false } };

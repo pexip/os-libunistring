@@ -1,12 +1,12 @@
 /* Properties of Unicode characters.
-   Copyright (C) 2007, 2011-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2011-2024 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2007.
 
    This file is free software.
    It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
    You can redistribute it and/or modify it under either
      - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
+       by the Free Software Foundation, either version 3, or (at your
        option) any later version, or
      - the terms of the GNU General Public License as published by the
        Free Software Foundation; either version 2, or (at your option)
@@ -69,6 +69,8 @@ enum
   UC_PROPERTY_INDEX_OTHER_ID_CONTINUE,
   UC_PROPERTY_INDEX_XID_START,
   UC_PROPERTY_INDEX_XID_CONTINUE,
+  UC_PROPERTY_INDEX_ID_COMPAT_MATH_START,
+  UC_PROPERTY_INDEX_ID_COMPAT_MATH_CONTINUE,
   UC_PROPERTY_INDEX_PATTERN_WHITE_SPACE,
   UC_PROPERTY_INDEX_PATTERN_SYNTAX,
   /* Shaping and rendering.  */
@@ -77,6 +79,7 @@ enum
   UC_PROPERTY_INDEX_GRAPHEME_EXTEND,
   UC_PROPERTY_INDEX_OTHER_GRAPHEME_EXTEND,
   UC_PROPERTY_INDEX_GRAPHEME_LINK,
+  UC_PROPERTY_INDEX_MODIFIER_COMBINING_MARK,
   /* Bidi.  */
   UC_PROPERTY_INDEX_BIDI_CONTROL,
   UC_PROPERTY_INDEX_BIDI_LEFT_TO_RIGHT,
@@ -102,6 +105,7 @@ enum
   UC_PROPERTY_INDEX_IDEOGRAPHIC,
   UC_PROPERTY_INDEX_UNIFIED_IDEOGRAPH,
   UC_PROPERTY_INDEX_RADICAL,
+  UC_PROPERTY_INDEX_IDS_UNARY_OPERATOR,
   UC_PROPERTY_INDEX_IDS_BINARY_OPERATOR,
   UC_PROPERTY_INDEX_IDS_TRINARY_OPERATOR,
   /* Misc.  */
@@ -110,6 +114,7 @@ enum
   UC_PROPERTY_INDEX_NON_BREAK,
   UC_PROPERTY_INDEX_ISO_CONTROL,
   UC_PROPERTY_INDEX_FORMAT_CONTROL,
+  UC_PROPERTY_INDEX_PREPENDED_CONCATENATION_MARK,
   UC_PROPERTY_INDEX_DASH,
   UC_PROPERTY_INDEX_HYPHEN,
   UC_PROPERTY_INDEX_PUNCTUATION,
@@ -227,6 +232,10 @@ uc_property_byname (const char *property_name)
         return UC_PROPERTY_XID_START;
       case UC_PROPERTY_INDEX_XID_CONTINUE:
         return UC_PROPERTY_XID_CONTINUE;
+      case UC_PROPERTY_INDEX_ID_COMPAT_MATH_START:
+        return UC_PROPERTY_ID_COMPAT_MATH_START;
+      case UC_PROPERTY_INDEX_ID_COMPAT_MATH_CONTINUE:
+        return UC_PROPERTY_ID_COMPAT_MATH_CONTINUE;
       case UC_PROPERTY_INDEX_PATTERN_WHITE_SPACE:
         return UC_PROPERTY_PATTERN_WHITE_SPACE;
       case UC_PROPERTY_INDEX_PATTERN_SYNTAX:
@@ -241,6 +250,8 @@ uc_property_byname (const char *property_name)
         return UC_PROPERTY_OTHER_GRAPHEME_EXTEND;
       case UC_PROPERTY_INDEX_GRAPHEME_LINK:
         return UC_PROPERTY_GRAPHEME_LINK;
+      case UC_PROPERTY_INDEX_MODIFIER_COMBINING_MARK:
+        return UC_PROPERTY_MODIFIER_COMBINING_MARK;
       case UC_PROPERTY_INDEX_BIDI_CONTROL:
         return UC_PROPERTY_BIDI_CONTROL;
       case UC_PROPERTY_INDEX_BIDI_LEFT_TO_RIGHT:
@@ -285,6 +296,8 @@ uc_property_byname (const char *property_name)
         return UC_PROPERTY_UNIFIED_IDEOGRAPH;
       case UC_PROPERTY_INDEX_RADICAL:
         return UC_PROPERTY_RADICAL;
+      case UC_PROPERTY_INDEX_IDS_UNARY_OPERATOR:
+        return UC_PROPERTY_IDS_UNARY_OPERATOR;
       case UC_PROPERTY_INDEX_IDS_BINARY_OPERATOR:
         return UC_PROPERTY_IDS_BINARY_OPERATOR;
       case UC_PROPERTY_INDEX_IDS_TRINARY_OPERATOR:
@@ -299,6 +312,8 @@ uc_property_byname (const char *property_name)
         return UC_PROPERTY_ISO_CONTROL;
       case UC_PROPERTY_INDEX_FORMAT_CONTROL:
         return UC_PROPERTY_FORMAT_CONTROL;
+      case UC_PROPERTY_INDEX_PREPENDED_CONCATENATION_MARK:
+        return UC_PROPERTY_PREPENDED_CONCATENATION_MARK;
       case UC_PROPERTY_INDEX_DASH:
         return UC_PROPERTY_DASH;
       case UC_PROPERTY_INDEX_HYPHEN:

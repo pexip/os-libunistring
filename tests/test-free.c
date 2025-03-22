@@ -1,9 +1,9 @@
 /* Test of free() function.
-   Copyright (C) 2020-2022 Free Software Foundation, Inc.
+   Copyright (C) 2020-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -98,6 +98,12 @@ main ()
     #undef N
   }
 
+  /* Skip this test when an address sanitizer is in use, because it would report
+     a "heap buffer overflow".  */
+  #ifndef __has_feature
+   #define __has_feature(a) 0
+  #endif
+  #if !(defined __SANITIZE_ADDRESS__ || __has_feature (address_sanitizer))
   /* Test a less common code path.
      When malloc() is based on mmap(), free() can sometimes call munmap().
      munmap() usually succeeds, but fails in a particular situation: when
@@ -115,7 +121,7 @@ main ()
   if (open ("/proc/sys/vm/max_map_count", O_RDONLY) >= 0)
     {
       /* Preparations.  */
-      size_t pagesize = getpagesize ();
+      size_t pagesize = sysconf (_SC_PAGESIZE);
       void *firstpage_backup = malloc (pagesize);
       void *lastpage_backup = malloc (pagesize);
       /* Allocate a large memory area, as a bumper, so that the MAP_FIXED
@@ -170,6 +176,7 @@ main ()
         }
     }
   #endif
+  #endif
 
-  return 0;
+  return test_exit_status;
 }

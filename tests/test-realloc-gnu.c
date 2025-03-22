@@ -1,9 +1,9 @@
 /* Test of realloc function.
-   Copyright (C) 2010-2022 Free Software Foundation, Inc.
+   Copyright (C) 2010-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -25,7 +25,7 @@
 #include "macros.h"
 
 int
-main (int argc, char **argv)
+main (int argc, _GL_UNUSED char **argv)
 {
   /* Check that realloc (NULL, 0) is not a NULL pointer.  */
   void *volatile p = realloc (NULL, 0);
@@ -45,5 +45,5 @@ main (int argc, char **argv)
     }
 
   free (p);
-  return 0;
+  return test_exit_status;
 }

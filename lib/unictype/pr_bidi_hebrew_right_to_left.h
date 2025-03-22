@@ -1,14 +1,14 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Properties of Unicode characters.  */
-/* Generated automatically by gen-uni-tables.c for Unicode 14.0.0.  */
+/* Generated automatically by gen-uni-tables.c for Unicode 16.0.0.  */
 
-/* Copyright (C) 2000-2022 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2024 Free Software Foundation, Inc.
 
    This file is free software.
    It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
    You can redistribute it and/or modify it under either
      - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
+       by the Free Software Foundation, either version 3, or (at your
        option) any later version, or
      - the terms of the GNU General Public License as published by the
        Free Software Foundation; either version 2, or (at your option)
@@ -312,7 +312,7 @@ u_property_bidi_hebrew_right_to_left =
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0xFFFFFFFFU, 0xDC3007FFU,
     0x043FFFFFU, 0xFFFFC110U, 0xF1FFFFFFU, 0x0000F800U,
-    0x00FC8000U, 0x00000000U, 0x00000000U, 0x00000000U,
+    0x007C8000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00008000U, 0x00000000U, 0x00000000U, 0x00000000U,
@@ -333,10 +333,10 @@ u_property_bidi_hebrew_right_to_left =
     0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU,
     0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU,
     0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU,
-    0x00000000U, 0xFC00FF00U, 0xFFFFFFFFU, 0xFFFFFFFFU,
+    0x00000000U, 0xFC00FF00U, 0xFFFFFC00U, 0xFFFF81FFU,
     0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU,
     0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0x80000000U,
-    0xFFFFFFFFU, 0xFFFFE7FFU, 0xFFFFFFFFU, 0xFFFFFFFFU,
+    0xFFFFFFFFU, 0xFFFFE7FFU, 0xFFFFFFE3U, 0x0FFFFFFFU,
     0xFFFFFFFFU, 0x0000FFFFU, 0xFC000000U, 0xFFFFFFFFU,
     0xFFFFFFC3U, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU,
     0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU, 0xFFFFFFFFU,

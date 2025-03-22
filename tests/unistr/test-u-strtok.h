@@ -1,9 +1,9 @@
 /* Test of uN_strtok() functions.
-   Copyright (C) 2015-2022 Free Software Foundation, Inc.
+   Copyright (C) 2015-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -50,10 +50,12 @@ test_u_strtok (void)
         'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B', 'D', 'E', 0
       };
     ucs4_t u_delim[] = { 0x3000, 0x3001, 0 };
-    size_t input_len = 6 * SIZEOF (u_input);
-    UNIT *input = (UNIT *) malloc (input_len);
-    size_t delim_len = 6 * SIZEOF (u_delim);
-    UNIT *delim = (UNIT *) malloc (delim_len);
+    /* Convert ucs4_t[] to UNIT[].
+       Every ucs4_t yields at most 4 / sizeof (UNIT) units.  */
+    size_t input_len = SIZEOF (u_input) * (4 / sizeof (UNIT));
+    UNIT *input = (UNIT *) malloc (input_len * sizeof (UNIT));
+    size_t delim_len = SIZEOF (u_delim) * (4 / sizeof (UNIT));
+    UNIT *delim = (UNIT *) malloc (delim_len * sizeof (UNIT));
     UNIT *state;
     const UNIT *result;
     UNIT *ptr, *first_ptr, *second_ptr;

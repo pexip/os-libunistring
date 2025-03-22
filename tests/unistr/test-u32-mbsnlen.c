@@ -1,9 +1,9 @@
 /* Test of u32_mbsnlen() function.
-   Copyright (C) 2010-2022 Free Software Foundation, Inc.
+   Copyright (C) 2010-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -25,7 +25,6 @@
 int
 main ()
 {
-
   /* Simple string.  */
   { /* "Grüß Gott. Здравствуйте! x=(-b±sqrt(b²-4ac))/(2a)  日本語,中文,한글" */
     static const uint32_t input[] =
@@ -59,5 +58,6 @@ main ()
         ASSERT (len == n);
       }
   }
-  return 0;
+
+  return test_exit_status;
 }

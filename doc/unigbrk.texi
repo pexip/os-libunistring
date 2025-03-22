@@ -47,8 +47,9 @@ Returns NULL if and only if @code{@var{s} == @var{end}}.
 
 Note that these functions do not handle the case when a character
 outside of the range between @var{s} and @var{end} is needed to
-determine the boundary.  Use @func{_grapheme_breaks} functions for such
-cases.
+determine the boundary.
+This is the case in particular with syllables in Indic scripts or emojis.
+Use @func{_grapheme_breaks} functions for such cases.
 @end deftypefun
 
 @deftypefun void u8_grapheme_prev (const@tie{}uint8_t@tie{}*@var{s}, const@tie{}uint8_t@tie{}*@var{start})
@@ -60,8 +61,9 @@ Returns NULL if and only if @code{@var{s} == @var{start}}.
 
 Note that these functions do not handle the case when a character
 outside of the range between @var{start} and @var{s} is needed to
-determine the boundary.  Use @func{_grapheme_breaks} functions for such
-cases.
+determine the boundary.
+This is the case in particular with syllables in Indic scripts or emojis.
+Use @func{_grapheme_breaks} functions for such cases.
 
 Note also that these functions work only on well-formed Unicode strings.
 @end deftypefun
@@ -151,6 +153,7 @@ described in the Unicode standard, because the standard says that they
 are preferred.
 
 Note that this function does not handle the case when three or more
-consecutive characters are needed to determine the boundary.  Use
-@func{uc_grapheme_breaks} for such cases.
+consecutive characters are needed to determine the boundary.
+This is the case in particular with syllables in Indic scripts or emojis.
+Use @func{uc_grapheme_breaks} for such cases.
 @end deftypefun

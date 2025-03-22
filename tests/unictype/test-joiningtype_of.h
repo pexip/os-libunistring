@@ -1,12 +1,12 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Arabic joining type of Unicode characters.  */
-/* Generated automatically by gen-uni-tables.c for Unicode 14.0.0.  */
+/* Generated automatically by gen-uni-tables.c for Unicode 16.0.0.  */
 
-/* Copyright (C) 2000-2022 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2024 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published
-   by the Free Software Foundation; either version 3 of the License,
+   by the Free Software Foundation, either version 3 of the License,
    or (at your option) any later version.
 
    This file is distributed in the hope that it will be useful,
@@ -702,6 +702,9 @@
     { 0x10D21, UC_JOINING_TYPE_D },
     { 0x10D22, UC_JOINING_TYPE_R },
     { 0x10D23, UC_JOINING_TYPE_D },
+    { 0x10EC2, UC_JOINING_TYPE_R },
+    { 0x10EC3, UC_JOINING_TYPE_D },
+    { 0x10EC4, UC_JOINING_TYPE_D },
     { 0x10F30, UC_JOINING_TYPE_D },
     { 0x10F31, UC_JOINING_TYPE_D },
     { 0x10F32, UC_JOINING_TYPE_D },

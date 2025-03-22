@@ -1,10 +1,10 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Test the Unicode character type functions.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published
-   by the Free Software Foundation; either version 3 of the License,
+   by the Free Software Foundation, either version 3 of the License,
    or (at your option) any later version.
 
    This file is distributed in the hope that it will be useful,
@@ -79,6 +79,7 @@
     { 0x11FC0, 0x11FD4 },
     { 0x16B5B, 0x16B61 },
     { 0x16E80, 0x16E96 },
+    { 0x1D2C0, 0x1D2D3 },
     { 0x1D2E0, 0x1D2F3 },
     { 0x1D360, 0x1D378 },
     { 0x1E8C7, 0x1E8CF },

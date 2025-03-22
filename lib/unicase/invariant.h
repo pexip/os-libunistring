@@ -1,12 +1,12 @@
 /* Internal functions for Unicode character case mappings.
-   Copyright (C) 2009-2022 Free Software Foundation, Inc.
+   Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This file is free software.
    It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
    You can redistribute it and/or modify it under either
      - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
+       by the Free Software Foundation, either version 3, or (at your
        option) any later version, or
      - the terms of the GNU General Public License as published by the
        Free Software Foundation; either version 2, or (at your option)
@@ -23,11 +23,15 @@
    License and of the GNU General Public License along with this
    program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#include <stdbool.h>
 #include <stddef.h>
 
 #include "unitypes.h"
 #include "uninorm.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /* Return true if mapping NFD(S) to via MAPPING is a no-op.  */
 extern int
@@ -51,3 +55,8 @@ extern int
                                                 uint32_t *resultbuf, size_t *lengthp),
                          const char *iso639_language,
                          bool *resultp);
+
+
+#ifdef __cplusplus
+}
+#endif

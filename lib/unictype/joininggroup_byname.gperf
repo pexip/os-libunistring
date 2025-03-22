@@ -1,11 +1,11 @@
 /* Arabic joining group of Unicode characters.
-   Copyright (C) 2011-2022 Free Software Foundation, Inc.
+   Copyright (C) 2011-2024 Free Software Foundation, Inc.
 
    This file is free software.
    It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
    You can redistribute it and/or modify it under either
      - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
+       by the Free Software Foundation, either version 3, or (at your
        option) any later version, or
      - the terms of the GNU General Public License as published by the
        Free Software Foundation; either version 2, or (at your option)
@@ -194,3 +194,5 @@ Thin Yeh, UC_JOINING_GROUP_THIN_YEH
 ThinYeh, UC_JOINING_GROUP_THIN_YEH
 Vertical Tail, UC_JOINING_GROUP_VERTICAL_TAIL
 VerticalTail, UC_JOINING_GROUP_VERTICAL_TAIL
+Kashmiri Yeh, UC_JOINING_GROUP_KASHMIRI_YEH
+KashmiriYeh, UC_JOINING_GROUP_KASHMIRI_YEH

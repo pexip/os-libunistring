@@ -21,6 +21,7 @@ in the presence of specific Unicode characters.
 * Mirrored character::
 * Arabic shaping::
 * Properties::
+* Other attributes::
 * Scripts::
 * Blocks::
 * ISO C and Java syntax::
@@ -715,6 +716,16 @@ The following function looks up the mirrored character of a Unicode character.
 Stores the mirrored character of a Unicode character @var{uc} in
 @code{*@var{puc}} and returns @code{true}, if it exists.  Otherwise it
 stores @var{uc} unmodified in @code{*@var{puc}} and returns @code{false}.
+
+Note: It is possible for this function to return @code{true} and set
+@code{*@var{puc}} to @code{0xFFFD}.
+This happens when the character has the bidi mirror property (that is, it
+should be displayed through a mirrored glyph) but this mirrored glyph
+does not exist as a Unicode character; thus a rendering engine needs to
+synthesize it artificially or pick it from an appropriate font.
+@c The list of such characters is found at the end of BidiMirroring.txt.
+This affects mostly mathematical operators.
+See section ``Bidi Mirrored'' of the Unicode standard.
 @end deftypefun
 
 @node Arabic shaping
@@ -909,6 +920,7 @@ The joining group has the following possible values:
 @deftypevrx Constant int UC_JOINING_GROUP_HANIFI_ROHINGYA_KINNA_YA
 @deftypevrx Constant int UC_JOINING_GROUP_THIN_YEH
 @deftypevrx Constant int UC_JOINING_GROUP_VERTICAL_TAIL
+@deftypevrx Constant int UC_JOINING_GROUP_KASHMIRI_YEH
 @end deftypevr
 
 The following functions implement the association between a joining group
@@ -1003,6 +1015,8 @@ The following properties are related to identifiers.
 @deftypevrx Constant uc_property_t UC_PROPERTY_OTHER_ID_CONTINUE
 @deftypevrx Constant uc_property_t UC_PROPERTY_XID_START
 @deftypevrx Constant uc_property_t UC_PROPERTY_XID_CONTINUE
+@deftypevrx Constant uc_property_t UC_PROPERTY_ID_COMPAT_MATH_START
+@deftypevrx Constant uc_property_t UC_PROPERTY_ID_COMPAT_MATH_CONTINUE
 @deftypevrx Constant uc_property_t UC_PROPERTY_PATTERN_WHITE_SPACE
 @deftypevrx Constant uc_property_t UC_PROPERTY_PATTERN_SYNTAX
 @end deftypevr
@@ -1014,6 +1028,7 @@ The following properties have an influence on shaping and rendering.
 @deftypevrx Constant uc_property_t UC_PROPERTY_GRAPHEME_EXTEND
 @deftypevrx Constant uc_property_t UC_PROPERTY_OTHER_GRAPHEME_EXTEND
 @deftypevrx Constant uc_property_t UC_PROPERTY_GRAPHEME_LINK
+@deftypevrx Constant uc_property_t UC_PROPERTY_MODIFIER_COMBINING_MARK
 @end deftypevr
 
 The following properties relate to bidirectional reordering.
@@ -1048,6 +1063,7 @@ The following properties deal with CJK.
 @deftypevr Constant uc_property_t UC_PROPERTY_IDEOGRAPHIC
 @deftypevrx Constant uc_property_t UC_PROPERTY_UNIFIED_IDEOGRAPH
 @deftypevrx Constant uc_property_t UC_PROPERTY_RADICAL
+@deftypevrx Constant uc_property_t UC_PROPERTY_IDS_UNARY_OPERATOR
 @deftypevrx Constant uc_property_t UC_PROPERTY_IDS_BINARY_OPERATOR
 @deftypevrx Constant uc_property_t UC_PROPERTY_IDS_TRINARY_OPERATOR
 @end deftypevr
@@ -1069,6 +1085,7 @@ Other miscellaneous properties are:
 @deftypevrx Constant uc_property_t UC_PROPERTY_NON_BREAK
 @deftypevrx Constant uc_property_t UC_PROPERTY_ISO_CONTROL
 @deftypevrx Constant uc_property_t UC_PROPERTY_FORMAT_CONTROL
+@deftypevrx Constant uc_property_t UC_PROPERTY_PREPENDED_CONCATENATION_MARK
 @deftypevrx Constant uc_property_t UC_PROPERTY_DASH
 @deftypevrx Constant uc_property_t UC_PROPERTY_HYPHEN
 @deftypevrx Constant uc_property_t UC_PROPERTY_PUNCTUATION
@@ -1163,6 +1180,8 @@ The following properties are related to identifiers.
 @deftypefunx bool uc_is_property_other_id_continue (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_xid_start (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_xid_continue (ucs4_t@tie{}@var{uc})
+@deftypefunx bool uc_is_property_id_compat_math_start (ucs4_t@tie{}@var{uc})
+@deftypefunx bool uc_is_property_id_compat_math_continue (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_pattern_white_space (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_pattern_syntax (ucs4_t@tie{}@var{uc})
 @end deftypefun
@@ -1174,6 +1193,7 @@ The following properties have an influence on shaping and rendering.
 @deftypefunx bool uc_is_property_grapheme_extend (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_other_grapheme_extend (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_grapheme_link (ucs4_t@tie{}@var{uc})
+@deftypefunx bool uc_is_property_modifier_combining_mark (ucs4_t@tie{}@var{uc})
 @end deftypefun
 
 The following properties relate to bidirectional reordering.
@@ -1208,6 +1228,7 @@ The following properties deal with CJK.
 @deftypefun bool uc_is_property_ideographic (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_unified_ideograph (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_radical (ucs4_t@tie{}@var{uc})
+@deftypefunx bool uc_is_property_ids_unary_operator (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_ids_binary_operator (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_ids_trinary_operator (ucs4_t@tie{}@var{uc})
 @end deftypefun
@@ -1229,6 +1250,7 @@ Other miscellaneous properties are:
 @deftypefunx bool uc_is_property_non_break (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_iso_control (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_format_control (ucs4_t@tie{}@var{uc})
+@deftypefunx bool uc_is_property_prepended_concatenation_mark (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_dash (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_hyphen (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_punctuation (ucs4_t@tie{}@var{uc})
@@ -1250,6 +1272,50 @@ Other miscellaneous properties are:
 @deftypefunx bool uc_is_property_extender (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_ignorable_control (ucs4_t@tie{}@var{uc})
 @deftypefunx bool uc_is_property_regional_indicator (ucs4_t@tie{}@var{uc})
+@end deftypefun
+
+@node Other attributes
+@section Other attributes
+
+This section defines non-boolean attributes of Unicode characters.
+
+@menu
+* Indic conjunct break::
+@end menu
+
+@node Indic conjunct break
+@subsection Indic conjunct break
+
+@cindex Indic_Conjunct_Break
+The Indic_Conjunct_Break attribute is used when determining the grapheme
+cluster boundary in Indic scripts.
+
+The Indic_Conjunct_Break attribute has the following possible values:
+
+@deftypevr Constant int UC_INDIC_CONJUNCT_BREAK_NONE
+@deftypevrx Constant int UC_INDIC_CONJUNCT_BREAK_CONSONANT
+@deftypevrx Constant int UC_INDIC_CONJUNCT_BREAK_LINKER
+@deftypevrx Constant int UC_INDIC_CONJUNCT_BREAK_EXTEND
+@end deftypevr
+
+The following functions implement the association between an
+Indic_Conjunct_Break value and its name.
+
+@deftypefun {const char *} uc_indic_conjunct_break_name (int@tie{}@var{indic_conjunct_break})
+Returns the name of an Indic_Conjunct_Break value.
+@end deftypefun
+
+@deftypefun int uc_indic_conjunct_break_byname (const@tie{}char@tie{}*@var{indic_conjunct_break_name})
+Returns the Indic_Conjunct_Break value given by name, e.g@. @code{"Consonant"}.
+This lookup ignores spaces, underscores, or hyphens as word separators and is
+case-insignificant.
+@end deftypefun
+
+The following function gives the Indic_Conjunct_Break attribute of every
+Unicode character.
+
+@deftypefun int uc_indic_conjunct_break (ucs4_t@tie{}@var{uc})
+Returns the Indic_Conjunct_Break attribute of a Unicode character.
 @end deftypefun
 
 @node Scripts

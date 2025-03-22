@@ -71,12 +71,12 @@ https://savannah.gnu.org/git/?group=libunistring .
 
 After fetching the sources from the Git repository, peek at the comments in
 autogen.sh, then run
-  ./gitsub.sh pull
+  ./autopull.sh
   ./autogen.sh
 Then you can proceed with "./configure" as usual.
 
 Each time you want to update the source, do not only "git pull".  Instead do
-  git pull && ./gitsub.sh pull
+  git pull && ./autopull.sh
   ./autogen.sh
 
 
@@ -104,10 +104,15 @@ To speed up the build:
 Continuous integration
 ======================
 
-The package is built automatically, at regular intervals.  You find the latest
-build results here:
+There are two continuous integrations that regularly build and test
+libunistring:
+* On a Linux/glibc system only:
   https://gitlab.com/gnu-libunistring/ci-distcheck/pipelines
   https://gitlab.com/gnu-libunistring/ci-distcheck/-/jobs?scope=finished
+  This one will catch only the most blatant mistakes.
+* On many platforms:
+  https://github.com/gnu-libunistring/ci-check/actions
+  This one catches platform-specific bugs.
 
 
 Running the testsuite in valgrind

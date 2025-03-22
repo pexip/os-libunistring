@@ -1,9 +1,9 @@
 /* Test of uN_chr() functions.
-   Copyright (C) 2008-2022 Free Software Foundation, Inc.
+   Copyright (C) 2008-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -20,7 +20,6 @@ int
 main (void)
 {
   size_t size = 0x100000;
-  size_t i;
   size_t length;
   UNIT *input;
   uint32_t *input32 = (uint32_t *) malloc (size * sizeof (uint32_t));
@@ -29,7 +28,7 @@ main (void)
   input32[0] = 'a';
   input32[1] = 'b';
   u32_set (input32 + 2, 'c', 1024);
-  for (i = 1026; i < size - 2; i += 63)
+  for (size_t i = 1026; i < size - 2; i += 63)
     {
       size_t last = i + 63 < size - 2 ? i + 63 : size - 2;
       ucs4_t uc = 'd' | (i - 1026);
@@ -48,9 +47,11 @@ main (void)
   ASSERT (U_CHR (input, length, 'a') == input);
 
   ASSERT (U_CHR (input, 0, 'a') == NULL);
-  void *page_boundary = zerosize_ptr ();
-  if (page_boundary)
-    ASSERT (U_CHR (page_boundary, 0, 'a') == NULL);
+  {
+    void *page_boundary = zerosize_ptr ();
+    if (page_boundary != NULL)
+      ASSERT (U_CHR (page_boundary, 0, 'a') == NULL);
+  }
 
   ASSERT (U_CHR (input, length, 'b') == input + 1);
   ASSERT (U_CHR (input, length, 'c') == input + 2);
@@ -59,7 +60,7 @@ main (void)
   {
     UNIT *exp = input + 1026;
     UNIT *prev = input + 1;
-    for (i = 1026; i < size - 2; i += 63)
+    for (size_t i = 1026; i < size - 2; i += 63)
       {
         UNIT c[6];
         size_t n;
@@ -108,14 +109,14 @@ main (void)
   /* Check that uN_chr() does not read past the first occurrence of the
      byte being searched.  */
   {
-    char *page_boundary = (char *) zerosize_ptr ();
+    UNIT *page_boundary = zerosize_ptr ();
     size_t n;
 
     if (page_boundary != NULL)
       {
         for (n = 1; n <= 500 / sizeof (UNIT); n++)
           {
-            UNIT *mem = (UNIT *) (page_boundary - n * sizeof (UNIT));
+            UNIT *mem = page_boundary - n;
             U_SET (mem, 'X', n);
             ASSERT (U_CHR (mem, n, 'U') == NULL);
 
@@ -137,5 +138,5 @@ main (void)
   if (sizeof (UNIT) != sizeof (uint32_t))
     free (input32);
 
-  return 0;
+  return test_exit_status;
 }

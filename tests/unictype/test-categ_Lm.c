@@ -1,10 +1,10 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Test the Unicode character type functions.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published
-   by the Free Software Foundation; either version 3 of the License,
+   by the Free Software Foundation, either version 3 of the License,
    or (at your option) any later version.
 
    This file is distributed in the hope that it will be useful,
@@ -77,14 +77,20 @@
     { 0x10780, 0x10785 },
     { 0x10787, 0x107B0 },
     { 0x107B2, 0x107BA },
+    { 0x10D4E, 0x10D4E },
+    { 0x10D6F, 0x10D6F },
     { 0x16B40, 0x16B43 },
+    { 0x16D40, 0x16D42 },
+    { 0x16D6B, 0x16D6C },
     { 0x16F93, 0x16F9F },
     { 0x16FE0, 0x16FE1 },
     { 0x16FE3, 0x16FE3 },
     { 0x1AFF0, 0x1AFF3 },
     { 0x1AFF5, 0x1AFFB },
     { 0x1AFFD, 0x1AFFE },
+    { 0x1E030, 0x1E06D },
     { 0x1E137, 0x1E13D },
+    { 0x1E4EB, 0x1E4EB },
     { 0x1E94B, 0x1E94B }
 
 #define PREDICATE(c) uc_is_general_category (c, UC_CATEGORY_Lm)

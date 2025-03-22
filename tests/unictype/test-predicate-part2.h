@@ -1,9 +1,9 @@
 /* Test the Unicode character type functions.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -33,5 +33,5 @@ main ()
   for (; c < 0x110000; c++)
     ASSERT (!PREDICATE (c));
 
-  return 0;
+  return test_exit_status;
 }

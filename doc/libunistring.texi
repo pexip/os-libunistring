@@ -98,7 +98,7 @@ This manual is for GNU libunistring.
 
 @ignore
 @c This was: @copying but it triggers a makeinfo 4.13 bug
-Copyright (C) 2001-2022 Free Software Foundation, Inc.
+Copyright (C) 2001-2024 Free Software Foundation, Inc.
 
 This manual is free documentation.  It is dually licensed under the
 GNU FDL and the GNU GPL.  This means that you can redistribute this
@@ -129,7 +129,7 @@ A copy of the license is included in @ref{GNU GPL}.
 @page
 @vskip 0pt plus 1filll
 @c @insertcopying
-Copyright (C) 2001-2022 Free Software Foundation, Inc.
+Copyright (C) 2001-2024 Free Software Foundation, Inc.
 
 This manual is free documentation.  It is dually licensed under the
 GNU FDL and the GNU GPL.  This means that you can redistribute this
@@ -609,7 +609,7 @@ number of screen columns of a string is requested.
 gnulib has functions @func{mbschr} and @func{mbsrrchr} that are
 like @posixfunc{strchr} and @posixfunc{strrchr}, but work in multibyte locales.
 @item
-gnulib has a function @func{mbsstr}, like @posixfunc{strstr}, but works
+gnulib has a function @func{mbsstr} that is like @posixfunc{strstr}, but works
 in multibyte locales.
 @item
 gnulib has functions @func{mbscspn}, @func{mbspbrk}, @func{mbsspn}
@@ -714,7 +714,10 @@ Variables of type @code{uint32_t *} denote UTF-32 strings, without byte
 order mark.  Their units are 4-byte words.
 
 Argument pairs @code{(@var{s}, @var{n})} denote a string
-@code{@var{s}[0..@var{n}-1]} with exactly @var{n} units.
+@code{@var{s}[0..@var{n}-1]} with exactly @var{n} units.@footnote{A NUL
+unit as terminator is not needed, since the number of units is given by
+@var{n}.  If some of the units of the string are NUL, they are just
+regular units; they are not interpreted as terminators.}
 
 All functions with prefix @samp{ulc_} operate on C strings in locale
 encoding.
@@ -753,6 +756,27 @@ into @code{*@var{lengthp}} units, it is put in @var{resultbuf}, and
 is returned.  In both cases, @code{*@var{lengthp}} is set to the
 length (number of units) of the returned string.  In case of error,
 NULL is returned and @code{errno} is set.
+
+To invoke such a function:
+@itemize @bullet
+@item
+First ask yourself whether you want to accept the overhead of a
+@code{malloc} invocation even for a small-sized result.
+If yes, pass NULL as @var{resultbuf}.
+If no, allocate an array of units on the stack, typically between 50 and
+4000 bytes large; pass this array as @var{resultbuf}; and initialize
+@code{*@var{lengthp}} to the number of units of this array.
+@item
+Upon return from such a function, look at the return value:
+NULL means an error; look at the value of @code{errno} in this case.
+Otherwise, the return value is the result, with @code{*@var{lengthp}}
+units.  Note that the function has @emph{not} added an extra NUL
+character at the end.
+@item
+Finally, do memory management.  You know that the result was
+@code{malloc}-allocated if it is @code{!= NULL} and
+@code{!= @var{resultbuf}}.
+@end itemize
 
 @include unitypes.texi
 @include unistr.texi
@@ -840,14 +864,16 @@ version number of the libunistring library.
 
 @deftypevr Macro int _LIBUNISTRING_VERSION
 This constant contains the version of libunistring that is being used
-at compile time.  It encodes the major and minor parts of the version
-number only.  These parts are encoded in the form @code{(major<<8) + minor}.
+at compile time.
+It encodes the major, minor, and subminor parts of the version number.
+These parts are encoded in the form @code{(major<<16) + (minor<<8) + subminor}.
 @end deftypevr
 
 @deftypevr Constant int _libunistring_version
 This constant contains the version of libunistring that is being used
-at run time.  It encodes the major and minor parts of the version
-number only.  These parts are encoded in the form @code{(major<<8) + minor}.
+at run time.
+It encodes the major, minor, and subminor parts of the version number.
+These parts are encoded in the form @code{(major<<16) + (minor<<8) + subminor}.
 @end deftypevr
 
 It is possible that @code{_libunistring_version} is greater than
@@ -855,6 +881,15 @@ It is possible that @code{_libunistring_version} is greater than
 @code{libunistring} as a shared library, and a newer, binary
 backward-compatible version has been installed after your program
 that uses @code{libunistring} was installed.
+
+@code{<unistring/version.h>} also contains:
+
+@deftypevr Constant int _libunistring_unicode_version
+This constant contains the version of the Unicode standard that is
+implemented by libunistring.
+It encodes the major and minor parts of the version number only.
+These parts are encoded in the form @code{(major<<8) + minor}.
+@end deftypevr
 
 @node Autoconf macro
 @section Autoconf macro

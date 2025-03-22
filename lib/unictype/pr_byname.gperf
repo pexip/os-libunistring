@@ -1,11 +1,11 @@
 /* Properties of Unicode characters.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This file is free software.
    It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
    You can redistribute it and/or modify it under either
      - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
+       by the Free Software Foundation, either version 3, or (at your
        option) any later version, or
      - the terms of the GNU General Public License as published by the
        Free Software Foundation; either version 2, or (at your option)
@@ -113,6 +113,12 @@ xids, UC_PROPERTY_INDEX_XID_START
 xid_continue, UC_PROPERTY_INDEX_XID_CONTINUE
 xidcontinue, UC_PROPERTY_INDEX_XID_CONTINUE
 xidc, UC_PROPERTY_INDEX_XID_CONTINUE
+id_compat_math_start, UC_PROPERTY_INDEX_ID_COMPAT_MATH_START
+idcompatmathstart, UC_PROPERTY_INDEX_ID_COMPAT_MATH_START
+idcms, UC_PROPERTY_INDEX_ID_COMPAT_MATH_START
+id_compat_math_continue, UC_PROPERTY_INDEX_ID_COMPAT_MATH_CONTINUE
+idcompatmathcontinue, UC_PROPERTY_INDEX_ID_COMPAT_MATH_CONTINUE
+idcmc, UC_PROPERTY_INDEX_ID_COMPAT_MATH_CONTINUE
 pattern_white_space, UC_PROPERTY_INDEX_PATTERN_WHITE_SPACE
 patternwhitespace, UC_PROPERTY_INDEX_PATTERN_WHITE_SPACE
 pat_ws, UC_PROPERTY_INDEX_PATTERN_WHITE_SPACE
@@ -141,6 +147,8 @@ grapheme_link, UC_PROPERTY_INDEX_GRAPHEME_LINK
 graphemelink, UC_PROPERTY_INDEX_GRAPHEME_LINK
 gr_link, UC_PROPERTY_INDEX_GRAPHEME_LINK
 grlink, UC_PROPERTY_INDEX_GRAPHEME_LINK
+modifier_combining_mark, UC_PROPERTY_INDEX_MODIFIER_COMBINING_MARK
+modifiercombiningmark, UC_PROPERTY_INDEX_MODIFIER_COMBINING_MARK
 bidi_control, UC_PROPERTY_INDEX_BIDI_CONTROL
 bidicontrol, UC_PROPERTY_INDEX_BIDI_CONTROL
 bidi_c, UC_PROPERTY_INDEX_BIDI_CONTROL
@@ -189,6 +197,9 @@ unified_ideograph, UC_PROPERTY_INDEX_UNIFIED_IDEOGRAPH
 unifiedideograph, UC_PROPERTY_INDEX_UNIFIED_IDEOGRAPH
 uideo, UC_PROPERTY_INDEX_UNIFIED_IDEOGRAPH
 radical, UC_PROPERTY_INDEX_RADICAL
+ids_unary_operator, UC_PROPERTY_INDEX_IDS_UNARY_OPERATOR
+idsunaryoperator, UC_PROPERTY_INDEX_IDS_UNARY_OPERATOR
+idsu, UC_PROPERTY_INDEX_IDS_UNARY_OPERATOR
 ids_binary_operator, UC_PROPERTY_INDEX_IDS_BINARY_OPERATOR
 idsbinaryoperator, UC_PROPERTY_INDEX_IDS_BINARY_OPERATOR
 idsb, UC_PROPERTY_INDEX_IDS_BINARY_OPERATOR
@@ -204,6 +215,8 @@ iso_control, UC_PROPERTY_INDEX_ISO_CONTROL
 isocontrol, UC_PROPERTY_INDEX_ISO_CONTROL
 format_control, UC_PROPERTY_INDEX_FORMAT_CONTROL
 formatcontrol, UC_PROPERTY_INDEX_FORMAT_CONTROL
+prepended_concatenation_mark, UC_PROPERTY_INDEX_PREPENDED_CONCATENATION_MARK
+prependedconcatenationmark, UC_PROPERTY_INDEX_PREPENDED_CONCATENATION_MARK
 dash, UC_PROPERTY_INDEX_DASH
 hyphen, UC_PROPERTY_INDEX_HYPHEN
 punctuation, UC_PROPERTY_INDEX_PUNCTUATION
