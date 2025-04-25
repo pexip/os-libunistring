@@ -1,29 +1,21 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* ISO C <ctype.h> like properties of Unicode characters.  */
-/* Generated automatically by gen-uni-tables.c for Unicode 14.0.0.  */
+/* Generated automatically by gen-uni-tables.c for Unicode 16.0.0.  */
 
-/* Copyright (C) 2000-2022 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2024 Free Software Foundation, Inc.
 
-   This file is free software.
-   It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
-   You can redistribute it and/or modify it under either
-     - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
-       option) any later version, or
-     - the terms of the GNU General Public License as published by the
-       Free Software Foundation; either version 2, or (at your option)
-       any later version, or
-     - the same dual license "the GNU LGPLv3+ or the GNU GPLv2+".
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
    This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License and the GNU General Public License
-   for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public
-   License and of the GNU General Public License along with this
-   program.  If not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #define header_0 16
 #define header_2 9
@@ -324,7 +316,7 @@ u_is_upper =
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0xFFFFFFFFU, 0xFFFFFFFFU, 0x003FFFFFU,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
-    0xFFFF0000U, 0xE7FFFFFFU, 0x00000000U, 0x00000000U,
+    0xFFFF0200U, 0xE7FFFFFFU, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x55555555U, 0x55555555U, 0x55555555U, 0x55555555U,
@@ -346,7 +338,7 @@ u_is_upper =
     0x00000000U, 0x00000000U, 0x55555555U, 0x00001555U,
     0x05555555U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x55545554U, 0x55555555U, 0x6A005555U,
-    0x55452855U, 0x555F7D55U, 0x014102F5U, 0x00200000U,
+    0x55452855U, 0x555F7D55U, 0x15411AF5U, 0x00200000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x07FFFFFEU, 0x00000000U, 0x00000000U,
@@ -357,7 +349,7 @@ u_is_upper =
     0x0037F7FFU, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0xFFFFFFFFU, 0x0007FFFFU, 0x00000000U, 0x00000000U,
-    0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
+    0x00000000U, 0x00000000U, 0xFFFF0000U, 0x0000003FU,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0xFFFFFFFFU, 0x00000000U, 0x00000000U,

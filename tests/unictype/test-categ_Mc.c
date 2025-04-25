@@ -1,10 +1,10 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Test the Unicode character type functions.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published
-   by the Free Software Foundation; either version 3 of the License,
+   by the Free Software Foundation, either version 3 of the License,
    or (at your option) any later version.
 
    This file is distributed in the hope that it will be useful,
@@ -52,6 +52,7 @@
     { 0x0CC7, 0x0CC8 },
     { 0x0CCA, 0x0CCB },
     { 0x0CD5, 0x0CD6 },
+    { 0x0CF3, 0x0CF3 },
     { 0x0D02, 0x0D03 },
     { 0x0D3E, 0x0D40 },
     { 0x0D46, 0x0D48 },
@@ -150,6 +151,12 @@
     { 0x1134B, 0x1134D },
     { 0x11357, 0x11357 },
     { 0x11362, 0x11363 },
+    { 0x113B8, 0x113BA },
+    { 0x113C2, 0x113C2 },
+    { 0x113C5, 0x113C5 },
+    { 0x113C7, 0x113CA },
+    { 0x113CC, 0x113CD },
+    { 0x113CF, 0x113CF },
     { 0x11435, 0x11437 },
     { 0x11440, 0x11441 },
     { 0x11445, 0x11445 },
@@ -166,6 +173,7 @@
     { 0x116AC, 0x116AC },
     { 0x116AE, 0x116AF },
     { 0x116B6, 0x116B6 },
+    { 0x1171E, 0x1171E },
     { 0x11720, 0x11721 },
     { 0x11726, 0x11726 },
     { 0x1182C, 0x1182E },
@@ -190,6 +198,11 @@
     { 0x11D93, 0x11D94 },
     { 0x11D96, 0x11D96 },
     { 0x11EF5, 0x11EF6 },
+    { 0x11F03, 0x11F03 },
+    { 0x11F34, 0x11F35 },
+    { 0x11F3E, 0x11F3F },
+    { 0x11F41, 0x11F41 },
+    { 0x1612A, 0x1612C },
     { 0x16F51, 0x16F87 },
     { 0x16FF0, 0x16FF1 },
     { 0x1D165, 0x1D166 },

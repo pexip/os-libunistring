@@ -1,9 +1,9 @@
 /* Grapheme cluster breaks test.
-   Copyright (C) 2010-2022 Free Software Foundation, Inc.
+   Copyright (C) 2010-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 3 of the License, or
+   by the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -61,19 +61,20 @@ test_u32_grapheme_breaks (const char *expected, ...)
 
         fprintf (stderr, "   input:");
         for (j = 0; j < n; j++)
-          fprintf (stderr, " %02x", s[j]);
+          fprintf (stderr, " %04X", s[j]);
         putc ('\n', stderr);
 
         fprintf (stderr, "expected:");
         for (j = 0; j < n; j++)
-          fprintf (stderr, "  %d", expected[j] == '#');
+          fprintf (stderr, "    %d", expected[j] == '#');
         putc ('\n', stderr);
 
         fprintf (stderr, "  actual:");
         for (j = 0; j < n; j++)
-          fprintf (stderr, "  %d", breaks[j]);
+          fprintf (stderr, "    %d", breaks[j]);
         putc ('\n', stderr);
 
+        fflush (stderr);
         abort ();
       }
 }
@@ -114,5 +115,5 @@ main (void)
                             '.', 0x1F1E9, 0x1F1EA, 0x1F1EB, 0x1F1F7, '.',
                             -1);
 
-  return 0;
+  return test_exit_status;
 }

@@ -1,9 +1,9 @@
 /* Test of <stdint.h> substitute.
-   Copyright (C) 2006-2022 Free Software Foundation, Inc.
+   Copyright (C) 2006-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -216,22 +216,24 @@ err or;
 /* 7.18.1.4. Integer types capable of holding object pointers */
 /* 7.18.2.4. Limits of integer types capable of holding object pointers */
 
+#ifdef INTPTR_MAX
 intptr_t g[3] = { 17, INTPTR_MIN, INTPTR_MAX };
 verify (sizeof (void *) <= sizeof (intptr_t));
+# ifndef __CHERI_PURE_CAPABILITY__
 verify (TYPE_MINIMUM (intptr_t) == INTPTR_MIN);
 verify (TYPE_MAXIMUM (intptr_t) == INTPTR_MAX);
+# endif
 verify_same_types (INTPTR_MIN, (intptr_t) 0 + 0);
 verify_same_types (INTPTR_MAX, (intptr_t) 0 + 0);
+#endif
 
+#ifdef UINTPTR_MAX
 uintptr_t h[2] = { 17, UINTPTR_MAX };
 verify (sizeof (void *) <= sizeof (uintptr_t));
+# ifndef __CHERI_PURE_CAPABILITY__
 verify (TYPE_MAXIMUM (uintptr_t) == UINTPTR_MAX);
+# endif
 verify_same_types (UINTPTR_MAX, (uintptr_t) 0 + 0);
-
-#if INTPTR_MIN && INTPTR_MAX && UINTPTR_MAX
-/* ok */
-#else
-err or;
 #endif
 
 /* 7.18.1.5. Greatest-width integer types */
@@ -295,17 +297,15 @@ verify_same_types (SIZE_MAX, (size_t) 0 + 0);
 err or;
 #endif
 
-#if HAVE_WCHAR_T
 verify (TYPE_MINIMUM (wchar_t) == WCHAR_MIN);
 verify (TYPE_MAXIMUM (wchar_t) == WCHAR_MAX);
 verify_same_types (WCHAR_MIN, (wchar_t) 0 + 0);
 verify_same_types (WCHAR_MAX, (wchar_t) 0 + 0);
 
-# if WCHAR_MIN != 17 && WCHAR_MAX
+#if WCHAR_MIN != 17 && WCHAR_MAX
 /* ok */
-# else
+#else
 err or;
-# endif
 #endif
 
 #if HAVE_WINT_T
@@ -408,8 +408,14 @@ verify_width (INT_FAST32_WIDTH, INT_FAST32_MIN, INT_FAST32_MAX);
 verify_width (UINT_FAST32_WIDTH, 0, UINT_FAST32_MAX);
 verify_width (INT_FAST64_WIDTH, INT_FAST64_MIN, INT_FAST64_MAX);
 verify_width (UINT_FAST64_WIDTH, 0, UINT_FAST64_MAX);
+#ifndef __CHERI_PURE_CAPABILITY__
+# ifdef INTPTR_WIDTH
 verify_width (INTPTR_WIDTH, INTPTR_MIN, INTPTR_MAX);
+# endif
+# ifdef UINTPTR_WIDTH
 verify_width (UINTPTR_WIDTH, 0, UINTPTR_MAX);
+# endif
+#endif
 verify_width (INTMAX_WIDTH, INTMAX_MIN, INTMAX_MAX);
 verify_width (UINTMAX_WIDTH, 0, UINTMAX_MAX);
 verify_width (PTRDIFF_WIDTH, PTRDIFF_MIN, PTRDIFF_MAX);

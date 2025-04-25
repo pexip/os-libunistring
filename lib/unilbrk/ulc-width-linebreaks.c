@@ -1,12 +1,12 @@
 /* Line breaking of strings.
-   Copyright (C) 2001-2003, 2006-2022 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2006-2024 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2001.
 
    This file is free software.
    It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
    You can redistribute it and/or modify it under either
      - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
+       by the Free Software Foundation, either version 3, or (at your
        option) any later version, or
      - the terms of the GNU General Public License as published by the
        Free Software Foundation; either version 2, or (at your option)
@@ -151,7 +151,10 @@ ulc_width_linebreaks_internal (const char *s, size_t n,
   return start_column;
 }
 
-#undef ulc_width_linebreaks
+#if defined IN_LIBUNISTRING
+/* For backward compatibility with older versions of libunistring.  */
+
+# undef ulc_width_linebreaks
 
 int
 ulc_width_linebreaks (const char *s, size_t n,
@@ -163,6 +166,8 @@ ulc_width_linebreaks (const char *s, size_t n,
                                         width, start_column, at_end_columns,
                                         o, encoding, -1, p);
 }
+
+#endif
 
 int
 ulc_width_linebreaks_v2 (const char *s, size_t n,

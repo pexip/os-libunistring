@@ -1,9 +1,9 @@
 /* Test of u8_v[a]s[n]printf() function.
-   Copyright (C) 2007, 2009-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -77,6 +77,22 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
       ASSERT (u8_strcmp (result, expected) == 0);
       free (result);
     }
+    { /* Width given as argument.  */
+      uint8_t *result =
+        my_xasprintf ("%*U %d", 10, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "     Hello 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
+    { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+      uint8_t *result =
+        my_xasprintf ("%*U %d", -10, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "Hello      33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
     { /* FLAG_LEFT.  */
       uint8_t *result =
         my_xasprintf ("%-10U %d", unicode_string, 33, 44, 55);
@@ -94,6 +110,26 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
       free (result);
     }
   }
+  { /* Width with a non-ASCII argument.  */
+    static const uint8_t unicode_string[] = /* hétérogénéité */
+      "h\303\251t\303\251rog\303\251n\303\251it\303\251";
+    uint8_t *result =
+      my_xasprintf ("%20U %d", unicode_string, 33, 44, 55);
+    static const uint8_t expected[] =
+      "       h\303\251t\303\251rog\303\251n\303\251it\303\251 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+  { /* Width with a non-BMP argument.  */
+    static const uint8_t unicode_string[] = "\360\237\220\203"; /* 🐃 */
+    uint8_t *result =
+      my_xasprintf ("%10U %d", unicode_string, 33, 44, 55);
+    static const uint8_t expected[] = "         \360\237\220\203 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
 
   {
     static const uint16_t unicode_string[] = { 'H', 'e', 'l', 'l', 'o', 0 };
@@ -109,6 +145,22 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
       uint8_t *result =
         my_xasprintf ("%10lU %d", unicode_string, 33, 44, 55);
       static const uint8_t expected[] = "     Hello 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
+    { /* Width given as argument.  */
+      uint8_t *result =
+        my_xasprintf ("%*lU %d", 10, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "     Hello 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
+    { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+      uint8_t *result =
+        my_xasprintf ("%*lU %d", -10, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "Hello      33";
       ASSERT (result != NULL);
       ASSERT (u8_strcmp (result, expected) == 0);
       free (result);
@@ -130,6 +182,28 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
       free (result);
     }
   }
+  { /* Width with a non-ASCII argument.  */
+    static const uint16_t unicode_string[] = /* hétérogénéité */
+      { 'h', 0x00e9, 't', 0x00e9, 'r', 'o', 'g', 0x00e9, 'n', 0x00e9,
+        'i', 't', 0x00e9, 0
+      };
+    uint8_t *result =
+      my_xasprintf ("%20lU %d", unicode_string, 33, 44, 55);
+    static const uint8_t expected[] =
+      "       h\303\251t\303\251rog\303\251n\303\251it\303\251 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+  { /* Width with a non-BMP argument.  */
+    static const uint16_t unicode_string[] = { 0xd83d, 0xdc03, 0 }; /* 🐃 */
+    uint8_t *result =
+      my_xasprintf ("%10lU %d", unicode_string, 33, 44, 55);
+    static const uint8_t expected[] = "         \360\237\220\203 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
 
   {
     static const uint32_t unicode_string[] = { 'H', 'e', 'l', 'l', 'o', 0 };
@@ -145,6 +219,22 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
       uint8_t *result =
         my_xasprintf ("%10llU %d", unicode_string, 33, 44, 55);
       static const uint8_t expected[] = "     Hello 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
+    { /* Width given as argument.  */
+      uint8_t *result =
+        my_xasprintf ("%*llU %d", 10, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "     Hello 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
+    { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+      uint8_t *result =
+        my_xasprintf ("%*llU %d", -10, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "Hello      33";
       ASSERT (result != NULL);
       ASSERT (u8_strcmp (result, expected) == 0);
       free (result);
@@ -166,6 +256,28 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
       free (result);
     }
   }
+  { /* Width with a non-ASCII argument.  */
+    static const uint32_t unicode_string[] = /* hétérogénéité */
+      { 'h', 0x00e9, 't', 0x00e9, 'r', 'o', 'g', 0x00e9, 'n', 0x00e9,
+        'i', 't', 0x00e9, 0
+      };
+    uint8_t *result =
+      my_xasprintf ("%20llU %d", unicode_string, 33, 44, 55);
+    static const uint8_t expected[] =
+      "       h\303\251t\303\251rog\303\251n\303\251it\303\251 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+  { /* Width with a non-BMP argument.  */
+    static const uint32_t unicode_string[] = { 0x1f403, 0 }; /* 🐃 */
+    uint8_t *result =
+      my_xasprintf ("%10llU %d", unicode_string, 33, 44, 55);
+    static const uint8_t expected[] = "         \360\237\220\203 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
 
   /* Test the support of the 's' conversion specifier for strings.  */
 
@@ -182,6 +294,24 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
     uint8_t *result =
       my_xasprintf ("Mr. %20s %d", "Ronald Reagan", 33, 44, 55);
     static const uint8_t expected[] = "Mr.        Ronald Reagan 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
+  { /* Width given as argument.  */
+    uint8_t *result =
+      my_xasprintf ("Mr. %*s %d", 20, "Ronald Reagan", 33, 44, 55);
+    static const uint8_t expected[] = "Mr.        Ronald Reagan 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
+  { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+    uint8_t *result =
+      my_xasprintf ("Mr. %*s %d", -20, "Ronald Reagan", 33, 44, 55);
+    static const uint8_t expected[] = "Mr. Ronald Reagan        33";
     ASSERT (result != NULL);
     ASSERT (u8_strcmp (result, expected) == 0);
     free (result);
@@ -230,6 +360,36 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
     static const uint8_t expected2[] = "  0x3.8p-1 33";
     static const uint8_t expected3[] = "    0x7p-2 33";
     static const uint8_t expected4[] = "    0xep-3 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected1) == 0
+            || u8_strcmp (result, expected2) == 0
+            || u8_strcmp (result, expected3) == 0
+            || u8_strcmp (result, expected4) == 0);
+    free (result);
+  }
+
+  { /* Width given as argument.  */
+    uint8_t *result =
+      my_xasprintf ("%*a %d", 10, 1.75, 33, 44, 55);
+    static const uint8_t expected1[] = "  0x1.cp+0 33";
+    static const uint8_t expected2[] = "  0x3.8p-1 33";
+    static const uint8_t expected3[] = "    0x7p-2 33";
+    static const uint8_t expected4[] = "    0xep-3 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected1) == 0
+            || u8_strcmp (result, expected2) == 0
+            || u8_strcmp (result, expected3) == 0
+            || u8_strcmp (result, expected4) == 0);
+    free (result);
+  }
+
+  { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+    uint8_t *result =
+      my_xasprintf ("%*a %d", -10, 1.75, 33, 44, 55);
+    static const uint8_t expected1[] = "0x1.cp+0   33";
+    static const uint8_t expected2[] = "0x3.8p-1   33";
+    static const uint8_t expected3[] = "0x7p-2     33";
+    static const uint8_t expected4[] = "0xep-3     33";
     ASSERT (result != NULL);
     ASSERT (u8_strcmp (result, expected1) == 0
             || u8_strcmp (result, expected2) == 0
@@ -298,6 +458,36 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
     free (result);
   }
 
+  { /* Width given as argument.  */
+    uint8_t *result =
+      my_xasprintf ("%*La %d", 10, 1.75L, 33, 44, 55);
+    static const uint8_t expected1[] = "  0x1.cp+0 33";
+    static const uint8_t expected2[] = "  0x3.8p-1 33";
+    static const uint8_t expected3[] = "    0x7p-2 33";
+    static const uint8_t expected4[] = "    0xep-3 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected1) == 0
+            || u8_strcmp (result, expected2) == 0
+            || u8_strcmp (result, expected3) == 0
+            || u8_strcmp (result, expected4) == 0);
+    free (result);
+  }
+
+  { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+    uint8_t *result =
+      my_xasprintf ("%*La %d", -10, 1.75L, 33, 44, 55);
+    static const uint8_t expected1[] = "0x1.cp+0   33";
+    static const uint8_t expected2[] = "0x3.8p-1   33";
+    static const uint8_t expected3[] = "0x7p-2     33";
+    static const uint8_t expected4[] = "0xep-3     33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected1) == 0
+            || u8_strcmp (result, expected2) == 0
+            || u8_strcmp (result, expected3) == 0
+            || u8_strcmp (result, expected4) == 0);
+    free (result);
+  }
+
   { /* Small precision.  */
     uint8_t *result =
       my_xasprintf ("%.10La %d", 1.75L, 33, 44, 55);
@@ -348,6 +538,24 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
     free (result);
   }
 
+  { /* Width given as argument.  */
+    uint8_t *result =
+      my_xasprintf ("%*f %d", 10, 1.75, 33, 44, 55);
+    static const uint8_t expected[] = "  1.750000 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
+  { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+    uint8_t *result =
+      my_xasprintf ("%*f %d", -10, 1.75, 33, 44, 55);
+    static const uint8_t expected[] = "1.750000   33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
   { /* Precision.  */
     uint8_t *result =
       my_xasprintf ("%.f %d", 1234.0, 33, 44, 55);
@@ -370,6 +578,24 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
     uint8_t *result =
       my_xasprintf ("%10Lf %d", 1.75L, 33, 44, 55);
     static const uint8_t expected[] = "  1.750000 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
+  { /* Width given as argument.  */
+    uint8_t *result =
+      my_xasprintf ("%*Lf %d", 10, 1.75L, 33, 44, 55);
+    static const uint8_t expected[] = "  1.750000 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
+  { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+    uint8_t *result =
+      my_xasprintf ("%*Lf %d", -10, 1.75L, 33, 44, 55);
+    static const uint8_t expected[] = "1.750000   33";
     ASSERT (result != NULL);
     ASSERT (u8_strcmp (result, expected) == 0);
     free (result);
@@ -446,6 +672,28 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
     free (result);
   }
 
+  { /* Width given as argument.  */
+    uint8_t *result =
+      my_xasprintf ("%*e %d", 15, 1.75, 33, 44, 55);
+    static const uint8_t expected1[] = "   1.750000e+00 33";
+    static const uint8_t expected2[] = "  1.750000e+000 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected1) == 0
+            || u8_strcmp (result, expected2) == 0);
+    free (result);
+  }
+
+  { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+    uint8_t *result =
+      my_xasprintf ("%*e %d", -15, 1.75, 33, 44, 55);
+    static const uint8_t expected1[] = "1.750000e+00    33";
+    static const uint8_t expected2[] = "1.750000e+000   33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected1) == 0
+            || u8_strcmp (result, expected2) == 0);
+    free (result);
+  }
+
   { /* Precision.  */
     uint8_t *result =
       my_xasprintf ("%.e %d", 1234.0, 33, 44, 55);
@@ -470,6 +718,24 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
     uint8_t *result =
       my_xasprintf ("%15Le %d", 1.75L, 33, 44, 55);
     static const uint8_t expected[] = "   1.750000e+00 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
+  { /* Width given as argument.  */
+    uint8_t *result =
+      my_xasprintf ("%*Le %d", 15, 1.75L, 33, 44, 55);
+    static const uint8_t expected[] = "   1.750000e+00 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
+  { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+    uint8_t *result =
+      my_xasprintf ("%*Le %d", -15, 1.75L, 33, 44, 55);
+    static const uint8_t expected[] = "1.750000e+00    33";
     ASSERT (result != NULL);
     ASSERT (u8_strcmp (result, expected) == 0);
     free (result);
@@ -504,6 +770,24 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
     free (result);
   }
 
+  { /* Width given as argument.  */
+    uint8_t *result =
+      my_xasprintf ("%*g %d", 10, 1.75, 33, 44, 55);
+    static const uint8_t expected[] = "      1.75 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
+  { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+    uint8_t *result =
+      my_xasprintf ("%*g %d", -10, 1.75, 33, 44, 55);
+    static const uint8_t expected[] = "1.75       33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
   { /* Precision.  */
     uint8_t *result =
       my_xasprintf ("%.g %d", 1234.0, 33, 44, 55);
@@ -533,6 +817,24 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
     free (result);
   }
 
+  { /* Width given as argument.  */
+    uint8_t *result =
+      my_xasprintf ("%*Lg %d", 10, 1.75L, 33, 44, 55);
+    static const uint8_t expected[] = "      1.75 33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
+  { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+    uint8_t *result =
+      my_xasprintf ("%*Lg %d", -10, 1.75L, 33, 44, 55);
+    static const uint8_t expected[] = "1.75       33";
+    ASSERT (result != NULL);
+    ASSERT (u8_strcmp (result, expected) == 0);
+    free (result);
+  }
+
   { /* Precision.  */
     uint8_t *result =
       my_xasprintf ("%.Lg %d", 1234.0L, 33, 44, 55);
@@ -548,11 +850,15 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
     int count = -1;
     uint8_t *result =
       my_xasprintf ("%d %n", 123, &count, 33, 44, 55);
+#if NEED_PRINTF_WITH_N_DIRECTIVE
     static const uint8_t expected[] = "123 ";
     ASSERT (result != NULL);
     ASSERT (u8_strcmp (result, expected) == 0);
     ASSERT (count == 4);
     free (result);
+#else
+    ASSERT (result == NULL);
+#endif
   }
 
   /* Test the support of the POSIX/XSI format strings with positions.  */
@@ -592,6 +898,22 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
       uint8_t *result =
         my_xasprintf ("%20U %d", unicode_string, 33, 44, 55);
       static const uint8_t expected[] = "    Rafa\305\202 Maszkowski 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
+    { /* Width given as argument.  */
+      uint8_t *result =
+        my_xasprintf ("%*U %d", 20, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "    Rafa\305\202 Maszkowski 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
+    { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+      uint8_t *result =
+        my_xasprintf ("%*U %d", -20, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "Rafa\305\202 Maszkowski     33";
       ASSERT (result != NULL);
       ASSERT (u8_strcmp (result, expected) == 0);
       free (result);
@@ -636,6 +958,22 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
       ASSERT (u8_strcmp (result, expected) == 0);
       free (result);
     }
+    { /* Width given as argument.  */
+      uint8_t *result =
+        my_xasprintf ("%*lU %d", 20, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "    Rafa\305\202 Maszkowski 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
+    { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+      uint8_t *result =
+        my_xasprintf ("%*lU %d", -20, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "Rafa\305\202 Maszkowski     33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
     { /* FLAG_LEFT.  */
       uint8_t *result =
         my_xasprintf ("%-20lU %d", unicode_string, 33, 44, 55);
@@ -672,6 +1010,22 @@ test_xfunction (uint8_t * (*my_xasprintf) (const char *, ...))
       uint8_t *result =
         my_xasprintf ("%20llU %d", unicode_string, 33, 44, 55);
       static const uint8_t expected[] = "    Rafa\305\202 Maszkowski 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
+    { /* Width given as argument.  */
+      uint8_t *result =
+        my_xasprintf ("%*llU %d", 20, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "    Rafa\305\202 Maszkowski 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      free (result);
+    }
+    { /* Negative width given as argument (cf. FLAG_LEFT below).  */
+      uint8_t *result =
+        my_xasprintf ("%*llU %d", -20, unicode_string, 33, 44, 55);
+      static const uint8_t expected[] = "Rafa\305\202 Maszkowski     33";
       ASSERT (result != NULL);
       ASSERT (u8_strcmp (result, expected) == 0);
       free (result);

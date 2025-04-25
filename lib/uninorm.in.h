@@ -1,5 +1,5 @@
 /* Normalization forms (composition and decomposition) of Unicode strings.
-   Copyright (C) 2001-2002, 2009-2022 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2009-2024 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This file is free software: you can redistribute it and/or modify
@@ -21,13 +21,16 @@
 /* Get common macros for C.  */
 #include <unistring/cdefs.h>
 
-/* Get LIBUNISTRING_DLL_VARIABLE.  */
-#include <unistring/woe32dll.h>
-
 /* Get size_t.  */
 #include <stddef.h>
 
 #include "unitypes.h"
+
+#if @HAVE_UNISTRING_WOE32DLL_H@
+# include <unistring/woe32dll.h>
+#else
+# define LIBUNISTRING_DLL_VARIABLE
+#endif
 
 
 #ifdef __cplusplus
@@ -114,21 +117,21 @@ struct unicode_normalization_form;
 typedef const struct unicode_normalization_form *uninorm_t;
 
 /* UNINORM_NFD: Normalization form D: canonical decomposition.  */
-extern LIBUNISTRING_DLL_VARIABLE const struct unicode_normalization_form uninorm_nfd;
+extern @GNULIB_UNINORM_NFD_DLL_VARIABLE@ const struct unicode_normalization_form uninorm_nfd;
 #define UNINORM_NFD (&uninorm_nfd)
 
 /* UNINORM_NFC: Normalization form C: canonical decomposition, then
    canonical composition.  */
-extern LIBUNISTRING_DLL_VARIABLE const struct unicode_normalization_form uninorm_nfc;
+extern @GNULIB_UNINORM_NFC_DLL_VARIABLE@ const struct unicode_normalization_form uninorm_nfc;
 #define UNINORM_NFC (&uninorm_nfc)
 
 /* UNINORM_NFKD: Normalization form KD: compatibility decomposition.  */
-extern LIBUNISTRING_DLL_VARIABLE const struct unicode_normalization_form uninorm_nfkd;
+extern @GNULIB_UNINORM_NFKD_DLL_VARIABLE@ const struct unicode_normalization_form uninorm_nfkd;
 #define UNINORM_NFKD (&uninorm_nfkd)
 
 /* UNINORM_NFKC: Normalization form KC: compatibility decomposition, then
    canonical composition.  */
-extern LIBUNISTRING_DLL_VARIABLE const struct unicode_normalization_form uninorm_nfkc;
+extern @GNULIB_UNINORM_NFKC_DLL_VARIABLE@ const struct unicode_normalization_form uninorm_nfkc;
 #define UNINORM_NFKC (&uninorm_nfkc)
 
 /* Test whether a normalization form does compatibility decomposition.  */

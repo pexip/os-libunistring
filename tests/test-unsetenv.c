@@ -1,9 +1,9 @@
 /* Tests of unsetenv.
-   Copyright (C) 2009-2022 Free Software Foundation, Inc.
+   Copyright (C) 2009-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -32,7 +32,8 @@ SIGNATURE_CHECK (unsetenv, int, (char const *));
 int
 main (void)
 {
-  char entry[] = "b=2";
+  /* Static to pacify gcc -Wanalyzer-putenv-of-auto-var.  */
+  static char entry[] = "b=2";
 
   /* Test removal when multiple entries present.  */
   ASSERT (putenv ((char *) "a=1") == 0);
@@ -57,5 +58,5 @@ main (void)
   ASSERT (errno == EINVAL);
 #endif
 
-  return 0;
+  return test_exit_status;
 }

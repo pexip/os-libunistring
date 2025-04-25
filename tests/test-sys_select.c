@@ -1,9 +1,9 @@
 /* Test of <sys/select.h> substitute.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -19,6 +19,16 @@
 #include <config.h>
 
 #include <sys/select.h>
+
+/* Check that the 'struct timeval' type is defined.  */
+struct timeval a;
+
+/* Check that a.tv_sec is wide enough to hold a time_t, ignoring
+   signedness issues.  */
+typedef int verify_tv_sec_type[sizeof (time_t) <= sizeof (a.tv_sec) ? 1 : -1];
+
+/* Check that sigset_t is defined.  */
+sigset_t t2;
 
 #include "signature.h"
 
@@ -36,16 +46,6 @@ SIGNATURE_CHECK (FD_SET, int, (int, fd_set *));
 #ifndef FD_ZERO
 SIGNATURE_CHECK (FD_ZERO, void, (fd_set *));
 #endif
-
-/* Check that the 'struct timeval' type is defined.  */
-struct timeval a;
-
-/* Check that a.tv_sec is wide enough to hold a time_t, ignoring
-   signedness issues.  */
-typedef int verify_tv_sec_type[sizeof (time_t) <= sizeof (a.tv_sec) ? 1 : -1];
-
-/* Check that sigset_t is defined.  */
-sigset_t t2;
 
 int
 main (void)

@@ -1,9 +1,9 @@
 /* Test of u8_vasnprintf() function in an ISO-8859-1 locale.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -77,6 +77,54 @@ test_function (uint8_t * (*my_asnprintf) (uint8_t *, size_t *, const char *, ...
       free (result);
     }
   }
+
+  /* Test the support of the 'ls' conversion specifier for wide strings.  */
+
+  {
+    const char *locale_string = "h\351t\351rog\351n\351it\351"; /* hétérogénéité */
+    wchar_t wide_string[20];
+    ASSERT (mbstowcs (wide_string, locale_string, SIZEOF (wide_string)) == 13);
+    {
+      size_t length;
+      uint8_t *result =
+        my_asnprintf (NULL, &length, "%ls %d", wide_string, 33, 44, 55);
+      static const uint8_t expected[] = "h\303\251t\303\251rog\303\251n\303\251it\303\251 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      ASSERT (length == u8_strlen (result));
+      free (result);
+    }
+    { /* Width.  */
+      size_t length;
+      uint8_t *result =
+        my_asnprintf (NULL, &length, "%20ls %d", wide_string, 33, 44, 55);
+      static const uint8_t expected[] = "       h\303\251t\303\251rog\303\251n\303\251it\303\251 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      ASSERT (length == u8_strlen (result));
+      free (result);
+    }
+    { /* FLAG_LEFT.  */
+      size_t length;
+      uint8_t *result =
+        my_asnprintf (NULL, &length, "%-20ls %d", wide_string, 33, 44, 55);
+      static const uint8_t expected[] = "h\303\251t\303\251rog\303\251n\303\251it\303\251        33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      ASSERT (length == u8_strlen (result));
+      free (result);
+    }
+    { /* FLAG_ZERO: no effect.  */
+      size_t length;
+      uint8_t *result =
+        my_asnprintf (NULL, &length, "%020ls %d", wide_string, 33, 44, 55);
+      static const uint8_t expected[] = "       h\303\251t\303\251rog\303\251n\303\251it\303\251 33";
+      ASSERT (result != NULL);
+      ASSERT (u8_strcmp (result, expected) == 0);
+      ASSERT (length == u8_strlen (result));
+      free (result);
+    }
+  }
 }
 
 static uint8_t *
@@ -105,5 +153,5 @@ main (int argc, char *argv[])
     return 1;
 
   test_vasnprintf ();
-  return 0;
+  return test_exit_status;
 }

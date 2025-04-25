@@ -18,6 +18,8 @@ The format directive @samp{lU} takes an UTF-16 string
 @item
 The format directive @samp{llU} takes an UTF-32 string
 (@code{const uint32_t *}).
+@item
+The format directive @samp{n} is not supported, for security reasons.
 @end itemize
 
 A function name with an infix @samp{v} indicates that a @code{va_list} is

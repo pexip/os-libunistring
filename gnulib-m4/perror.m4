@@ -1,5 +1,6 @@
-# perror.m4 serial 10
-dnl Copyright (C) 2008-2022 Free Software Foundation, Inc.
+# perror.m4
+# serial 13
+dnl Copyright (C) 2008-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -10,7 +11,7 @@ AC_DEFUN([gl_FUNC_PERROR],
   AC_REQUIRE([gl_HEADER_ERRNO_H])
   AC_REQUIRE([gl_FUNC_STRERROR_R])
   AC_REQUIRE([gl_FUNC_STRERROR_0])
-  AC_REQUIRE([AC_CANONICAL_HOST]) dnl for cross-compiles
+  AC_REQUIRE([AC_CANONICAL_HOST])
   dnl We intentionally do not check for the broader REPLACE_STRERROR_R,
   dnl since on glibc systems, strerror_r is replaced only for signature
   dnl issues, and perror is just fine.  Rather, we only want to
@@ -48,12 +49,12 @@ AC_DEFUN([gl_FUNC_PERROR],
             rm -rf conftest.txt1 conftest.txt2],
            [gl_cv_func_perror_works=no],
            [case "$host_os" in
-                       # Guess yes on musl systems.
-              *-musl*) gl_cv_func_perror_works="guessing yes" ;;
-                       # Guess yes on native Windows.
-              mingw*)  gl_cv_func_perror_works="guessing yes" ;;
-                       # Otherwise obey --enable-cross-guesses.
-              *)       gl_cv_func_perror_works="$gl_cross_guess_normal" ;;
+                                  # Guess yes on musl systems.
+              *-musl* | midipix*) gl_cv_func_perror_works="guessing yes" ;;
+                                  # Guess yes on native Windows.
+              mingw* | windows*)  gl_cv_func_perror_works="guessing yes" ;;
+                                  # Otherwise obey --enable-cross-guesses.
+              *)                  gl_cv_func_perror_works="$gl_cross_guess_normal" ;;
             esac
            ])
         ])
@@ -67,5 +68,10 @@ AC_DEFUN([gl_FUNC_PERROR],
       dnl system's strerror_r(). Replace it.
       REPLACE_PERROR=1
       ;;
+  esac
+  dnl Does perror clobber the strerror buffer?
+  case "$host_os" in
+                     # Yes on Android 11.
+    linux*-android*) REPLACE_PERROR=1 ;;
   esac
 ])

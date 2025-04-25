@@ -1,9 +1,9 @@
 /* Test of opening a file descriptor.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -15,6 +15,11 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
+
+/* Tell GCC not to warn about the specific edge cases tested here.  */
+#if _GL_GNUC_PREREQ (13, 0)
+# pragma GCC diagnostic ignored "-Wanalyzer-fd-leak"
+#endif
 
 /* Make test_open always inline if we're using Fortify, which defines
    __always_inline to do that.  Do nothing otherwise.  This works

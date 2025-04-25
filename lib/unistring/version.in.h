@@ -1,5 +1,5 @@
 /* Meta information about GNU libunistring.
-   Copyright (C) 2009-2010 Free Software Foundation, Inc.
+   Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This program is free software: you can redistribute it and/or
@@ -29,6 +29,9 @@
 
 /* Get LIBUNISTRING_DLL_VARIABLE.  */
 #include <unistring/woe32dll.h>
+
+/* Declare _libunistring_unicode_version.  */
+#include <unimetadata.h>
 
 
 #ifdef __cplusplus

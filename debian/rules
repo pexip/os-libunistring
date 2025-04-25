@@ -5,6 +5,8 @@
 # hardening
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
+include /usr/share/dpkg/default.mk
+
 ifneq ($(findstring $(DEB_BUILD_ARCH), mips mipsel),)
 	CFLAGS += -mplt
 endif
@@ -22,4 +24,4 @@ VERSION = $(shell head -n1 debian/changelog | sed -e 's/.*(//;s/-.*).*//;s/\+/\-
 
 override_dh_makeshlibs:
 	dh_makeshlibs
-	dpkg-gensymbols -v$(VERSION) -plibunistring2
+	dpkg-gensymbols -v$(DEB_VERSION_UPSTREAM) -plibunistring5

@@ -1,9 +1,9 @@
 /* Test of u32_vasnprintf() function in an UTF-8 locale.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -87,6 +87,69 @@ test_function (uint32_t * (*my_asnprintf) (uint32_t *, size_t *, const char *, .
       free (result);
     }
   }
+
+  /* Test the support of the 'ls' conversion specifier for wide strings.  */
+
+  {
+    const char *locale_string = "h\303\251t\303\251rog\303\251n\303\251it\303\251"; /* hétérogénéité */
+    wchar_t wide_string[20];
+    ASSERT (mbstowcs (wide_string, locale_string, SIZEOF (wide_string)) == 13);
+    {
+      size_t length;
+      uint32_t *result =
+        my_asnprintf (NULL, &length, "%ls %d", wide_string, 33, 44, 55);
+      static const uint32_t expected[] =
+        { 'h', 0x00e9, 't', 0x00e9, 'r', 'o', 'g', 0x00e9, 'n', 0x00e9,
+          'i', 't', 0x00e9, ' ', '3', '3', 0
+        };
+      ASSERT (result != NULL);
+      ASSERT (u32_strcmp (result, expected) == 0);
+      ASSERT (length == u32_strlen (result));
+      free (result);
+    }
+    { /* Width.  */
+      size_t length;
+      uint32_t *result =
+        my_asnprintf (NULL, &length, "%20ls %d", wide_string, 33, 44, 55);
+      static const uint32_t expected[] =
+        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'h', 0x00e9, 't',
+          0x00e9, 'r', 'o', 'g', 0x00e9, 'n', 0x00e9, 'i', 't', 0x00e9,
+          ' ', '3', '3', 0
+        };
+      ASSERT (result != NULL);
+      ASSERT (u32_strcmp (result, expected) == 0);
+      ASSERT (length == u32_strlen (result));
+      free (result);
+    }
+    { /* FLAG_LEFT.  */
+      size_t length;
+      uint32_t *result =
+        my_asnprintf (NULL, &length, "%-20ls %d", wide_string, 33, 44, 55);
+      static const uint32_t expected[] =
+        { 'h', 0x00e9, 't', 0x00e9, 'r', 'o', 'g', 0x00e9, 'n', 0x00e9,
+          'i', 't', 0x00e9, ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+          ' ', '3', '3', 0
+        };
+      ASSERT (result != NULL);
+      ASSERT (u32_strcmp (result, expected) == 0);
+      ASSERT (length == u32_strlen (result));
+      free (result);
+    }
+    { /* FLAG_ZERO: no effect.  */
+      size_t length;
+      uint32_t *result =
+        my_asnprintf (NULL, &length, "%020ls %d", wide_string, 33, 44, 55);
+      static const uint32_t expected[] =
+        { ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'h', 0x00e9, 't',
+          0x00e9, 'r', 'o', 'g', 0x00e9, 'n', 0x00e9, 'i', 't', 0x00e9,
+          ' ', '3', '3', 0
+        };
+      ASSERT (result != NULL);
+      ASSERT (u32_strcmp (result, expected) == 0);
+      ASSERT (length == u32_strlen (result));
+      free (result);
+    }
+  }
 }
 
 static uint32_t *
@@ -115,5 +178,5 @@ main (int argc, char *argv[])
     return 1;
 
   test_vasnprintf ();
-  return 0;
+  return test_exit_status;
 }

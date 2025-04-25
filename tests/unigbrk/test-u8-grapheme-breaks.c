@@ -1,9 +1,9 @@
 /* Grapheme cluster breaks test.
-   Copyright (C) 2010-2022 Free Software Foundation, Inc.
+   Copyright (C) 2010-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 3 of the License, or
+   by the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -50,7 +50,7 @@ test_u8_grapheme_breaks (const char *input, const char *expected)
 
         fprintf (stderr, "   input:");
         for (j = 0; j < n; j++)
-          fprintf (stderr, " %02x", s[j]);
+          fprintf (stderr, " %02X", s[j]);
         putc ('\n', stderr);
 
         fprintf (stderr, "expected:");
@@ -63,6 +63,7 @@ test_u8_grapheme_breaks (const char *input, const char *expected)
           fprintf (stderr, "  %d", breaks[j]);
         putc ('\n', stderr);
 
+        fflush (stderr);
         abort ();
       }
 
@@ -102,5 +103,5 @@ main (void)
   test_u8_grapheme_breaks (".\360\237\207\251\360\237\207\252\360\237\207\253\360\237\207\267.",
                            "##_______#_______#");
 
-  return 0;
+  return test_exit_status;
 }

@@ -1,29 +1,21 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Simple character mapping of Unicode characters.  */
-/* Generated automatically by gen-uni-tables.c for Unicode 14.0.0.  */
+/* Generated automatically by gen-uni-tables.c for Unicode 16.0.0.  */
 
-/* Copyright (C) 2000-2022 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2024 Free Software Foundation, Inc.
 
-   This file is free software.
-   It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
-   You can redistribute it and/or modify it under either
-     - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
-       option) any later version, or
-     - the terms of the GNU General Public License as published by the
-       Free Software Foundation; either version 2, or (at your option)
-       any later version, or
-     - the same dual license "the GNU LGPLv3+ or the GNU GPLv2+".
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
    This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License and the GNU General Public License
-   for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public
-   License and of the GNU General Public License along with this
-   program.  If not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #define mapping_header_0 16
 #define mapping_header_1 2
@@ -35,7 +27,7 @@ struct
   {
     int level1[2];
     short level2[2 << 9];
-    int level3[35 << 7];
+    int level3[36 << 7];
   }
 u_mapping =
 {
@@ -108,13 +100,10 @@ u_mapping =
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
      3456,  3584,  3712,  3840,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-       -1,  3968,    -1,    -1,    -1,    -1,    -1,    -1,
+       -1,  3968,  4096,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-       -1,  4096,    -1,    -1,    -1,    -1,    -1,    -1,
-       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+       -1,  4224,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
@@ -132,10 +121,10 @@ u_mapping =
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-       -1,    -1,    -1,    -1,  4224,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+       -1,    -1,    -1,    -1,  4352,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
@@ -163,7 +152,10 @@ u_mapping =
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-       -1,    -1,  4352,    -1,    -1,    -1,    -1,    -1,
+       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
+       -1,    -1,  4480,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
        -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
@@ -364,7 +356,7 @@ u_mapping =
         8,     8,     8,     8,     8,     8,     0,     0,
         0,     0,     0,     0,     0,     0,     0,     0,
         0,     0,     0,     0,     0,     0,     0,     0,
-        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     1,     0,     0,     0,     0,     0,     0,
     -3008, -3008, -3008, -3008, -3008, -3008, -3008, -3008,
     -3008, -3008, -3008, -3008, -3008, -3008, -3008, -3008,
     -3008, -3008, -3008, -3008, -3008, -3008, -3008, -3008,
@@ -580,9 +572,9 @@ u_mapping =
     -42258, -42282, -42261,   928,     1,     0,     1,     0,
         1,     0,     1,     0,     1,     0,     1,     0,
         1,     0,     1,     0,   -48, -42307, -35384,     1,
-        0,     1,     0,     0,     0,     0,     0,     0,
+        0,     1,     0, -42343,     1,     0,     0,     0,
         1,     0,     0,     0,     0,     0,     1,     0,
-        1,     0,     0,     0,     0,     0,     0,     0,
+        1,     0,     1,     0, -42561,     0,     0,     0,
         0,     0,     0,     0,     0,     0,     0,     0,
         0,     0,     0,     0,     0,     0,     0,     0,
         0,     0,     0,     0,     0,     1,     0,     0,
@@ -680,6 +672,22 @@ u_mapping =
         0,     0,     0,     0,     0,     0,     0,     0,
         0,     0,     0,     0,     0,     0,     0,     0,
         0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+        0,     0,     0,     0,     0,     0,     0,     0,
+       32,    32,    32,    32,    32,    32,    32,    32,
+       32,    32,    32,    32,    32,    32,    32,    32,
+       32,    32,    32,    32,    32,    32,     0,     0,
         0,     0,     0,     0,     0,     0,     0,     0,
         0,     0,     0,     0,     0,     0,     0,     0,
         0,     0,     0,     0,     0,     0,     0,     0,

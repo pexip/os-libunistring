@@ -1,14 +1,14 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Properties of Unicode characters.  */
-/* Generated automatically by gen-uni-tables.c for Unicode 14.0.0.  */
+/* Generated automatically by gen-uni-tables.c for Unicode 16.0.0.  */
 
-/* Copyright (C) 2000-2022 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2024 Free Software Foundation, Inc.
 
    This file is free software.
    It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
    You can redistribute it and/or modify it under either
      - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
+       by the Free Software Foundation, either version 3, or (at your
        option) any later version, or
      - the terms of the GNU General Public License as published by the
        Free Software Foundation; either version 2, or (at your option)
@@ -472,7 +472,7 @@ u_property_zero_width =
     0x00000000U, 0x20000000U, 0x00002000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
-    0x00000000U, 0x01FF0000U, 0x00000000U, 0x00000000U,
+    0x00000000U, 0xFFFF0000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,

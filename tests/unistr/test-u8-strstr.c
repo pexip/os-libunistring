@@ -1,9 +1,9 @@
 /* Test of u8_strstr() function.
-   Copyright (C) 2011-2022 Free Software Foundation, Inc.
+   Copyright (C) 2011-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -29,6 +29,7 @@
 
 #define UNIT uint8_t
 #define U_STRSTR u8_strstr
+#define U_SET u8_set
 #include "test-u-strstr.h"
 
 int
@@ -40,11 +41,12 @@ main (void)
      case, we're assuming that we're running this test on the
      same system that we did the check to ensure it has linear
      performance characteristics.  */
+  int alarm_value = 50;
   signal (SIGALRM, SIG_DFL);
-  alarm (5);
+  alarm (alarm_value);
 #endif
 
   test_u_strstr ();
 
-  return 0;
+  return test_exit_status;
 }

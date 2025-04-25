@@ -4,14 +4,11 @@
 # also regenerates all aclocal.m4, config.h.in, Makefile.in, configure files
 # with new versions of autoconf or automake.
 #
-# This script requires autoconf-2.65..2.71 and automake-1.16.4 in the PATH.
-# If not used from a released tarball, it also requires either
-#   - the GNULIB_SRCDIR environment variable pointing to a gnulib checkout, or
-#   - a preceding invocation of './gitsub.sh pull'.
+# This script requires autoconf-2.65..2.72 and automake-1.16.4..1.17 in the PATH.
 # It also requires
 #   - the gperf program.
 
-# Copyright (C) 2003-2021 Free Software Foundation, Inc.
+# Copyright (C) 2003-2024 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +23,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# Prerequisite (if not used from a released tarball): either
+#   - the GNULIB_SRCDIR environment variable pointing to a gnulib checkout, or
+#   - a preceding invocation of './autopull.sh'.
+#
 # Usage: ./autogen.sh [--skip-gnulib]
+#
+# Options:
+#   --skip-gnulib       Avoid fetching files from Gnulib.
+#                       This option is useful
+#                       - when you are working from a released tarball (possibly
+#                         with modifications), or
+#                       - as a speedup, if the set of gnulib modules did not
+#                         change since the last time you ran this script.
 
 skip_gnulib=false
 while :; do
@@ -71,6 +80,7 @@ if test $skip_gnulib = false; then
     exit 1
   }
   GNULIB_MODULES='
+    gitlog-to-changelog
     unitypes
     unistr/base
     unistr/u8-check
@@ -87,6 +97,7 @@ if test $skip_gnulib = false; then
     unistr/u8-mbtouc-unsafe
     unistr/u8-move
     unistr/u8-next
+    unistr/u8-pcpy
     unistr/u8-prev
     unistr/u8-set
     unistr/u8-startswith
@@ -128,6 +139,7 @@ if test $skip_gnulib = false; then
     unistr/u16-mbtouc-unsafe
     unistr/u16-move
     unistr/u16-next
+    unistr/u16-pcpy
     unistr/u16-prev
     unistr/u16-set
     unistr/u16-startswith
@@ -169,6 +181,7 @@ if test $skip_gnulib = false; then
     unistr/u32-mbtouc-unsafe
     unistr/u32-move
     unistr/u32-next
+    unistr/u32-pcpy
     unistr/u32-prev
     unistr/u32-set
     unistr/u32-startswith
@@ -295,6 +308,7 @@ if test $skip_gnulib = false; then
     unictype/ctype-xdigit
     unictype/decimal-digit
     unictype/digit
+    unictype/incb-all
     unictype/joininggroup-all
     unictype/joiningtype-all
     unictype/mirror
@@ -342,6 +356,8 @@ if test $skip_gnulib = false; then
     unilbrk/u32-width-linebreaks
     unilbrk/ulc-possible-linebreaks
     unilbrk/ulc-width-linebreaks
+    unimetadata/base
+    unimetadata/u-version
     uninorm/base
     uninorm/canonical-decomposition
     uninorm/composition
@@ -439,20 +455,6 @@ if test $skip_gnulib = false; then
       < lib/unistr.in.h \
       > lib/unistr.in.h.tmp \
   && mv lib/unistr.in.h.tmp lib/unistr.in.h
-  # Change lib/unictype.h, lib/uninorm.h, lib/unicase.h for shared libraries on Woe32 systems.
-  sed -e 's/extern const uc_general_category_t UC_/extern LIBUNISTRING_DLL_VARIABLE const uc_general_category_t UC_/' \
-      -e 's/extern const uc_property_t UC_/extern LIBUNISTRING_DLL_VARIABLE const uc_property_t UC_/' \
-      < lib/unictype.in.h \
-      > lib/unictype.in.h.tmp \
-  && mv lib/unictype.in.h.tmp lib/unictype.in.h
-  sed -e 's/extern const struct unicode_normalization_form /extern LIBUNISTRING_DLL_VARIABLE const struct unicode_normalization_form /' \
-      < lib/uninorm.in.h \
-      > lib/uninorm.in.h.tmp \
-  && mv lib/uninorm.in.h.tmp lib/uninorm.in.h
-  sed -e 's/extern const casing_/extern LIBUNISTRING_DLL_VARIABLE const casing_/' \
-      < lib/unicase.in.h \
-      > lib/unicase.in.h.tmp \
-  && mv lib/unicase.in.h.tmp lib/unicase.in.h
   $GNULIB_TOOL --copy-file build-aux/ar-lib; chmod a+x build-aux/ar-lib
   $GNULIB_TOOL --copy-file build-aux/config.guess; chmod a+x build-aux/config.guess
   $GNULIB_TOOL --copy-file build-aux/config.sub;   chmod a+x build-aux/config.sub
@@ -474,3 +476,5 @@ automake --add-missing --copy
 patch build-aux/test-driver < build-aux/test-driver.diff
 # Get rid of autom4te.cache directory.
 rm -rf autom4te.cache
+
+echo "$0: done.  Now you can run './configure'."

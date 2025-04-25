@@ -1,10 +1,10 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Test the Unicode character type functions.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published
-   by the Free Software Foundation; either version 3 of the License,
+   by the Free Software Foundation, either version 3 of the License,
    or (at your option) any later version.
 
    This file is distributed in the hope that it will be useful,
@@ -291,6 +291,7 @@
     { 0x10FD, 0x10FF },
     { 0x13F8, 0x13FD },
     { 0x1C80, 0x1C88 },
+    { 0x1C8A, 0x1C8A },
     { 0x1D00, 0x1D2B },
     { 0x1D6B, 0x1D77 },
     { 0x1D79, 0x1D9A },
@@ -621,11 +622,13 @@
     { 0xA7C3, 0xA7C3 },
     { 0xA7C8, 0xA7C8 },
     { 0xA7CA, 0xA7CA },
+    { 0xA7CD, 0xA7CD },
     { 0xA7D1, 0xA7D1 },
     { 0xA7D3, 0xA7D3 },
     { 0xA7D5, 0xA7D5 },
     { 0xA7D7, 0xA7D7 },
     { 0xA7D9, 0xA7D9 },
+    { 0xA7DB, 0xA7DB },
     { 0xA7F6, 0xA7F6 },
     { 0xA7FA, 0xA7FA },
     { 0xAB30, 0xAB5A },
@@ -641,6 +644,7 @@
     { 0x105B3, 0x105B9 },
     { 0x105BB, 0x105BC },
     { 0x10CC0, 0x10CF2 },
+    { 0x10D70, 0x10D85 },
     { 0x118C0, 0x118DF },
     { 0x16E60, 0x16E7F },
     { 0x1D41A, 0x1D433 },
@@ -673,6 +677,7 @@
     { 0x1D7CB, 0x1D7CB },
     { 0x1DF00, 0x1DF09 },
     { 0x1DF0B, 0x1DF1E },
+    { 0x1DF25, 0x1DF2A },
     { 0x1E922, 0x1E943 }
 
 #define PREDICATE(c) uc_is_general_category (c, UC_CATEGORY_Ll)

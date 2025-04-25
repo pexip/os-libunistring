@@ -1,29 +1,21 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* ISO C <ctype.h> like properties of Unicode characters.  */
-/* Generated automatically by gen-uni-tables.c for Unicode 14.0.0.  */
+/* Generated automatically by gen-uni-tables.c for Unicode 16.0.0.  */
 
-/* Copyright (C) 2000-2022 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2024 Free Software Foundation, Inc.
 
-   This file is free software.
-   It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
-   You can redistribute it and/or modify it under either
-     - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
-       option) any later version, or
-     - the terms of the GNU General Public License as published by the
-       Free Software Foundation; either version 2, or (at your option)
-       any later version, or
-     - the same dual license "the GNU LGPLv3+ or the GNU GPLv2+".
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
    This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License and the GNU General Public License
-   for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Lesser General Public
-   License and of the GNU General Public License along with this
-   program.  If not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #define header_0 16
 #define header_2 9
@@ -306,8 +298,8 @@ u_is_lower =
     0x00000000U, 0x00000000U, 0x00000000U, 0x07FFFFFEU,
     0x00000000U, 0x00200000U, 0x80000000U, 0xFF7FFFFFU,
     0xAAAAAAAAU, 0x54AAAAAAU, 0xAAAAA955U, 0xD4AAAAAAU,
-    0x46241129U, 0xA251212AU, 0xB5555B60U, 0xAA2CAAAAU,
-    0xAAAAAAAAU, 0x900AAAA8U, 0x1ADFAA85U, 0x20269F6BU,
+    0x4E241129U, 0xA251212AU, 0xB5555B60U, 0xAA2CAAAAU,
+    0xAAAAAAAAU, 0x900AAAA8U, 0x1ADFAA85U, 0x20269F7BU,
     0x60041F8DU, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000020U, 0x388A0000U,
     0x00000000U, 0xFFFEF000U, 0xAAE37FFFU, 0x092FAAAAU,
@@ -324,7 +316,7 @@ u_is_lower =
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x3F000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
-    0x000001FFU, 0x00000000U, 0x00000000U, 0x00000000U,
+    0x000005FFU, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x22000000U,
     0x00004000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0xAAAAAAAAU, 0xAAAAAAAAU, 0xAAAAAAAAU, 0xAAAAAAAAU,
@@ -346,7 +338,7 @@ u_is_lower =
     0x00000000U, 0x00000000U, 0xAAAAAAAAU, 0x00002AAAU,
     0x0AAAAAAAU, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0xAAA8AAA8U, 0xAAAAAAAAU, 0x9400AAAAU,
-    0xAA9A10AAU, 0xAAA002AAU, 0x0282050AU, 0x00400000U,
+    0xAA9A10AAU, 0xAAA002AAU, 0x0A82250AU, 0x00400000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00080000U, 0xFFFF0000U,
@@ -361,8 +353,8 @@ u_is_lower =
     0xFF800000U, 0x1BFBFFFBU, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0xFFFFFFFFU, 0x0007FFFFU,
-    0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
-    0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
+    0x00000000U, 0x00000000U, 0x00000000U, 0xFFFF0000U,
+    0x0000003FU, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,
     0x00000000U, 0x00000000U, 0xFFFFFFFFU, 0x00000000U,
     0x00000000U, 0x00000000U, 0x00000000U, 0x00000000U,

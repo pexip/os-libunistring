@@ -1,9 +1,9 @@
 /* Test of <float.h> substitute.
-   Copyright (C) 2011-2022 Free Software Foundation, Inc.
+   Copyright (C) 2011-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -20,11 +20,92 @@
 
 #include <float.h>
 
-#include "fpucw.h"
-#include "macros.h"
+/* Check that some macros are constant expressions.  */
+int a[] =
+  {
+    FLT_RADIX,
+    FLT_EVAL_METHOD /* added in ISO C 99 */
+  };
 
-/* Check that FLT_RADIX is a constant expression.  */
-int a[] = { FLT_RADIX };
+/* ----------------------- Check macros for 'float' ----------------------- */
+
+/* Check that the FLT_* macros expand to constant expressions.  */
+int fb[] =
+  {
+    FLT_MANT_DIG, FLT_MIN_EXP, FLT_MAX_EXP,
+    FLT_DIG, FLT_MIN_10_EXP, FLT_MAX_10_EXP,
+    FLT_HAS_SUBNORM, /* added in ISO C 11 */
+    FLT_DECIMAL_DIG, /* added in ISO C 11 */
+    FLT_IS_IEC_60559 /* added in ISO C 23 */
+  };
+float fc[] =
+  {
+    FLT_EPSILON, FLT_MIN, FLT_MAX,
+    FLT_TRUE_MIN, /* added in ISO C 11 */
+    FLT_NORM_MAX /* added in ISO C 23 */
+  };
+#if 0 /* FLT_SNAN is not a constant expression on some platforms.  */
+float fs = FLT_SNAN; /* added in ISO C 23 */
+#endif
+
+/* ----------------------- Check macros for 'double' ----------------------- */
+
+/* Check that the DBL_* macros expand to constant expressions.  */
+int db[] =
+  {
+    DBL_MANT_DIG, DBL_MIN_EXP, DBL_MAX_EXP,
+    DBL_DIG, DBL_MIN_10_EXP, DBL_MAX_10_EXP,
+    DBL_HAS_SUBNORM, /* added in ISO C 11 */
+    DBL_DECIMAL_DIG, /* added in ISO C 11 */
+    DBL_IS_IEC_60559 /* added in ISO C 23 */
+  };
+double dc[] =
+  {
+    DBL_EPSILON, DBL_MIN, DBL_MAX,
+    DBL_TRUE_MIN, /* added in ISO C 11 */
+    DBL_NORM_MAX /* added in ISO C 23 */
+  };
+#if 0 /* DBL_SNAN is not a constant expression on some platforms.  */
+double ds = DBL_SNAN; /* added in ISO C 23 */
+#endif
+
+/* -------------------- Check macros for 'long double' -------------------- */
+
+/* Check that the LDBL_* macros expand to constant expressions.  */
+int lb[] =
+  {
+    LDBL_MANT_DIG, LDBL_MIN_EXP, LDBL_MAX_EXP,
+    LDBL_DIG, LDBL_MIN_10_EXP, LDBL_MAX_10_EXP,
+    LDBL_HAS_SUBNORM, /* added in ISO C 11 */
+    LDBL_DECIMAL_DIG, /* added in ISO C 11 */
+    LDBL_IS_IEC_60559 /* added in ISO C 23 */
+  };
+long double lc1 = LDBL_EPSILON;
+long double lc2 = LDBL_MIN;
+#if !GNULIB_defined_long_double_union
+/* LDBL_MAX is not a constant expression on some platforms.  */
+long double lc3 = LDBL_MAX;
+#endif
+#if !GNULIB_defined_long_double_union
+/* LDBL_TRUE_MIN is not a constant expression on FreeBSD/i386.  */
+long double lc4 = LDBL_TRUE_MIN; /* added in ISO C 11 */
+#endif
+#if !GNULIB_defined_long_double_union
+/* LDBL_MAX is not a constant expression on some platforms.  */
+long double lc5 = LDBL_NORM_MAX; /* added in ISO C 23 */
+#endif
+#if 0
+/* LDBL_SNAN is not a constant expression on some platforms.  */
+long double ls = LDBL_SNAN; /* added in ISO C 23 */
+#endif
+
+/* ------------------------------------------------------------------------- */
+
+#include "fpucw.h"
+#include "isnanf-nolibm.h"
+#include "isnand-nolibm.h"
+#include "isnanl-nolibm.h"
+#include "macros.h"
 
 #if FLT_RADIX == 2
 
@@ -117,14 +198,6 @@ pow2l (int n)
 
 /* ----------------------- Check macros for 'float' ----------------------- */
 
-/* Check that the FLT_* macros expand to constant expressions.  */
-int fb[] =
-  {
-    FLT_MANT_DIG, FLT_MIN_EXP, FLT_MAX_EXP,
-    FLT_DIG, FLT_MIN_10_EXP, FLT_MAX_10_EXP
-  };
-float fc[] = { FLT_EPSILON, FLT_MIN, FLT_MAX };
-
 static void
 test_float (void)
 {
@@ -192,17 +265,37 @@ test_float (void)
           ASSERT (x <= 1.0f);
       }
   }
+
+  /* Check the value of FLT_HAS_SUBNORM.  */
+  ASSERT (FLT_HAS_SUBNORM == 1);
+
+  /* Check the value of FLT_DECIMAL_DIG.  */
+  ASSERT (FLT_DECIMAL_DIG == (int)(FLT_MANT_DIG * 0.3010299956639812 + 2));
+
+  /* Check the value of FLT_TRUE_MIN.  */
+  ASSERT (FLT_TRUE_MIN > 0.0f);
+  {
+    volatile float x = FLT_TRUE_MIN * 0.5f;
+    ASSERT (x == 0.0f);
+  }
+
+  /* Check the value of FLT_IS_IEC_60559.  */
+#if !defined __m68k__
+  ASSERT (FLT_IS_IEC_60559);
+#elif 0
+  /* It is not clear what this macro actually means.  Cf.
+     <http://mailman.oakapple.net/pipermail/cfp-interest/2023-April/002760.html> */
+  ASSERT (!FLT_IS_IEC_60559);
+#endif
+
+  /* Check the value of FLT_NORM_MAX.  */
+  ASSERT (FLT_NORM_MAX == FLT_MAX);
+
+  /* Check the value of FLT_SNAN.  */
+  ASSERT (isnanf (FLT_SNAN));
 }
 
 /* ----------------------- Check macros for 'double' ----------------------- */
-
-/* Check that the DBL_* macros expand to constant expressions.  */
-int db[] =
-  {
-    DBL_MANT_DIG, DBL_MIN_EXP, DBL_MAX_EXP,
-    DBL_DIG, DBL_MIN_10_EXP, DBL_MAX_10_EXP
-  };
-double dc[] = { DBL_EPSILON, DBL_MIN, DBL_MAX };
 
 static void
 test_double (void)
@@ -271,21 +364,37 @@ test_double (void)
           ASSERT (x <= 1.0);
       }
   }
+
+  /* Check the value of DBL_HAS_SUBNORM.  */
+  ASSERT (DBL_HAS_SUBNORM == 1);
+
+  /* Check the value of DBL_DECIMAL_DIG.  */
+  ASSERT (DBL_DECIMAL_DIG == (int)(DBL_MANT_DIG * 0.3010299956639812 + 2));
+
+  /* Check the value of DBL_TRUE_MIN.  */
+  ASSERT (DBL_TRUE_MIN > 0.0);
+  {
+    volatile double x = DBL_TRUE_MIN * 0.5;
+    ASSERT (x == 0.0);
+  }
+
+  /* Check the value of DBL_IS_IEC_60559.  */
+#if !defined __m68k__
+  ASSERT (DBL_IS_IEC_60559);
+#elif 0
+  /* It is not clear what this macro actually means.  Cf.
+     <http://mailman.oakapple.net/pipermail/cfp-interest/2023-April/002760.html> */
+  ASSERT (!DBL_IS_IEC_60559);
+#endif
+
+  /* Check the value of DBL_NORM_MAX.  */
+  ASSERT (DBL_NORM_MAX == DBL_MAX);
+
+  /* Check the value of DBL_SNAN.  */
+  ASSERT (isnand (DBL_SNAN));
 }
 
 /* -------------------- Check macros for 'long double' -------------------- */
-
-/* Check that the LDBL_* macros expand to constant expressions.  */
-int lb[] =
-  {
-    LDBL_MANT_DIG, LDBL_MIN_EXP, LDBL_MAX_EXP,
-    LDBL_DIG, LDBL_MIN_10_EXP, LDBL_MAX_10_EXP
-  };
-long double lc1 = LDBL_EPSILON;
-long double lc2 = LDBL_MIN;
-#if 0 /* LDBL_MAX is not a constant expression on some platforms.  */
-long double lc3 = LDBL_MAX;
-#endif
 
 static void
 test_long_double (void)
@@ -351,6 +460,34 @@ test_long_double (void)
           ASSERT (x <= 1.0L);
       }
   }
+
+  /* Check the value of LDBL_HAS_SUBNORM.  */
+  ASSERT (LDBL_HAS_SUBNORM == 1);
+
+  /* Check the value of LDBL_DECIMAL_DIG.  */
+  ASSERT (LDBL_DECIMAL_DIG == (int)(LDBL_MANT_DIG * 0.3010299956639812 + 2));
+
+  /* Check the value of LDBL_TRUE_MIN.  */
+  ASSERT (LDBL_TRUE_MIN > 0.0L);
+  {
+    volatile long double x = LDBL_TRUE_MIN * 0.5L;
+    ASSERT (x == 0.0L);
+  }
+
+  /* Check the value of LDBL_IS_IEC_60559.  */
+#if (LDBL_MANT_DIG == 53 || LDBL_MANT_DIG == 113) && !defined __m68k__
+  ASSERT (LDBL_IS_IEC_60559);
+#elif 0
+  /* It is not clear what this macro actually means.  Cf.
+     <http://mailman.oakapple.net/pipermail/cfp-interest/2023-April/002760.html> */
+  ASSERT (!LDBL_IS_IEC_60559);
+#endif
+
+  /* Check the value of LDBL_NORM_MAX.  */
+  ASSERT (LDBL_NORM_MAX == LDBL_MAX);
+
+  /* Check the value of LDBL_SNAN.  */
+  ASSERT (isnanl (LDBL_SNAN));
 }
 
 int
@@ -369,7 +506,7 @@ main ()
     END_LONG_DOUBLE_ROUNDING ();
   }
 
-  return 0;
+  return test_exit_status;
 }
 
 #else

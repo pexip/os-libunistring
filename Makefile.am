@@ -1,5 +1,5 @@
 ## Makefile for the toplevel directory of GNU libunistring.
-## Copyright (C) 2009, 2016, 2018, 2021 Free Software Foundation, Inc.
+## Copyright (C) 2009, 2016, 2018, 2021-2022 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -22,8 +22,10 @@ ACLOCAL_AMFLAGS = -I m4 -I gnulib-m4
 SUBDIRS = doc gnulib-local lib tests
 
 EXTRA_DIST = \
-  version.sh BUGS DEPENDENCIES HACKING autogen.sh \
-  build-aux/join-v-1 build-aux/texi2html build-aux/run-test
+  version.sh BUGS DEPENDENCIES HACKING JOIN-GNU \
+  autogen.sh \
+  build-aux/join-v-1 build-aux/texi2html build-aux/run-test \
+  build-aux/git-log-fix
 
 
 # Allow users to use "gnulib-tool --update".
@@ -38,3 +40,23 @@ EXTRA_DIST += woe32dll/export.h
 # Windows support.
 
 EXTRA_DIST += INSTALL.windows build-aux/windres-options
+
+
+# Generate ChangeLog during "make dist".
+
+dist-hook: gen-ChangeLog
+
+gen_start_date = 2023-09-10
+.PHONY: gen-ChangeLog
+gen-ChangeLog:
+	$(AM_V_GEN)if test -d .git; then                                \
+	  log_fix="$(srcdir)/build-aux/git-log-fix";                    \
+	  test -e "$$log_fix"                                           \
+	    && amend_git_log="--amend=$$log_fix"                        \
+	    || amend_git_log=;                                          \
+	  $(top_srcdir)/build-aux/gitlog-to-changelog                   \
+	    $$amend_git_log --no-cluster --since=$(gen_start_date) -- . \
+	    > "$(distdir)/ChangeLog-t"                                  \
+	    && rm -f "$(distdir)/ChangeLog"                             \
+	    && mv "$(distdir)/ChangeLog-t" "$(distdir)/ChangeLog";      \
+	fi

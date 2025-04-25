@@ -1,9 +1,9 @@
 /* Test of line breaking of UTF-16 strings.
-   Copyright (C) 2008-2022 Free Software Foundation, Inc.
+   Copyright (C) 2008-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -76,8 +76,10 @@ int
 main ()
 {
   test_function (u16_width_linebreaks, 2);
-#undef u16_width_linebreaks
+#ifdef IN_LIBUNISTRING_GNULIB_TESTS
+# undef u16_width_linebreaks
   test_function (u16_width_linebreaks, 1);
+#endif
 
-  return 0;
+  return test_exit_status;
 }

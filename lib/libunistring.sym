@@ -86,6 +86,9 @@ UC_PROPERTY_HYPHEN
 UC_PROPERTY_IDEOGRAPHIC
 UC_PROPERTY_IDS_BINARY_OPERATOR
 UC_PROPERTY_IDS_TRINARY_OPERATOR
+UC_PROPERTY_IDS_UNARY_OPERATOR
+UC_PROPERTY_ID_COMPAT_MATH_CONTINUE
+UC_PROPERTY_ID_COMPAT_MATH_START
 UC_PROPERTY_ID_CONTINUE
 UC_PROPERTY_ID_START
 UC_PROPERTY_IGNORABLE_CONTROL
@@ -96,6 +99,7 @@ UC_PROPERTY_LINE_SEPARATOR
 UC_PROPERTY_LOGICAL_ORDER_EXCEPTION
 UC_PROPERTY_LOWERCASE
 UC_PROPERTY_MATH
+UC_PROPERTY_MODIFIER_COMBINING_MARK
 UC_PROPERTY_NON_BREAK
 UC_PROPERTY_NOT_A_CHARACTER
 UC_PROPERTY_NUMERIC
@@ -111,6 +115,7 @@ UC_PROPERTY_PAIRED_PUNCTUATION
 UC_PROPERTY_PARAGRAPH_SEPARATOR
 UC_PROPERTY_PATTERN_SYNTAX
 UC_PROPERTY_PATTERN_WHITE_SPACE
+UC_PROPERTY_PREPENDED_CONCATENATION_MARK
 UC_PROPERTY_PRIVATE_USE
 UC_PROPERTY_PUNCTUATION
 UC_PROPERTY_QUOTATION_MARK
@@ -130,6 +135,7 @@ UC_PROPERTY_XID_CONTINUE
 UC_PROPERTY_XID_START
 UC_PROPERTY_ZERO_WIDTH
 _UC_CATEGORY_NONE
+_libunistring_unicode_version
 _libunistring_version
 locale_charset
 u16_asnprintf
@@ -176,6 +182,7 @@ u16_normalize
 u16_normcmp
 u16_normcoll
 u16_normxfrm
+u16_pcpy
 u16_possible_linebreaks
 u16_possible_linebreaks_v2
 u16_prev
@@ -274,6 +281,7 @@ u32_normalize
 u32_normcmp
 u32_normcoll
 u32_normxfrm
+u32_pcpy
 u32_possible_linebreaks
 u32_possible_linebreaks_v2
 u32_prev
@@ -373,6 +381,7 @@ u8_normalize
 u8_normcmp
 u8_normcoll
 u8_normxfrm
+u8_pcpy
 u8_possible_linebreaks
 u8_possible_linebreaks_v2
 u8_prev
@@ -459,6 +468,9 @@ uc_general_category_name
 uc_general_category_or
 uc_grapheme_breaks
 uc_graphemeclusterbreak_property
+uc_indic_conjunct_break
+uc_indic_conjunct_break_byname
+uc_indic_conjunct_break_name
 uc_is_alnum
 uc_is_alpha
 uc_is_bidi_category
@@ -523,11 +535,14 @@ uc_is_property_grapheme_extend
 uc_is_property_grapheme_link
 uc_is_property_hex_digit
 uc_is_property_hyphen
+uc_is_property_id_compat_math_continue
+uc_is_property_id_compat_math_start
 uc_is_property_id_continue
 uc_is_property_id_start
 uc_is_property_ideographic
 uc_is_property_ids_binary_operator
 uc_is_property_ids_trinary_operator
+uc_is_property_ids_unary_operator
 uc_is_property_ignorable_control
 uc_is_property_iso_control
 uc_is_property_join_control
@@ -536,6 +551,7 @@ uc_is_property_line_separator
 uc_is_property_logical_order_exception
 uc_is_property_lowercase
 uc_is_property_math
+uc_is_property_modifier_combining_mark
 uc_is_property_non_break
 uc_is_property_not_a_character
 uc_is_property_numeric
@@ -551,6 +567,7 @@ uc_is_property_paired_punctuation
 uc_is_property_paragraph_separator
 uc_is_property_pattern_syntax
 uc_is_property_pattern_white_space
+uc_is_property_prepended_concatenation_mark
 uc_is_property_private_use
 uc_is_property_punctuation
 uc_is_property_quotation_mark

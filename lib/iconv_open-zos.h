@@ -1,4 +1,4 @@
-/* ANSI-C code produced by gperf version 3.1 */
+/* ANSI-C code produced by gperf version 3.2 */
 /* Command-line: gperf -m 10 ./iconv_open-zos.gperf  */
 /* Computed positions: -k'4,$' */
 
@@ -85,6 +85,11 @@ mapping_hash (register const char *str, register size_t len)
     {
       default:
         hval += asso_values[(unsigned char)str[3]+6];
+#if defined __cplusplus && (__cplusplus >= 201703L || (__cplusplus >= 201103L && defined __clang_major__ && defined __clang_minor__ && __clang_major__ + (__clang_minor__ >= 9) > 3))
+      [[fallthrough]];
+#elif defined __GNUC__ && __GNUC__ >= 7
+      __attribute__ ((__fallthrough__));
+#endif
       /*FALLTHROUGH*/
       case 3:
         break;

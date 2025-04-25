@@ -1,9 +1,9 @@
 /* Test of u8_width() function.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -58,5 +58,5 @@ main ()
     ASSERT (u8_width (input + INPUT4_OFFSET, INPUT4_LENGTH, "GB2312") == 6);
   }
 
-  return 0;
+  return test_exit_status;
 }

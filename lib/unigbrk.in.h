@@ -1,12 +1,12 @@
 /* Grapheme cluster breaks in Unicode strings.
-   Copyright (C) 2010-2022 Free Software Foundation, Inc.
+   Copyright (C) 2010-2024 Free Software Foundation, Inc.
    Written by Ben Pfaff <blp@cs.stanford.edu>, 2010.
 
    This file is free software.
    It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
    You can redistribute it and/or modify it under either
      - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
+       by the Free Software Foundation, either version 3, or (at your
        option) any later version, or
      - the terms of the GNU General Public License as published by the
        Free Software Foundation; either version 2, or (at your option)
@@ -27,7 +27,7 @@
 #define _UNIGBRK_H
 
 /* Get bool.  */
-#include <unistring/stdbool.h>
+#include <stdbool.h>
 
 /* Get size_t. */
 #include <stddef.h>
@@ -88,6 +88,9 @@ extern int
    Implements extended (not legacy) grapheme cluster rules, because UAX #29
    indicates that they are preferred.
 
+   Note: This function does not work right with syllables in Indic scripts or
+   emojis, because it does not look at the characters before A and after B.
+
    Use A == 0 or B == 0 to indicate start of text or end of text,
    respectively. */
 extern bool
@@ -95,7 +98,9 @@ extern bool
        _UC_ATTRIBUTE_CONST;
 
 /* Returns the start of the next grapheme cluster following S, or NULL if the
-   end of the string has been reached. */
+   end of the string has been reached.
+   Note: These functions do not work right with syllables in Indic scripts or
+   emojis, because they do not consider the characters before S. */
 extern const uint8_t *
        u8_grapheme_next (const uint8_t *s, const uint8_t *end)
        _UC_ATTRIBUTE_PURE;
@@ -107,7 +112,9 @@ extern const uint32_t *
        _UC_ATTRIBUTE_PURE;
 
 /* Returns the start of the previous grapheme cluster before S, or NULL if the
-   start of the string has been reached. */
+   start of the string has been reached.
+   Note: These functions do not work right with syllables in Indic scripts or
+   emojis, because they do not consider the characters at or after S. */
 extern const uint8_t *
        u8_grapheme_prev (const uint8_t *s, const uint8_t *start)
        _UC_ATTRIBUTE_PURE;

@@ -1,10 +1,10 @@
 /* Test the Unicode character Arabic joining type functions.
-   Copyright (C) 2011 Free Software Foundation, Inc.
+   Copyright (C) 2011-2024 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2011.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 3 of the License, or
+   by the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -61,5 +61,5 @@ main ()
   ASSERT (uc_joining_type (0x0613) == UC_JOINING_TYPE_T);
   ASSERT (uc_joining_type (0x0614) == UC_JOINING_TYPE_T);
 
-  return 0;
+  return test_exit_status;
 }

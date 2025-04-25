@@ -1,9 +1,9 @@
 /* Grapheme cluster break function test.
-   Copyright (C) 2010-2022 Free Software Foundation, Inc.
+   Copyright (C) 2010-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU Lesser General Public License as published
-   by the Free Software Foundation; either version 3 of the License, or
+   by the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -27,7 +27,7 @@
 
 #include "macros.h"
 
-static const char *
+_GL_UNUSED static const char *
 graphemebreakproperty_to_string (int gbp)
 {
   printf ("%d\n", gbp);
@@ -75,19 +75,20 @@ test_uc_grapheme_breaks (const char *expected, ucs4_t *s, size_t n,
 
         fprintf (stderr, "   input:");
         for (j = 0; j < n; j++)
-          fprintf (stderr, " %02x", s[j]);
+          fprintf (stderr, " %04X", s[j]);
         putc ('\n', stderr);
 
         fprintf (stderr, "expected:");
         for (j = 0; j < n; j++)
-          fprintf (stderr, "  %d", expected[j] == '#');
+          fprintf (stderr, "    %d", expected[j] == '#');
         putc ('\n', stderr);
 
         fprintf (stderr, "  actual:");
         for (j = 0; j < n; j++)
-          fprintf (stderr, "  %d", breaks[j]);
+          fprintf (stderr, "    %d", breaks[j]);
         putc ('\n', stderr);
 
+        fflush (stderr);
         abort ();
       }
 }
@@ -96,10 +97,9 @@ int
 main (int argc, char *argv[])
 {
   const char *filename;
-  char line[1024];
-  int exit_code;
   FILE *stream;
   int lineno;
+  char line[1024];
 
   if (argc != 2)
     {
@@ -117,23 +117,23 @@ main (int argc, char *argv[])
       exit (1);
     }
 
-  exit_code = 0;
   lineno = 0;
-  while (fgets (line, sizeof line, stream))
+  while (fgets (line, sizeof (line), stream))
     {
-      char *comment;
+      lineno++;
+
+      /* Cut off the trailing comment, if any.  */
+      char *comment = strchr (line, '#');
+      if (comment != NULL)
+        *comment = '\0';
+      /* Is the remaining line blank?  */
+      if (line[strspn (line, " \t\r\n")] == '\0')
+        continue;
+
       const char *p;
       ucs4_t s[16];
       char breaks[16];
       size_t i = 0;
-
-      lineno++;
-
-      comment = strchr (line, '#');
-      if (comment != NULL)
-        *comment = '\0';
-      if (line[strspn (line, " \t\r\n")] == '\0')
-        continue;
 
       s[0] = 0;
       p = line;
@@ -185,5 +185,5 @@ main (int argc, char *argv[])
         test_uc_grapheme_breaks (breaks, s, i, filename, lineno);
     }
 
-  return exit_code;
+  return test_exit_status;
 }

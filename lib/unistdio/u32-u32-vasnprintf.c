@@ -1,12 +1,12 @@
 /* Formatted output to UTF-32 strings.
-   Copyright (C) 1999, 2002, 2006-2007, 2009-2022 Free Software Foundation,
+   Copyright (C) 1999, 2002, 2006-2007, 2009-2024 Free Software Foundation,
    Inc.
 
    This file is free software.
    It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
    You can redistribute it and/or modify it under either
      - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
+       by the Free Software Foundation, either version 3, or (at your
        option) any later version, or
      - the terms of the GNU General Public License as published by the
        Free Software Foundation; either version 2, or (at your option)
@@ -46,7 +46,6 @@
 #define DIRECTIVES u32_directives
 #define PRINTF_PARSE u32_printf_parse
 #define DCHAR_T uint32_t
-#define DCHAR_T_IS_UINT32_T 1
 #define DCHAR_CPY u32_cpy
 #define DCHAR_SET u32_set
 #define DCHAR_MBSNLEN u32_mbsnlen

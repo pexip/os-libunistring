@@ -1,5 +1,5 @@
 /* Decomposition of Unicode strings.
-   Copyright (C) 2009-2022 Free Software Foundation, Inc.
+   Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2009.
 
    This file is free software: you can redistribute it and/or modify
@@ -19,6 +19,11 @@
 
 #include "unitypes.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /* Variant of uc_decomposition that does not produce the 'tag'.  */
 extern int
        uc_compat_decomposition (ucs4_t uc, ucs4_t *decomposition);
@@ -34,3 +39,8 @@ struct ucs4_with_ccc
 extern void
        gl_uninorm_decompose_merge_sort_inplace (struct ucs4_with_ccc *src, size_t n,
                                                 struct ucs4_with_ccc *tmp);
+
+
+#ifdef __cplusplus
+}
+#endif
