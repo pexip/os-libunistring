@@ -48,7 +48,7 @@ The titlecase mapping of a character is to be used when the character should
 look like upper case and the following characters are lower cased.
 
 For most characters, this is the same as the uppercase mapping.  There are
-only few characters where the title case variant and the uuper case variant
+only few characters where the title case variant and the upper case variant
 are different.  These characters occur in the Latin writing of the Croatian,
 Bosnian, and Serbian languages.
 
@@ -80,7 +80,7 @@ Bosnian, and Serbian languages.
 @cindex lowercasing
 @cindex titlecasing
 Case mapping should always be performed on entire strings, not on individual
-characters.  The functions in this sections do so.
+characters.  The functions in this section do so.
 
 These functions allow to apply a normalization after the case mapping.  The
 reason is that if you want to treat @samp{@"{a}} and @samp{@"{A}} the same,
@@ -281,6 +281,9 @@ case mapping contexts of the prefix and suffix strings.
 The @var{resultbuf} and @var{lengthp} arguments are as described in
 chapter @ref{Conventions}.
 @end deftypefun
+
+The following functions ignore locale-dependent collation rules, but do
+use locale-dependent case mappings (if @var{iso639_language} is not NULL).
 
 @deftypefun int u8_casecmp (const@tie{}uint8_t@tie{}*@var{s1}, size_t@tie{}@var{n1}, const@tie{}uint8_t@tie{}*@var{s2}, size_t@tie{}@var{n2}, const@tie{}char@tie{}*@var{iso639_language}, uninorm_t@tie{}@var{nf}, int@tie{}*@var{resultp})
 @deftypefunx int u16_casecmp (const@tie{}uint16_t@tie{}*@var{s1}, size_t@tie{}@var{n1}, const@tie{}uint16_t@tie{}*@var{s2}, size_t@tie{}@var{n2}, const@tie{}char@tie{}*@var{iso639_language}, uninorm_t@tie{}@var{nf}, int@tie{}*@var{resultp})

@@ -1,10 +1,10 @@
 /* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* Test the Unicode character type functions.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published
-   by the Free Software Foundation; either version 3 of the License,
+   by the Free Software Foundation, either version 3 of the License,
    or (at your option) any later version.
 
    This file is distributed in the hope that it will be useful,
@@ -151,7 +151,7 @@
     { 0x1F680, 0x1F6C5 },
     { 0x1F6CB, 0x1F6D2 },
     { 0x1F6D5, 0x1F6D7 },
-    { 0x1F6DD, 0x1F6E5 },
+    { 0x1F6DC, 0x1F6E5 },
     { 0x1F6E9, 0x1F6E9 },
     { 0x1F6EB, 0x1F6EC },
     { 0x1F6F0, 0x1F6F0 },
@@ -161,15 +161,12 @@
     { 0x1F90C, 0x1F93A },
     { 0x1F93C, 0x1F945 },
     { 0x1F947, 0x1F9FF },
-    { 0x1FA70, 0x1FA74 },
-    { 0x1FA78, 0x1FA7C },
-    { 0x1FA80, 0x1FA86 },
-    { 0x1FA90, 0x1FAAC },
-    { 0x1FAB0, 0x1FABA },
-    { 0x1FAC0, 0x1FAC5 },
-    { 0x1FAD0, 0x1FAD9 },
-    { 0x1FAE0, 0x1FAE7 },
-    { 0x1FAF0, 0x1FAF6 }
+    { 0x1FA70, 0x1FA7C },
+    { 0x1FA80, 0x1FA89 },
+    { 0x1FA8F, 0x1FAC6 },
+    { 0x1FACE, 0x1FADC },
+    { 0x1FADF, 0x1FAE9 },
+    { 0x1FAF0, 0x1FAF8 }
 
 #define PREDICATE(c) uc_is_property_emoji (c)
 #include "test-predicate-part2.h"

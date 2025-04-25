@@ -37,6 +37,12 @@ This handler causes the function to return with @code{errno} set to
 This handler produces one question mark @samp{?} per unconvertible character.
 @end deftypevr
 
+@deftypevr Constant {enum iconv_ilseq_handler} iconveh_question_replacement_character
+This handler produces one U+FFFD per unconvertible character if that
+fits in the target encoding, otherwise one question mark @samp{?} per
+unconvertible character.
+@end deftypevr
+
 @deftypevr Constant {enum iconv_ilseq_handler} iconveh_escape_sequence
 This handler produces an escape sequence @code{\u@var{xxxx}} or
 @code{\U@var{xxxxxxxx}} for each unconvertible character.

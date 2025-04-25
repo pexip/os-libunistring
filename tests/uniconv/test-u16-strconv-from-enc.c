@@ -1,9 +1,9 @@
 /* Test of conversion to UTF-16 from legacy encodings.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -71,7 +71,8 @@ main ()
     }
 
   /* autodetect_jp is only supported when iconv() support ISO-2022-JP-2.  */
-# if defined _LIBICONV_VERSION || !(defined _AIX || defined __sgi || defined __hpux || defined __osf__ || defined __sun)
+# if (defined _LIBICONV_VERSION && !(_LIBICONV_VERSION == 0x10b && defined __APPLE__)) \
+     || !(defined _AIX || defined __sgi || defined __hpux || defined __osf__ || defined __sun)
   if (iconv_supports_encoding ("ISO-2022-JP-2"))
     {
       /* Test conversions from autodetect_jp to UTF-16.  */
@@ -119,5 +120,5 @@ main ()
 
 #endif
 
-  return 0;
+  return test_exit_status;
 }

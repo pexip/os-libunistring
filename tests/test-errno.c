@@ -1,9 +1,9 @@
 /* Test of <errno.h> substitute.
-   Copyright (C) 2008-2022 Free Software Foundation, Inc.
+   Copyright (C) 2008-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -20,100 +20,147 @@
 
 #include <errno.h>
 
-/* Verify that the POSIX mandated errno values exist and can be used as
-   initializers outside of a function.
-   The variable names happen to match the Linux/x86 error numbers.  */
-int e1 = EPERM;
-int e2 = ENOENT;
-int e3 = ESRCH;
-int e4 = EINTR;
-int e5 = EIO;
-int e6 = ENXIO;
-int e7 = E2BIG;
-int e8 = ENOEXEC;
-int e9 = EBADF;
-int e10 = ECHILD;
-int e11 = EAGAIN;
-int e11a = EWOULDBLOCK;
-int e12 = ENOMEM;
-int e13 = EACCES;
-int e14 = EFAULT;
-int e16 = EBUSY;
-int e17 = EEXIST;
-int e18 = EXDEV;
-int e19 = ENODEV;
-int e20 = ENOTDIR;
-int e21 = EISDIR;
-int e22 = EINVAL;
-int e23 = ENFILE;
-int e24 = EMFILE;
-int e25 = ENOTTY;
-int e26 = ETXTBSY;
-int e27 = EFBIG;
-int e28 = ENOSPC;
-int e29 = ESPIPE;
-int e30 = EROFS;
-int e31 = EMLINK;
-int e32 = EPIPE;
-int e33 = EDOM;
-int e34 = ERANGE;
-int e35 = EDEADLK;
-int e36 = ENAMETOOLONG;
-int e37 = ENOLCK;
-int e38 = ENOSYS;
-int e39 = ENOTEMPTY;
-int e40 = ELOOP;
-int e42 = ENOMSG;
-int e43 = EIDRM;
-int e67 = ENOLINK;
-int e71 = EPROTO;
-int e72 = EMULTIHOP;
-int e74 = EBADMSG;
-int e75 = EOVERFLOW;
-int e84 = EILSEQ;
-int e88 = ENOTSOCK;
-int e89 = EDESTADDRREQ;
-int e90 = EMSGSIZE;
-int e91 = EPROTOTYPE;
-int e92 = ENOPROTOOPT;
-int e93 = EPROTONOSUPPORT;
-int e95 = EOPNOTSUPP;
-int e95a = ENOTSUP;
-int e97 = EAFNOSUPPORT;
-int e98 = EADDRINUSE;
-int e99 = EADDRNOTAVAIL;
-int e100 = ENETDOWN;
-int e101 = ENETUNREACH;
-int e102 = ENETRESET;
-int e103 = ECONNABORTED;
-int e104 = ECONNRESET;
-int e105 = ENOBUFS;
-int e106 = EISCONN;
-int e107 = ENOTCONN;
-int e110 = ETIMEDOUT;
-int e111 = ECONNREFUSED;
-int e113 = EHOSTUNREACH;
-int e114 = EALREADY;
-int e115 = EINPROGRESS;
-int e116 = ESTALE;
-int e122 = EDQUOT;
-int e125 = ECANCELED;
-int e130 = EOWNERDEAD;
-int e131 = ENOTRECOVERABLE;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-/* Don't verify that these errno values are all different, except for possibly
-   EWOULDBLOCK == EAGAIN.  Even Linux/x86 does not pass this check: it has
-   ENOTSUP == EOPNOTSUPP.  */
+/* Check all POSIX-defined errno values, using M (v) to check value v.  */
+#define CHECK_POSIX_ERRNOS(m) \
+  m (E2BIG) \
+  m (EACCES) \
+  m (EADDRINUSE) \
+  m (EADDRNOTAVAIL) \
+  m (EAFNOSUPPORT) \
+  m (EAGAIN) \
+  m (EALREADY) \
+  m (EBADF) \
+  m (EBADMSG) \
+  m (EBUSY) \
+  m (ECANCELED) \
+  m (ECHILD) \
+  m (ECONNABORTED) \
+  m (ECONNREFUSED) \
+  m (ECONNRESET) \
+  m (EDEADLK) \
+  m (EDESTADDRREQ) \
+  m (EDOM) \
+  m (EDQUOT) \
+  m (EEXIST) \
+  m (EFAULT) \
+  m (EFBIG) \
+  m (EHOSTUNREACH) \
+  m (EIDRM) \
+  m (EILSEQ) \
+  m (EINPROGRESS) \
+  m (EINTR) \
+  m (EINVAL) \
+  m (EIO) \
+  m (EISCONN) \
+  m (EISDIR) \
+  m (ELOOP) \
+  m (EMFILE) \
+  m (EMLINK) \
+  m (EMSGSIZE) \
+  m (EMULTIHOP) \
+  m (ENAMETOOLONG) \
+  m (ENETDOWN) \
+  m (ENETRESET) \
+  m (ENETUNREACH) \
+  m (ENFILE) \
+  m (ENOBUFS) \
+  m (ENODEV) \
+  m (ENOENT) \
+  m (ENOEXEC) \
+  m (ENOLCK) \
+  m (ENOLINK) \
+  m (ENOMEM) \
+  m (ENOMSG) \
+  m (ENOPROTOOPT) \
+  m (ENOSPC) \
+  m (ENOSYS) \
+  m (ENOTCONN) \
+  m (ENOTDIR) \
+  m (ENOTEMPTY) \
+  m (ENOTRECOVERABLE) \
+  m (ENOTSOCK) \
+  m (ENOTSUP) \
+  m (ENOTTY) \
+  m (ENXIO) \
+  m (EOPNOTSUPP) \
+  m (EOVERFLOW) \
+  m (EOWNERDEAD) \
+  m (EPERM) \
+  m (EPIPE) \
+  m (EPROTO) \
+  m (EPROTONOSUPPORT) \
+  m (EPROTOTYPE) \
+  m (ERANGE) \
+  m (EROFS) \
+  m (ESOCKTNOSUPPORT) \
+  m (ESPIPE) \
+  m (ESRCH) \
+  m (ESTALE) \
+  m (ETIMEDOUT) \
+  m (ETXTBSY) \
+  m (EWOULDBLOCK) \
+  m (EXDEV) \
+  /* end of CHECK_POSIX_ERRNOS */
+
+/* Verify that the POSIX mandated errno values can be used as integer
+   constant expressions and are all positive (except on Haiku).  */
+#if defined __HAIKU__
+# define NONZERO_INTEGER_CONSTANT_EXPRESSION(e) static_assert (0 != (e) << 0);
+CHECK_POSIX_ERRNOS (NONZERO_INTEGER_CONSTANT_EXPRESSION)
+#else
+# define POSITIVE_INTEGER_CONSTANT_EXPRESSION(e) static_assert (0 < (e) << 0);
+CHECK_POSIX_ERRNOS (POSITIVE_INTEGER_CONSTANT_EXPRESSION)
+#endif
+
+/* Verify that errno values can all be used in #if.  */
+#define USABLE_IN_IF(e) ^ e
+#if 0 CHECK_POSIX_ERRNOS (USABLE_IN_IF)
+#endif
+
+/* Check that errno values all differ, except possibly for
+   EWOULDBLOCK == EAGAIN and ENOTSUP == EOPNOTSUPP.  */
+#define ERRTAB(e) { #e, e },
+static struct nameval { char const *name; int value; }
+  errtab[] = { CHECK_POSIX_ERRNOS (ERRTAB) };
+
+static int
+errtab_cmp (void const *va, void const *vb)
+{
+  struct nameval const *a = va, *b = vb;
+
+  /* Sort by value first, then by name (to simplify later tests).
+     Subtraction cannot overflow as both are positive.  */
+  int diff = a->value - b->value;
+  return diff ? diff : strcmp (a->name, b->name);
+}
 
 int
 main ()
 {
+  int test_exit_status = EXIT_SUCCESS;
+
   /* Verify that errno can be assigned.  */
   errno = EOVERFLOW;
 
-  /* snprintf() callers want to distinguish EINVAL and EOVERFLOW.  */
-  if (errno == EINVAL)
-    return 1;
+  /* Check that errno values all differ, except possibly for
+     EAGAIN == EWOULDBLOCK and ENOTSUP == EOPNOTSUPP.  */
+  int nerrtab = sizeof errtab / sizeof *errtab;
+  qsort (errtab, nerrtab, sizeof *errtab, errtab_cmp);
+  for (int i = 1; i < nerrtab; i++)
+    if (errtab[i - 1].value == errtab[i].value)
+      {
+        fprintf (stderr, "%s == %s == %d\n",
+                 errtab[i - 1].name, errtab[i].name, errtab[i].value);
+        if (! ((strcmp ("EAGAIN", errtab[i - 1].name) == 0
+                && strcmp ("EWOULDBLOCK", errtab[i].name) == 0)
+               || (strcmp ("ENOTSUP", errtab[i - 1].name) == 0
+                   && strcmp ("EOPNOTSUPP", errtab[i].name) == 0)))
+          test_exit_status = EXIT_FAILURE;
+      }
 
-  return 0;
+  return test_exit_status;
 }

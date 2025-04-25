@@ -1,5 +1,6 @@
-# setlocale.m4 serial 7
-dnl Copyright (C) 2011-2022 Free Software Foundation, Inc.
+# setlocale.m4
+# serial 10
+dnl Copyright (C) 2011-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -15,7 +16,7 @@ AC_DEFUN([gl_FUNC_SETLOCALE],
   case "$host_os" in
     dnl On native Windows systems, setlocale(category,NULL) does not look at
     dnl the environment variables LC_ALL, category, and LANG.
-    mingw*) NEED_SETLOCALE_IMPROVED=1 ;;
+    mingw* | windows*) NEED_SETLOCALE_IMPROVED=1 ;;
     dnl On Cygwin 1.5.x, setlocale always succeeds but setlocale(LC_CTYPE,NULL)
     dnl is then still "C".
     cygwin*)
@@ -66,12 +67,15 @@ int main ()
   fi
 
   if test $NEED_SETLOCALE_MTSAFE = 1; then
-    LIB_SETLOCALE="$LIB_SETLOCALE_NULL"
+    SETLOCALE_LIB="$SETLOCALE_NULL_LIB"
   else
-    LIB_SETLOCALE=
+    SETLOCALE_LIB=
   fi
-  dnl LIB_SETLOCALE is expected to be '-pthread' or '-lpthread' on AIX with gcc
+  dnl SETLOCALE_LIB is expected to be '-pthread' or '-lpthread' on AIX with gcc
   dnl or xlc, and empty otherwise.
+  AC_SUBST([SETLOCALE_LIB])
+  dnl For backward compatibility.
+  LIB_SETLOCALE="$SETLOCALE_LIB"
   AC_SUBST([LIB_SETLOCALE])
 ])
 

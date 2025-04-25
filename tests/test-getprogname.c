@@ -1,9 +1,9 @@
 /* Test the gnulib getprogname module.
-   Copyright (C) 2016-2022 Free Software Foundation, Inc.
+   Copyright (C) 2016-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -16,7 +16,8 @@
 
 #include <config.h>
 
-#include "getprogname.h"
+#include <stdlib.h>
+
 #include <string.h>
 #include <assert.h>
 

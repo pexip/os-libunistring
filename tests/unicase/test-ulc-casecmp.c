@@ -1,9 +1,9 @@
 /* Test of case and normalization insensitive comparison of strings.
-   Copyright (C) 2009-2022 Free Software Foundation, Inc.
+   Copyright (C) 2009-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -382,12 +382,12 @@ main (int argc, char *argv[])
       case '1':
         /* Locale encoding is ISO-8859-1 or ISO-8859-15.  */
         test_iso_8859_1 (ulc_casecmp);
-        return 0;
+        return test_exit_status;
 
       case '2':
         /* Locale encoding is UTF-8.  */
         test_utf_8 (ulc_casecmp);
-        return 0;
+        return test_exit_status;
       }
 
   return 1;

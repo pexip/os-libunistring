@@ -1,5 +1,5 @@
 ## Makefile for the doc subdirectory of GNU libunistring.
-## Copyright (C) 2009, 2011, 2014, 2017-2019 Free Software Foundation, Inc.
+## Copyright (C) 2009, 2011, 2014, 2017-2023 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -28,7 +28,11 @@ TEXINCLUDES = -I .
 
 RM = rm -f
 
-MAKEINFO = env LANG= LC_MESSAGES= LC_ALL= LANGUAGE= @MAKEINFO@
+# The customization variable CHECK_NORMAL_MENU_STRUCTURE is necessary with
+# makeinfo versions ≥ 6.8.
+MAKEINFO = \
+  env LANG= LC_MESSAGES= LC_ALL= LANGUAGE= \
+  @MAKEINFO@ -c CHECK_NORMAL_MENU_STRUCTURE=1
 MAKEINFOFLAGS = $(TEXINCLUDES) --no-split
 
 info_TEXINFOS = libunistring.texi

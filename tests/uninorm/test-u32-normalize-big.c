@@ -1,9 +1,9 @@
 /* Test of Unicode compliance of normalization of UTF-32 strings.
-   Copyright (C) 2009-2022 Free Software Foundation, Inc.
+   Copyright (C) 2009-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -28,6 +28,7 @@
 
 #include "xalloc.h"
 #include "unistr.h"
+#define NO_MAIN_HERE
 #include "macros.h"
 
 #define ASSERT_WITH_LINE(expr, file, line) \
@@ -69,7 +70,7 @@ read_normalization_test_file (const char *filename,
       exit (1);
     }
 
-  for (part_index = 0; part_index < 4; part_index++)
+  for (part_index = 0; part_index < 6; part_index++)
     {
       file->parts[part_index].lines = NULL;
       file->parts[part_index].lines_length = 0;
@@ -131,7 +132,7 @@ read_normalization_test_file (const char *filename,
 
       /* It's a line containing 5 sequences of Unicode characters.
          Parse it and append it to the current part.  */
-      if (!(part_index >= 0 && part_index < 4))
+      if (!(part_index >= 0 && part_index < 6))
         {
           fprintf (stderr, "unexpected structure of '%s'\n", filename);
           exit (1);
@@ -248,7 +249,7 @@ test_specific (const struct normalization_test_file *file,
 {
   size_t part_index;
 
-  for (part_index = 0; part_index < 4; part_index++)
+  for (part_index = 0; part_index < 6; part_index++)
     {
       const struct normalization_test_part *p = &file->parts[part_index];
       size_t line_index;
@@ -308,7 +309,7 @@ free_normalization_test_file (struct normalization_test_file *file)
 {
   size_t part_index;
 
-  for (part_index = 0; part_index < 4; part_index++)
+  for (part_index = 0; part_index < 6; part_index++)
     {
       const struct normalization_test_part *p = &file->parts[part_index];
       size_t line_index;

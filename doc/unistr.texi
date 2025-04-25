@@ -179,6 +179,16 @@ This function is similar to @posixfunc{memcpy}, except that it operates on
 Unicode strings.
 @end deftypefun
 
+@deftypefun {uint8_t *} u8_pcpy (uint8_t@tie{}*@var{dest}, const@tie{}uint8_t@tie{}*@var{src}, size_t@tie{}@var{n})
+@deftypefunx {uint16_t *} u16_pcpy (uint16_t@tie{}*@var{dest}, const@tie{}uint16_t@tie{}*@var{src}, size_t@tie{}@var{n})
+@deftypefunx {uint32_t *} u32_pcpy (uint32_t@tie{}*@var{dest}, const@tie{}uint32_t@tie{}*@var{src}, size_t@tie{}@var{n})
+Copies @var{n} units from @var{src} to @var{dest}, returning a pointer
+after the last written unit.
+
+This function is similar to @func{mempcpy}, except that it operates on
+Unicode strings.
+@end deftypefun
+
 @deftypefun {uint8_t *} u8_move (uint8_t@tie{}*@var{dest}, const@tie{}uint8_t@tie{}*@var{src}, size_t@tie{}@var{n})
 @deftypefunx {uint16_t *} u16_move (uint16_t@tie{}*@var{dest}, const@tie{}uint16_t@tie{}*@var{src}, size_t@tie{}@var{n})
 @deftypefunx {uint32_t *} u32_move (uint32_t@tie{}*@var{dest}, const@tie{}uint32_t@tie{}*@var{src}, size_t@tie{}@var{n})
@@ -429,6 +439,7 @@ that it operates on Unicode strings.
 
 @cindex comparing
 The following functions compare two Unicode strings.
+They ignore locale-dependent collation rules.
 
 @deftypefun int u8_strcmp (const@tie{}uint8_t@tie{}*@var{s1}, const@tie{}uint8_t@tie{}*@var{s2})
 @deftypefunx int u16_strcmp (const@tie{}uint16_t@tie{}*@var{s1}, const@tie{}uint16_t@tie{}*@var{s2})

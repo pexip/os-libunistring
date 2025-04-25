@@ -8,7 +8,8 @@ problem mentioned in the section @ref{char * strings}.  They introduced
 @item
 a type @samp{wchar_t}, designed to encapsulate an entire character,
 @item
-a ``wide string'' type @samp{wchar_t *}, and
+a ``wide string'' type @samp{wchar_t *}, with some API functions declared in
+@posixheader{wchar.h}, and
 @item
 functions declared in @posixheader{wctype.h} that were meant to supplant the
 ones in @posixheader{ctype.h}.
@@ -18,8 +19,8 @@ Unfortunately, this API and its implementation has numerous problems:
 
 @itemize @bullet
 @item
-On AIX and Windows platforms, @code{wchar_t} is a 16-bit type.  This
-means that it can never accommodate an entire Unicode character.  Either
+On Windows platforms and on AIX in 32-bit mode, @code{wchar_t} is a 16-bit type.
+This means that it can never accommodate an entire Unicode character.  Either
 the @code{wchar_t *} strings are limited to characters in UCS-2 (the
 ``Basic Multilingual Plane'' of Unicode), or --- if @code{wchar_t *}
 strings are encoded in UTF-16 --- a @code{wchar_t} represents only half

@@ -1,12 +1,12 @@
 /* Substring test for UTF-8 strings.
-   Copyright (C) 1999, 2002, 2006, 2010-2022 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002, 2006, 2010-2024 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
    This file is free software.
    It is dual-licensed under "the GNU LGPLv3+ or the GNU GPLv2+".
    You can redistribute it and/or modify it under either
      - the terms of the GNU Lesser General Public License as published
-       by the Free Software Foundation; either version 3, or (at your
+       by the Free Software Foundation, either version 3, or (at your
        option) any later version, or
      - the terms of the GNU General Public License as published by the
        Free Software Foundation; either version 2, or (at your option)
@@ -30,11 +30,26 @@
 
 #include <string.h>
 
-/* FIXME: Maybe walking the string via u8_mblen is a win?  */
+uint8_t *
+u8_strstr (const uint8_t *haystack, const uint8_t *needle)
+{
+  uint8_t first = needle[0];
 
-#define FUNC u8_strstr
-#define UNIT uint8_t
-#define U_STRCHR u8_strchr
-#define U_STRMBTOUC u8_strmbtouc
-#define UNIT_IS_UINT8_T 1
-#include "u-strstr.h"
+  /* Is needle empty?  */
+  if (first == 0)
+    return (uint8_t *) haystack;
+
+  /* Is needle nearly empty (only one unit)?  */
+  if (needle[1] == 0)
+    return u8_strchr (haystack, first);
+
+  /* Is needle nearly empty (only one character)?  */
+  {
+    ucs4_t first_uc;
+    int count = u8_strmbtouc (&first_uc, needle);
+    if (count > 0 && needle[count] == 0)
+      return u8_strchr (haystack, first_uc);
+  }
+
+  return (uint8_t *) strstr ((const char *) haystack, (const char *) needle);
+}

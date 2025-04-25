@@ -1,4 +1,4 @@
-This is libunistring.info, produced by makeinfo version 6.7 from
+This is libunistring.info, produced by makeinfo version 6.8 from
 libunistring.texi.
 
 INFO-DIR-SECTION Software development
@@ -425,7 +425,7 @@ encoding; therefore, the majority of users are using multibyte locales.
      screen columns of a string is requested.
    • gnulib has functions ‘mbschr’ and ‘mbsrrchr’ that are like ‘strchr’
      and ‘strrchr’, but work in multibyte locales.
-   • gnulib has a function ‘mbsstr’, like ‘strstr’, but works in
+   • gnulib has a function ‘mbsstr’ that is like ‘strstr’, but works in
      multibyte locales.
    • gnulib has functions ‘mbscspn’, ‘mbspbrk’, ‘mbsspn’ that are like
      ‘strcspn’, ‘strpbrk’, ‘strspn’, but work in multibyte locales.
@@ -510,7 +510,7 @@ order mark.  Their units are 2-byte words.
 order mark.  Their units are 4-byte words.
 
    Argument pairs ‘(S, N)’ denote a string ‘S[0..N-1]’ with exactly N
-units.
+units.(1)
 
    All functions with prefix ‘ulc_’ operate on C strings in locale
 encoding.
@@ -546,6 +546,27 @@ argument pair.  If RESULTBUF is not NULL and the result fits into
 Otherwise, a freshly allocated string is returned.  In both cases,
 ‘*LENGTHP’ is set to the length (number of units) of the returned
 string.  In case of error, NULL is returned and ‘errno’ is set.
+
+   To invoke such a function:
+   • First ask yourself whether you want to accept the overhead of a
+     ‘malloc’ invocation even for a small-sized result.  If yes, pass
+     NULL as RESULTBUF.  If no, allocate an array of units on the stack,
+     typically between 50 and 4000 bytes large; pass this array as
+     RESULTBUF; and initialize ‘*LENGTHP’ to the number of units of this
+     array.
+   • Upon return from such a function, look at the return value: NULL
+     means an error; look at the value of ‘errno’ in this case.
+     Otherwise, the return value is the result, with ‘*LENGTHP’ units.
+     Note that the function has _not_ added an extra NUL character at
+     the end.
+   • Finally, do memory management.  You know that the result was
+     ‘malloc’-allocated if it is ‘!= NULL’ and ‘!= RESULTBUF’.
+
+   ---------- Footnotes ----------
+
+   (1) A NUL unit as terminator is not needed, since the number of units
+is given by N.  If some of the units of the string are NUL, they are
+just regular units; they are not interpreted as terminators.
 
 
 File: libunistring.info,  Node: unitypes.h,  Next: unistr.h,  Prev: Conventions,  Up: Top
@@ -773,6 +794,18 @@ File: libunistring.info,  Node: Copying Unicode strings,  Next: Comparing Unicod
      Copies N units from SRC to DEST.
 
      This function is similar to ‘memcpy’, except that it operates on
+     Unicode strings.
+
+ -- Function: uint8_t * u8_pcpy (uint8_t *DEST, const uint8_t *SRC,
+          size_t N)
+ -- Function: uint16_t * u16_pcpy (uint16_t *DEST, const uint16_t *SRC,
+          size_t N)
+ -- Function: uint32_t * u32_pcpy (uint32_t *DEST, const uint32_t *SRC,
+          size_t N)
+     Copies N units from SRC to DEST, returning a pointer after the last
+     written unit.
+
+     This function is similar to ‘mempcpy’, except that it operates on
      Unicode strings.
 
  -- Function: uint8_t * u8_move (uint8_t *DEST, const uint8_t *SRC,
@@ -1051,7 +1084,8 @@ File: libunistring.info,  Node: Comparing NUL terminated Unicode strings,  Next:
 4.5.4 Comparing NUL terminated Unicode strings
 ----------------------------------------------
 
-   The following functions compare two Unicode strings.
+   The following functions compare two Unicode strings.  They ignore
+locale-dependent collation rules.
 
  -- Function: int u8_strcmp (const uint8_t *S1, const uint8_t *S2)
  -- Function: int u16_strcmp (const uint16_t *S1, const uint16_t *S2)
@@ -1264,6 +1298,12 @@ be parametrized through the following enumeration type:
      This handler produces one question mark ‘?’ per unconvertible
      character.
 
+ -- Constant: enum iconv_ilseq_handler
+          iconveh_question_replacement_character
+     This handler produces one U+FFFD per unconvertible character if
+     that fits in the target encoding, otherwise one question mark ‘?’
+     per unconvertible character.
+
  -- Constant: enum iconv_ilseq_handler iconveh_escape_sequence
      This handler produces an escape sequence ‘\uXXXX’ or ‘\UXXXXXXXX’
      for each unconvertible character.
@@ -1421,6 +1461,7 @@ format string:
      *’).
    • The format directive ‘llU’ takes an UTF-32 string (‘const uint32_t
      *’).
+   • The format directive ‘n’ is not supported, for security reasons.
 
    A function name with an infix ‘v’ indicates that a ‘va_list’ is
 passed instead of multiple arguments.
@@ -1652,6 +1693,7 @@ algorithms in the presence of specific Unicode characters.
 * Mirrored character::
 * Arabic shaping::
 * Properties::
+* Other attributes::
 * Scripts::
 * Blocks::
 * ISO C and Java syntax::
@@ -2273,6 +2315,15 @@ character.
      and returns ‘true’, if it exists.  Otherwise it stores UC
      unmodified in ‘*PUC’ and returns ‘false’.
 
+     Note: It is possible for this function to return ‘true’ and set
+     ‘*PUC’ to ‘0xFFFD’.  This happens when the character has the bidi
+     mirror property (that is, it should be displayed through a mirrored
+     glyph) but this mirrored glyph does not exist as a Unicode
+     character; thus a rendering engine needs to synthesize it
+     artificially or pick it from an appropriate font.  This affects
+     mostly mathematical operators.  See section “Bidi Mirrored” of the
+     Unicode standard.
+
 
 File: libunistring.info,  Node: Arabic shaping,  Next: Properties,  Prev: Mirrored character,  Up: unictype.h
 
@@ -2462,6 +2513,7 @@ two contexts of right-joining characters.
  -- Constant: int UC_JOINING_GROUP_HANIFI_ROHINGYA_KINNA_YA
  -- Constant: int UC_JOINING_GROUP_THIN_YEH
  -- Constant: int UC_JOINING_GROUP_VERTICAL_TAIL
+ -- Constant: int UC_JOINING_GROUP_KASHMIRI_YEH
 
    The following functions implement the association between a joining
 group and its name.
@@ -2482,7 +2534,7 @@ character.
      Returns the joining group of a Unicode character.
 
 
-File: libunistring.info,  Node: Properties,  Next: Scripts,  Prev: Arabic shaping,  Up: unictype.h
+File: libunistring.info,  Node: Properties,  Next: Other attributes,  Prev: Arabic shaping,  Up: unictype.h
 
 8.9 Properties
 ==============
@@ -2556,6 +2608,8 @@ File: libunistring.info,  Node: Properties as objects,  Next: Properties as func
  -- Constant: uc_property_t UC_PROPERTY_OTHER_ID_CONTINUE
  -- Constant: uc_property_t UC_PROPERTY_XID_START
  -- Constant: uc_property_t UC_PROPERTY_XID_CONTINUE
+ -- Constant: uc_property_t UC_PROPERTY_ID_COMPAT_MATH_START
+ -- Constant: uc_property_t UC_PROPERTY_ID_COMPAT_MATH_CONTINUE
  -- Constant: uc_property_t UC_PROPERTY_PATTERN_WHITE_SPACE
  -- Constant: uc_property_t UC_PROPERTY_PATTERN_SYNTAX
 
@@ -2566,6 +2620,7 @@ File: libunistring.info,  Node: Properties as objects,  Next: Properties as func
  -- Constant: uc_property_t UC_PROPERTY_GRAPHEME_EXTEND
  -- Constant: uc_property_t UC_PROPERTY_OTHER_GRAPHEME_EXTEND
  -- Constant: uc_property_t UC_PROPERTY_GRAPHEME_LINK
+ -- Constant: uc_property_t UC_PROPERTY_MODIFIER_COMBINING_MARK
 
    The following properties relate to bidirectional reordering.
 
@@ -2597,6 +2652,7 @@ File: libunistring.info,  Node: Properties as objects,  Next: Properties as func
  -- Constant: uc_property_t UC_PROPERTY_IDEOGRAPHIC
  -- Constant: uc_property_t UC_PROPERTY_UNIFIED_IDEOGRAPH
  -- Constant: uc_property_t UC_PROPERTY_RADICAL
+ -- Constant: uc_property_t UC_PROPERTY_IDS_UNARY_OPERATOR
  -- Constant: uc_property_t UC_PROPERTY_IDS_BINARY_OPERATOR
  -- Constant: uc_property_t UC_PROPERTY_IDS_TRINARY_OPERATOR
 
@@ -2616,6 +2672,7 @@ File: libunistring.info,  Node: Properties as objects,  Next: Properties as func
  -- Constant: uc_property_t UC_PROPERTY_NON_BREAK
  -- Constant: uc_property_t UC_PROPERTY_ISO_CONTROL
  -- Constant: uc_property_t UC_PROPERTY_FORMAT_CONTROL
+ -- Constant: uc_property_t UC_PROPERTY_PREPENDED_CONCATENATION_MARK
  -- Constant: uc_property_t UC_PROPERTY_DASH
  -- Constant: uc_property_t UC_PROPERTY_HYPHEN
  -- Constant: uc_property_t UC_PROPERTY_PUNCTUATION
@@ -2711,6 +2768,8 @@ File: libunistring.info,  Node: Properties as functions,  Prev: Properties as ob
  -- Function: bool uc_is_property_other_id_continue (ucs4_t UC)
  -- Function: bool uc_is_property_xid_start (ucs4_t UC)
  -- Function: bool uc_is_property_xid_continue (ucs4_t UC)
+ -- Function: bool uc_is_property_id_compat_math_start (ucs4_t UC)
+ -- Function: bool uc_is_property_id_compat_math_continue (ucs4_t UC)
  -- Function: bool uc_is_property_pattern_white_space (ucs4_t UC)
  -- Function: bool uc_is_property_pattern_syntax (ucs4_t UC)
 
@@ -2721,6 +2780,7 @@ File: libunistring.info,  Node: Properties as functions,  Prev: Properties as ob
  -- Function: bool uc_is_property_grapheme_extend (ucs4_t UC)
  -- Function: bool uc_is_property_other_grapheme_extend (ucs4_t UC)
  -- Function: bool uc_is_property_grapheme_link (ucs4_t UC)
+ -- Function: bool uc_is_property_modifier_combining_mark (ucs4_t UC)
 
    The following properties relate to bidirectional reordering.
 
@@ -2752,6 +2812,7 @@ File: libunistring.info,  Node: Properties as functions,  Prev: Properties as ob
  -- Function: bool uc_is_property_ideographic (ucs4_t UC)
  -- Function: bool uc_is_property_unified_ideograph (ucs4_t UC)
  -- Function: bool uc_is_property_radical (ucs4_t UC)
+ -- Function: bool uc_is_property_ids_unary_operator (ucs4_t UC)
  -- Function: bool uc_is_property_ids_binary_operator (ucs4_t UC)
  -- Function: bool uc_is_property_ids_trinary_operator (ucs4_t UC)
 
@@ -2771,6 +2832,8 @@ File: libunistring.info,  Node: Properties as functions,  Prev: Properties as ob
  -- Function: bool uc_is_property_non_break (ucs4_t UC)
  -- Function: bool uc_is_property_iso_control (ucs4_t UC)
  -- Function: bool uc_is_property_format_control (ucs4_t UC)
+ -- Function: bool uc_is_property_prepended_concatenation_mark
+          (ucs4_t UC)
  -- Function: bool uc_is_property_dash (ucs4_t UC)
  -- Function: bool uc_is_property_hyphen (ucs4_t UC)
  -- Function: bool uc_is_property_punctuation (ucs4_t UC)
@@ -2794,9 +2857,56 @@ File: libunistring.info,  Node: Properties as functions,  Prev: Properties as ob
  -- Function: bool uc_is_property_regional_indicator (ucs4_t UC)
 
 
-File: libunistring.info,  Node: Scripts,  Next: Blocks,  Prev: Properties,  Up: unictype.h
+File: libunistring.info,  Node: Other attributes,  Next: Scripts,  Prev: Properties,  Up: unictype.h
 
-8.10 Scripts
+8.10 Other attributes
+=====================
+
+   This section defines non-boolean attributes of Unicode characters.
+
+* Menu:
+
+* Indic conjunct break::
+
+
+File: libunistring.info,  Node: Indic conjunct break,  Up: Other attributes
+
+8.10.1 Indic conjunct break
+---------------------------
+
+   The Indic_Conjunct_Break attribute is used when determining the
+grapheme cluster boundary in Indic scripts.
+
+   The Indic_Conjunct_Break attribute has the following possible values:
+
+ -- Constant: int UC_INDIC_CONJUNCT_BREAK_NONE
+ -- Constant: int UC_INDIC_CONJUNCT_BREAK_CONSONANT
+ -- Constant: int UC_INDIC_CONJUNCT_BREAK_LINKER
+ -- Constant: int UC_INDIC_CONJUNCT_BREAK_EXTEND
+
+   The following functions implement the association between an
+Indic_Conjunct_Break value and its name.
+
+ -- Function: const char * uc_indic_conjunct_break_name
+          (int INDIC_CONJUNCT_BREAK)
+     Returns the name of an Indic_Conjunct_Break value.
+
+ -- Function: int uc_indic_conjunct_break_byname
+          (const char *INDIC_CONJUNCT_BREAK_NAME)
+     Returns the Indic_Conjunct_Break value given by name, e.g.
+     ‘"Consonant"’.  This lookup ignores spaces, underscores, or hyphens
+     as word separators and is case-insignificant.
+
+   The following function gives the Indic_Conjunct_Break attribute of
+every Unicode character.
+
+ -- Function: int uc_indic_conjunct_break (ucs4_t UC)
+     Returns the Indic_Conjunct_Break attribute of a Unicode character.
+
+
+File: libunistring.info,  Node: Scripts,  Next: Blocks,  Prev: Other attributes,  Up: unictype.h
+
+8.11 Scripts
 ============
 
    The Unicode characters are subdivided into scripts.
@@ -2836,7 +2946,7 @@ File: libunistring.info,  Node: Scripts,  Next: Blocks,  Prev: Properties,  Up: 
 
 File: libunistring.info,  Node: Blocks,  Next: ISO C and Java syntax,  Prev: Scripts,  Up: unictype.h
 
-8.11 Blocks
+8.12 Blocks
 ===========
 
    The Unicode characters are subdivided into blocks.  A block is an
@@ -2877,7 +2987,7 @@ interval of Unicode code points.
 
 File: libunistring.info,  Node: ISO C and Java syntax,  Next: Classifications like in ISO C,  Prev: Blocks,  Up: unictype.h
 
-8.12 ISO C and Java syntax
+8.13 ISO C and Java syntax
 ==========================
 
    The following properties are taken from language standards.  The
@@ -2923,7 +3033,7 @@ constituent of an identifier in the given programming language.
 
 File: libunistring.info,  Node: Classifications like in ISO C,  Prev: ISO C and Java syntax,  Up: unictype.h
 
-8.13 Classifications like in ISO C
+8.14 Classifications like in ISO C
 ==================================
 
    The following character classifications mimic those declared in the
@@ -3084,7 +3194,9 @@ clusters in a string.
 
      Note that these functions do not handle the case when a character
      outside of the range between S and END is needed to determine the
-     boundary.  Use ‘_grapheme_breaks’ functions for such cases.
+     boundary.  This is the case in particular with syllables in Indic
+     scripts or emojis.  Use ‘_grapheme_breaks’ functions for such
+     cases.
 
  -- Function: void u8_grapheme_prev (const uint8_t *S,
           const uint8_t *START)
@@ -3098,7 +3210,9 @@ clusters in a string.
 
      Note that these functions do not handle the case when a character
      outside of the range between START and S is needed to determine the
-     boundary.  Use ‘_grapheme_breaks’ functions for such cases.
+     boundary.  This is the case in particular with syllables in Indic
+     scripts or emojis.  Use ‘_grapheme_breaks’ functions for such
+     cases.
 
      Note also that these functions work only on well-formed Unicode
      strings.
@@ -3192,8 +3306,9 @@ the higher-level functions in the previous section are directly based.
      they are preferred.
 
      Note that this function does not handle the case when three or more
-     consecutive characters are needed to determine the boundary.  Use
-     ‘uc_grapheme_breaks’ for such cases.
+     consecutive characters are needed to determine the boundary.  This
+     is the case in particular with syllables in Indic scripts or
+     emojis.  Use ‘uc_grapheme_breaks’ for such cases.
 
 
 File: libunistring.info,  Node: uniwbrk.h,  Next: unilbrk.h,  Prev: unigbrk.h,  Up: Top
@@ -3731,7 +3846,7 @@ an entire string at once and are language aware.
 
      For most characters, this is the same as the uppercase mapping.
      There are only few characters where the title case variant and the
-     uuper case variant are different.  These characters occur in the
+     upper case variant are different.  These characters occur in the
      Latin writing of the Croatian, Bosnian, and Serbian languages.
 
      Lower case             Title case             Upper case
@@ -3756,7 +3871,7 @@ File: libunistring.info,  Node: Case mappings of strings,  Next: Case mappings o
 =============================
 
    Case mapping should always be performed on entire strings, not on
-individual characters.  The functions in this sections do so.
+individual characters.  The functions in this section do so.
 
    These functions allow to apply a normalization after the case
 mapping.  The reason is that if you want to treat ‘ä’ and ‘Ä’ the same,
@@ -4035,6 +4150,9 @@ in case and normalization.
      The RESULTBUF and LENGTHP arguments are as described in chapter
      *note Conventions::.
 
+   The following functions ignore locale-dependent collation rules, but
+do use locale-dependent case mappings (if ISO639_LANGUAGE is not NULL).
+
  -- Function: int u8_casecmp (const uint8_t *S1, size_t N1,
           const uint8_t *S2, size_t N2, const char *ISO639_LANGUAGE,
           uninorm_t NF, int *RESULTP)
@@ -4257,21 +4375,29 @@ version number of the libunistring library.
 
  -- Macro: int _LIBUNISTRING_VERSION
      This constant contains the version of libunistring that is being
-     used at compile time.  It encodes the major and minor parts of the
-     version number only.  These parts are encoded in the form
-     ‘(major<<8) + minor’.
+     used at compile time.  It encodes the major, minor, and subminor
+     parts of the version number.  These parts are encoded in the form
+     ‘(major<<16) + (minor<<8) + subminor’.
 
  -- Constant: int _libunistring_version
      This constant contains the version of libunistring that is being
-     used at run time.  It encodes the major and minor parts of the
-     version number only.  These parts are encoded in the form
-     ‘(major<<8) + minor’.
+     used at run time.  It encodes the major, minor, and subminor parts
+     of the version number.  These parts are encoded in the form
+     ‘(major<<16) + (minor<<8) + subminor’.
 
    It is possible that ‘_libunistring_version’ is greater than
 ‘_LIBUNISTRING_VERSION’.  This can happen when you use ‘libunistring’ as
 a shared library, and a newer, binary backward-compatible version has
 been installed after your program that uses ‘libunistring’ was
 installed.
+
+   ‘<unistring/version.h>’ also contains:
+
+ -- Constant: int _libunistring_unicode_version
+     This constant contains the version of the Unicode standard that is
+     implemented by libunistring.  It encodes the major and minor parts
+     of the version number only.  These parts are encoded in the form
+     ‘(major<<8) + minor’.
 
 
 File: libunistring.info,  Node: Autoconf macro,  Next: Reporting problems,  Prev: Include files,  Up: Using the library
@@ -4350,19 +4476,20 @@ Appendix A The ‘wchar_t’ mess
 first problem mentioned in the section *note char * strings::.  They
 introduced
    • a type ‘wchar_t’, designed to encapsulate an entire character,
-   • a “wide string” type ‘wchar_t *’, and
+   • a “wide string” type ‘wchar_t *’, with some API functions declared
+     in ‘<wchar.h>’, and
    • functions declared in ‘<wctype.h>’ that were meant to supplant the
      ones in ‘<ctype.h>’.
 
    Unfortunately, this API and its implementation has numerous problems:
 
-   • On AIX and Windows platforms, ‘wchar_t’ is a 16-bit type.  This
-     means that it can never accommodate an entire Unicode character.
-     Either the ‘wchar_t *’ strings are limited to characters in UCS-2
-     (the “Basic Multilingual Plane” of Unicode), or — if ‘wchar_t *’
-     strings are encoded in UTF-16 — a ‘wchar_t’ represents only half of
-     a character in the worst case, making the ‘<wctype.h>’ functions
-     pointless.
+   • On Windows platforms and on AIX in 32-bit mode, ‘wchar_t’ is a
+     16-bit type.  This means that it can never accommodate an entire
+     Unicode character.  Either the ‘wchar_t *’ strings are limited to
+     characters in UCS-2 (the “Basic Multilingual Plane” of Unicode), or
+     — if ‘wchar_t *’ strings are encoded in UTF-16 — a ‘wchar_t’
+     represents only half of a character in the worst case, making the
+     ‘<wctype.h>’ functions pointless.
 
    • On Solaris and FreeBSD, the ‘wchar_t’ encoding is locale dependent
      and undocumented.  This means, if you want to know any property of
@@ -5885,7 +6012,7 @@ Index
 * casing_prefix_context_t:               Case mappings of substrings.
                                                               (line  14)
 * casing_suffix_context_t:               Case mappings of substrings.
-                                                              (line  52)
+                                                              (line  46)
 * char, type:                            char * strings.      (line  22)
 * char16_t, type:                        The char32_t problem.
                                                               (line   6)
@@ -5900,29 +6027,29 @@ Index
 * comparing, ignoring case:              Case insensitive comparison.
                                                               (line   6)
 * comparing, ignoring case, with collation rules: Case insensitive comparison.
-                                                              (line  87)
+                                                              (line  74)
 * comparing, ignoring normalization:     Normalizing comparisons.
                                                               (line   6)
 * comparing, ignoring normalization and case: Case insensitive comparison.
                                                               (line   6)
 * comparing, ignoring normalization and case, with collation rules: Case insensitive comparison.
-                                                              (line  87)
+                                                              (line  74)
 * comparing, ignoring normalization, with collation rules: Normalizing comparisons.
-                                                              (line  25)
+                                                              (line  22)
 * comparing, with collation rules:       Comparing NUL terminated Unicode strings.
-                                                              (line  18)
+                                                              (line  19)
 * comparing, with collation rules, ignoring case: Case insensitive comparison.
-                                                              (line  87)
+                                                              (line  74)
 * comparing, with collation rules, ignoring normalization: Normalizing comparisons.
-                                                              (line  25)
+                                                              (line  22)
 * comparing, with collation rules, ignoring normalization and case: Case insensitive comparison.
-                                                              (line  87)
+                                                              (line  74)
 * compiler options:                      Compiler options.    (line  24)
 * composing, Unicode characters:         Composition of characters.
                                                               (line   6)
 * converting:                            Elementary string conversions.
                                                               (line   6)
-* converting <1>:                        uniconv.h.           (line  45)
+* converting <1>:                        uniconv.h.           (line  51)
 * copying:                               Copying Unicode strings.
                                                               (line   6)
 * copying <1>:                           Copying a NUL terminated Unicode string.
@@ -5947,6 +6074,8 @@ Index
 * grapheme cluster breaks:               unigbrk.h.           (line   6)
 * halfwidth:                             uniwidth.h.          (line  22)
 * identifiers:                           ISO C and Java syntax.
+                                                              (line   6)
+* Indic_Conjunct_Break:                  Indic conjunct break.
                                                               (line   6)
 * installation:                          Installation.        (line  10)
 * internationalization:                  Unicode and i18n.    (line   6)
@@ -5996,24 +6125,24 @@ Index
                                                               (line  10)
 * titlecasing:                           Case mappings of strings.
                                                               (line   6)
-* u16_asnprintf:                         unistdio.h.          (line 119)
-* u16_asprintf:                          unistdio.h.          (line 117)
+* u16_asnprintf:                         unistdio.h.          (line 112)
+* u16_asprintf:                          unistdio.h.          (line 110)
 * u16_casecmp:                           Case insensitive comparison.
-                                                              (line  65)
+                                                              (line  57)
 * u16_casecoll:                          Case insensitive comparison.
-                                                              (line 125)
+                                                              (line 103)
 * u16_casefold:                          Case insensitive comparison.
-                                                              (line  13)
+                                                              (line  12)
 * u16_casexfrm:                          Case insensitive comparison.
-                                                              (line  95)
+                                                              (line  80)
 * u16_casing_prefixes_context:           Case mappings of substrings.
-                                                              (line  41)
+                                                              (line  37)
 * u16_casing_prefix_context:             Case mappings of substrings.
-                                                              (line  29)
+                                                              (line  28)
 * u16_casing_suffixes_context:           Case mappings of substrings.
-                                                              (line  79)
+                                                              (line  69)
 * u16_casing_suffix_context:             Case mappings of substrings.
-                                                              (line  67)
+                                                              (line  60)
 * u16_check:                             Elementary string checks.
                                                               (line  10)
 * u16_chr:                               Searching for a character.
@@ -6021,76 +6150,78 @@ Index
 * u16_cmp:                               Comparing Unicode strings.
                                                               (line  11)
 * u16_cmp2:                              Comparing Unicode strings.
-                                                              (line  29)
-* u16_conv_from_encoding:                uniconv.h.           (line  53)
-* u16_conv_to_encoding:                  uniconv.h.           (line  96)
+                                                              (line  27)
+* u16_conv_from_encoding:                uniconv.h.           (line  58)
+* u16_conv_to_encoding:                  uniconv.h.           (line  98)
 * u16_cpy:                               Copying Unicode strings.
-                                                              (line  11)
+                                                              (line  10)
 * u16_cpy_alloc:                         Elementary string functions with memory allocation.
                                                               (line   9)
 * u16_ct_casefold:                       Case insensitive comparison.
-                                                              (line  40)
+                                                              (line  35)
 * u16_ct_tolower:                        Case mappings of substrings.
-                                                              (line 127)
+                                                              (line 107)
 * u16_ct_totitle:                        Case mappings of substrings.
-                                                              (line 154)
+                                                              (line 128)
 * u16_ct_toupper:                        Case mappings of substrings.
-                                                              (line 100)
+                                                              (line  86)
 * u16_endswith:                          Searching for a substring.
-                                                              (line  33)
+                                                              (line  30)
 * u16_grapheme_breaks:                   Grapheme cluster breaks in a string.
-                                                              (line  45)
+                                                              (line  49)
 * u16_grapheme_next:                     Grapheme cluster breaks in a string.
                                                               (line  11)
 * u16_grapheme_prev:                     Grapheme cluster breaks in a string.
-                                                              (line  25)
-* u16_is_cased:                          Case detection.      (line  67)
-* u16_is_casefolded:                     Case detection.      (line  52)
-* u16_is_lowercase:                      Case detection.      (line  26)
-* u16_is_titlecase:                      Case detection.      (line  39)
-* u16_is_uppercase:                      Case detection.      (line  13)
+                                                              (line  27)
+* u16_is_cased:                          Case detection.      (line  55)
+* u16_is_casefolded:                     Case detection.      (line  42)
+* u16_is_lowercase:                      Case detection.      (line  22)
+* u16_is_titlecase:                      Case detection.      (line  32)
+* u16_is_uppercase:                      Case detection.      (line  12)
 * u16_mblen:                             Iterating.           (line  10)
 * u16_mbsnlen:                           Counting characters. (line   9)
 * u16_mbtouc:                            Iterating.           (line  20)
-* u16_mbtoucr:                           Iterating.           (line  51)
-* u16_mbtouc_unsafe:                     Iterating.           (line  40)
+* u16_mbtoucr:                           Iterating.           (line  48)
+* u16_mbtouc_unsafe:                     Iterating.           (line  39)
 * u16_move:                              Copying Unicode strings.
-                                                              (line  25)
+                                                              (line  33)
 * u16_next:                              Iterating over a NUL terminated Unicode string.
                                                               (line  23)
 * u16_normalize:                         Normalization of strings.
-                                                              (line  49)
+                                                              (line  48)
 * u16_normcmp:                           Normalizing comparisons.
-                                                              (line  12)
+                                                              (line  11)
 * u16_normcoll:                          Normalizing comparisons.
-                                                              (line  46)
-* u16_normxfrm:                          Normalizing comparisons.
-                                                              (line  27)
-* u16_possible_linebreaks:               unilbrk.h.           (line  49)
-* u16_prev:                              Iterating over a NUL terminated Unicode string.
-                                                              (line  35)
-* u16_set:                               Copying Unicode strings.
                                                               (line  40)
-* u16_snprintf:                          unistdio.h.          (line 115)
-* u16_sprintf:                           unistdio.h.          (line 114)
+* u16_normxfrm:                          Normalizing comparisons.
+                                                              (line  24)
+* u16_pcpy:                              Copying Unicode strings.
+                                                              (line  21)
+* u16_possible_linebreaks:               unilbrk.h.           (line  48)
+* u16_prev:                              Iterating over a NUL terminated Unicode string.
+                                                              (line  34)
+* u16_set:                               Copying Unicode strings.
+                                                              (line  46)
+* u16_snprintf:                          unistdio.h.          (line 108)
+* u16_sprintf:                           unistdio.h.          (line 107)
 * u16_startswith:                        Searching for a substring.
-                                                              (line  25)
+                                                              (line  22)
 * u16_stpcpy:                            Copying a NUL terminated Unicode string.
                                                               (line  19)
 * u16_stpncpy:                           Copying a NUL terminated Unicode string.
-                                                              (line  44)
+                                                              (line  42)
 * u16_strcat:                            Copying a NUL terminated Unicode string.
-                                                              (line  57)
+                                                              (line  55)
 * u16_strchr:                            Searching for a character in a NUL terminated Unicode string.
                                                               (line   9)
 * u16_strcmp:                            Comparing NUL terminated Unicode strings.
-                                                              (line   9)
+                                                              (line  10)
 * u16_strcoll:                           Comparing NUL terminated Unicode strings.
-                                                              (line  19)
-* u16_strconv_from_encoding:             uniconv.h.           (line 140)
-* u16_strconv_from_locale:               uniconv.h.           (line 174)
-* u16_strconv_to_encoding:               uniconv.h.           (line 156)
-* u16_strconv_to_locale:                 uniconv.h.           (line 184)
+                                                              (line  20)
+* u16_strconv_from_encoding:             uniconv.h.           (line 139)
+* u16_strconv_from_locale:               uniconv.h.           (line 168)
+* u16_strconv_to_encoding:               uniconv.h.           (line 152)
+* u16_strconv_to_locale:                 uniconv.h.           (line 178)
 * u16_strcpy:                            Copying a NUL terminated Unicode string.
                                                               (line   9)
 * u16_strcspn:                           Searching for a character in a NUL terminated Unicode string.
@@ -6103,11 +6234,11 @@ Index
 * u16_strmbtouc:                         Iterating over a NUL terminated Unicode string.
                                                               (line  16)
 * u16_strncat:                           Copying a NUL terminated Unicode string.
-                                                              (line  69)
+                                                              (line  66)
 * u16_strncmp:                           Comparing NUL terminated Unicode strings.
                                                               (line  36)
 * u16_strncpy:                           Copying a NUL terminated Unicode string.
-                                                              (line  32)
+                                                              (line  31)
 * u16_strnlen:                           Length.              (line  17)
 * u16_strpbrk:                           Searching for a character in a NUL terminated Unicode string.
                                                               (line  53)
@@ -6116,132 +6247,134 @@ Index
 * u16_strspn:                            Searching for a character in a NUL terminated Unicode string.
                                                               (line  41)
 * u16_strstr:                            Searching for a substring.
-                                                              (line  12)
-* u16_strtok:                            Tokenizing.          (line  11)
+                                                              (line  11)
+* u16_strtok:                            Tokenizing.          (line  10)
 * u16_strwidth:                          uniwidth.h.          (line  38)
 * u16_tolower:                           Case mappings of strings.
-                                                              (line  48)
+                                                              (line  44)
 * u16_totitle:                           Case mappings of strings.
-                                                              (line  68)
+                                                              (line  61)
 * u16_toupper:                           Case mappings of strings.
-                                                              (line  28)
+                                                              (line  27)
 * u16_to_u32:                            Elementary string conversions.
-                                                              (line  32)
+                                                              (line  30)
 * u16_to_u8:                             Elementary string conversions.
-                                                              (line  25)
-* u16_u16_asnprintf:                     unistdio.h.          (line 141)
-* u16_u16_asprintf:                      unistdio.h.          (line 139)
-* u16_u16_snprintf:                      unistdio.h.          (line 136)
-* u16_u16_sprintf:                       unistdio.h.          (line 134)
-* u16_u16_vasnprintf:                    unistdio.h.          (line 150)
-* u16_u16_vasprintf:                     unistdio.h.          (line 148)
-* u16_u16_vsnprintf:                     unistdio.h.          (line 145)
-* u16_u16_vsprintf:                      unistdio.h.          (line 143)
+                                                              (line  23)
+* u16_u16_asnprintf:                     unistdio.h.          (line 132)
+* u16_u16_asprintf:                      unistdio.h.          (line 130)
+* u16_u16_snprintf:                      unistdio.h.          (line 128)
+* u16_u16_sprintf:                       unistdio.h.          (line 126)
+* u16_u16_vasnprintf:                    unistdio.h.          (line 140)
+* u16_u16_vasprintf:                     unistdio.h.          (line 138)
+* u16_u16_vsnprintf:                     unistdio.h.          (line 136)
+* u16_u16_vsprintf:                      unistdio.h.          (line 134)
 * u16_uctomb:                            Creating Unicode strings.
                                                               (line  10)
-* u16_vasnprintf:                        unistdio.h.          (line 128)
-* u16_vasprintf:                         unistdio.h.          (line 126)
-* u16_vsnprintf:                         unistdio.h.          (line 124)
-* u16_vsprintf:                          unistdio.h.          (line 121)
+* u16_vasnprintf:                        unistdio.h.          (line 120)
+* u16_vasprintf:                         unistdio.h.          (line 118)
+* u16_vsnprintf:                         unistdio.h.          (line 116)
+* u16_vsprintf:                          unistdio.h.          (line 114)
 * u16_width:                             uniwidth.h.          (line  29)
-* u16_width_linebreaks:                  unilbrk.h.           (line  68)
+* u16_width_linebreaks:                  unilbrk.h.           (line  66)
 * u16_wordbreaks:                        Word breaks in a string.
                                                               (line   9)
-* u32_asnprintf:                         unistdio.h.          (line 162)
-* u32_asprintf:                          unistdio.h.          (line 160)
+* u32_asnprintf:                         unistdio.h.          (line 151)
+* u32_asprintf:                          unistdio.h.          (line 149)
 * u32_casecmp:                           Case insensitive comparison.
-                                                              (line  70)
+                                                              (line  60)
 * u32_casecoll:                          Case insensitive comparison.
-                                                              (line 130)
+                                                              (line 106)
 * u32_casefold:                          Case insensitive comparison.
-                                                              (line  17)
+                                                              (line  15)
 * u32_casexfrm:                          Case insensitive comparison.
-                                                              (line 100)
-* u32_casing_prefixes_context:           Case mappings of substrings.
-                                                              (line  45)
-* u32_casing_prefix_context:             Case mappings of substrings.
-                                                              (line  32)
-* u32_casing_suffixes_context:           Case mappings of substrings.
                                                               (line  83)
+* u32_casing_prefixes_context:           Case mappings of substrings.
+                                                              (line  40)
+* u32_casing_prefix_context:             Case mappings of substrings.
+                                                              (line  30)
+* u32_casing_suffixes_context:           Case mappings of substrings.
+                                                              (line  72)
 * u32_casing_suffix_context:             Case mappings of substrings.
-                                                              (line  70)
+                                                              (line  62)
 * u32_check:                             Elementary string checks.
                                                               (line  11)
 * u32_chr:                               Searching for a character.
                                                               (line  11)
 * u32_cmp:                               Comparing Unicode strings.
-                                                              (line  14)
+                                                              (line  13)
 * u32_cmp2:                              Comparing Unicode strings.
-                                                              (line  32)
-* u32_conv_from_encoding:                uniconv.h.           (line  58)
-* u32_conv_to_encoding:                  uniconv.h.           (line 101)
+                                                              (line  29)
+* u32_conv_from_encoding:                uniconv.h.           (line  62)
+* u32_conv_to_encoding:                  uniconv.h.           (line 102)
 * u32_cpy:                               Copying Unicode strings.
-                                                              (line  14)
+                                                              (line  12)
 * u32_cpy_alloc:                         Elementary string functions with memory allocation.
                                                               (line  10)
 * u32_ct_casefold:                       Case insensitive comparison.
-                                                              (line  47)
+                                                              (line  40)
 * u32_ct_tolower:                        Case mappings of substrings.
-                                                              (line 134)
+                                                              (line 112)
 * u32_ct_totitle:                        Case mappings of substrings.
-                                                              (line 161)
+                                                              (line 133)
 * u32_ct_toupper:                        Case mappings of substrings.
-                                                              (line 107)
+                                                              (line  91)
 * u32_endswith:                          Searching for a substring.
-                                                              (line  35)
+                                                              (line  32)
 * u32_grapheme_breaks:                   Grapheme cluster breaks in a string.
-                                                              (line  48)
+                                                              (line  51)
 * u32_grapheme_next:                     Grapheme cluster breaks in a string.
                                                               (line  13)
 * u32_grapheme_prev:                     Grapheme cluster breaks in a string.
-                                                              (line  27)
-* u32_is_cased:                          Case detection.      (line  69)
-* u32_is_casefolded:                     Case detection.      (line  55)
-* u32_is_lowercase:                      Case detection.      (line  29)
-* u32_is_titlecase:                      Case detection.      (line  42)
-* u32_is_uppercase:                      Case detection.      (line  16)
+                                                              (line  29)
+* u32_is_cased:                          Case detection.      (line  57)
+* u32_is_casefolded:                     Case detection.      (line  44)
+* u32_is_lowercase:                      Case detection.      (line  24)
+* u32_is_titlecase:                      Case detection.      (line  34)
+* u32_is_uppercase:                      Case detection.      (line  14)
 * u32_mblen:                             Iterating.           (line  11)
 * u32_mbsnlen:                           Counting characters. (line  10)
 * u32_mbtouc:                            Iterating.           (line  21)
-* u32_mbtoucr:                           Iterating.           (line  52)
-* u32_mbtouc_unsafe:                     Iterating.           (line  43)
+* u32_mbtoucr:                           Iterating.           (line  49)
+* u32_mbtouc_unsafe:                     Iterating.           (line  41)
 * u32_move:                              Copying Unicode strings.
-                                                              (line  28)
+                                                              (line  35)
 * u32_next:                              Iterating over a NUL terminated Unicode string.
                                                               (line  24)
 * u32_normalize:                         Normalization of strings.
-                                                              (line  51)
+                                                              (line  50)
 * u32_normcmp:                           Normalizing comparisons.
-                                                              (line  15)
+                                                              (line  13)
 * u32_normcoll:                          Normalizing comparisons.
-                                                              (line  49)
+                                                              (line  42)
 * u32_normxfrm:                          Normalizing comparisons.
-                                                              (line  30)
-* u32_possible_linebreaks:               unilbrk.h.           (line  51)
+                                                              (line  26)
+* u32_pcpy:                              Copying Unicode strings.
+                                                              (line  23)
+* u32_possible_linebreaks:               unilbrk.h.           (line  50)
 * u32_prev:                              Iterating over a NUL terminated Unicode string.
-                                                              (line  37)
+                                                              (line  36)
 * u32_set:                               Copying Unicode strings.
-                                                              (line  41)
-* u32_snprintf:                          unistdio.h.          (line 158)
-* u32_sprintf:                           unistdio.h.          (line 157)
+                                                              (line  47)
+* u32_snprintf:                          unistdio.h.          (line 147)
+* u32_sprintf:                           unistdio.h.          (line 146)
 * u32_startswith:                        Searching for a substring.
-                                                              (line  27)
+                                                              (line  24)
 * u32_stpcpy:                            Copying a NUL terminated Unicode string.
                                                               (line  21)
 * u32_stpncpy:                           Copying a NUL terminated Unicode string.
-                                                              (line  46)
+                                                              (line  44)
 * u32_strcat:                            Copying a NUL terminated Unicode string.
-                                                              (line  59)
+                                                              (line  57)
 * u32_strchr:                            Searching for a character in a NUL terminated Unicode string.
                                                               (line  10)
 * u32_strcmp:                            Comparing NUL terminated Unicode strings.
-                                                              (line  10)
+                                                              (line  11)
 * u32_strcoll:                           Comparing NUL terminated Unicode strings.
-                                                              (line  20)
-* u32_strconv_from_encoding:             uniconv.h.           (line 143)
-* u32_strconv_from_locale:               uniconv.h.           (line 175)
-* u32_strconv_to_encoding:               uniconv.h.           (line 159)
-* u32_strconv_to_locale:                 uniconv.h.           (line 185)
+                                                              (line  21)
+* u32_strconv_from_encoding:             uniconv.h.           (line 141)
+* u32_strconv_from_locale:               uniconv.h.           (line 169)
+* u32_strconv_to_encoding:               uniconv.h.           (line 154)
+* u32_strconv_to_locale:                 uniconv.h.           (line 179)
 * u32_strcpy:                            Copying a NUL terminated Unicode string.
                                                               (line  11)
 * u32_strcspn:                           Searching for a character in a NUL terminated Unicode string.
@@ -6254,68 +6387,68 @@ Index
 * u32_strmbtouc:                         Iterating over a NUL terminated Unicode string.
                                                               (line  17)
 * u32_strncat:                           Copying a NUL terminated Unicode string.
-                                                              (line  71)
+                                                              (line  68)
 * u32_strncmp:                           Comparing NUL terminated Unicode strings.
-                                                              (line  39)
+                                                              (line  38)
 * u32_strncpy:                           Copying a NUL terminated Unicode string.
-                                                              (line  34)
+                                                              (line  33)
 * u32_strnlen:                           Length.              (line  18)
 * u32_strpbrk:                           Searching for a character in a NUL terminated Unicode string.
-                                                              (line  56)
+                                                              (line  55)
 * u32_strrchr:                           Searching for a character in a NUL terminated Unicode string.
                                                               (line  18)
 * u32_strspn:                            Searching for a character in a NUL terminated Unicode string.
                                                               (line  43)
 * u32_strstr:                            Searching for a substring.
-                                                              (line  15)
-* u32_strtok:                            Tokenizing.          (line  13)
+                                                              (line  13)
+* u32_strtok:                            Tokenizing.          (line  12)
 * u32_strwidth:                          uniwidth.h.          (line  39)
 * u32_tolower:                           Case mappings of strings.
-                                                              (line  52)
-* u32_totitle:                           Case mappings of strings.
-                                                              (line  72)
-* u32_toupper:                           Case mappings of strings.
-                                                              (line  32)
-* u32_to_u16:                            Elementary string conversions.
                                                               (line  47)
+* u32_totitle:                           Case mappings of strings.
+                                                              (line  64)
+* u32_toupper:                           Case mappings of strings.
+                                                              (line  30)
+* u32_to_u16:                            Elementary string conversions.
+                                                              (line  44)
 * u32_to_u8:                             Elementary string conversions.
-                                                              (line  40)
-* u32_u32_asnprintf:                     unistdio.h.          (line 184)
-* u32_u32_asprintf:                      unistdio.h.          (line 182)
-* u32_u32_snprintf:                      unistdio.h.          (line 179)
-* u32_u32_sprintf:                       unistdio.h.          (line 177)
-* u32_u32_vasnprintf:                    unistdio.h.          (line 193)
-* u32_u32_vasprintf:                     unistdio.h.          (line 191)
-* u32_u32_vsnprintf:                     unistdio.h.          (line 188)
-* u32_u32_vsprintf:                      unistdio.h.          (line 186)
+                                                              (line  37)
+* u32_u32_asnprintf:                     unistdio.h.          (line 171)
+* u32_u32_asprintf:                      unistdio.h.          (line 169)
+* u32_u32_snprintf:                      unistdio.h.          (line 167)
+* u32_u32_sprintf:                       unistdio.h.          (line 165)
+* u32_u32_vasnprintf:                    unistdio.h.          (line 179)
+* u32_u32_vasprintf:                     unistdio.h.          (line 177)
+* u32_u32_vsnprintf:                     unistdio.h.          (line 175)
+* u32_u32_vsprintf:                      unistdio.h.          (line 173)
 * u32_uctomb:                            Creating Unicode strings.
                                                               (line  11)
-* u32_vasnprintf:                        unistdio.h.          (line 171)
-* u32_vasprintf:                         unistdio.h.          (line 169)
-* u32_vsnprintf:                         unistdio.h.          (line 167)
-* u32_vsprintf:                          unistdio.h.          (line 164)
+* u32_vasnprintf:                        unistdio.h.          (line 159)
+* u32_vasprintf:                         unistdio.h.          (line 157)
+* u32_vsnprintf:                         unistdio.h.          (line 155)
+* u32_vsprintf:                          unistdio.h.          (line 153)
 * u32_width:                             uniwidth.h.          (line  31)
-* u32_width_linebreaks:                  unilbrk.h.           (line  72)
+* u32_width_linebreaks:                  unilbrk.h.           (line  69)
 * u32_wordbreaks:                        Word breaks in a string.
                                                               (line  10)
-* u8_asnprintf:                          unistdio.h.          (line  75)
-* u8_asprintf:                           unistdio.h.          (line  73)
+* u8_asnprintf:                          unistdio.h.          (line  73)
+* u8_asprintf:                           unistdio.h.          (line  71)
 * u8_casecmp:                            Case insensitive comparison.
-                                                              (line  60)
+                                                              (line  54)
 * u8_casecoll:                           Case insensitive comparison.
-                                                              (line 120)
+                                                              (line 100)
 * u8_casefold:                           Case insensitive comparison.
                                                               (line   9)
 * u8_casexfrm:                           Case insensitive comparison.
-                                                              (line  90)
+                                                              (line  77)
 * u8_casing_prefixes_context:            Case mappings of substrings.
-                                                              (line  37)
+                                                              (line  34)
 * u8_casing_prefix_context:              Case mappings of substrings.
                                                               (line  26)
 * u8_casing_suffixes_context:            Case mappings of substrings.
-                                                              (line  75)
+                                                              (line  66)
 * u8_casing_suffix_context:              Case mappings of substrings.
-                                                              (line  64)
+                                                              (line  58)
 * u8_check:                              Elementary string checks.
                                                               (line   9)
 * u8_chr:                                Searching for a character.
@@ -6323,41 +6456,41 @@ Index
 * u8_cmp:                                Comparing Unicode strings.
                                                               (line   9)
 * u8_cmp2:                               Comparing Unicode strings.
-                                                              (line  27)
-* u8_conv_from_encoding:                 uniconv.h.           (line  48)
-* u8_conv_to_encoding:                   uniconv.h.           (line  91)
+                                                              (line  25)
+* u8_conv_from_encoding:                 uniconv.h.           (line  54)
+* u8_conv_to_encoding:                   uniconv.h.           (line  94)
 * u8_cpy:                                Copying Unicode strings.
                                                               (line   8)
 * u8_cpy_alloc:                          Elementary string functions with memory allocation.
                                                               (line   8)
 * u8_ct_casefold:                        Case insensitive comparison.
-                                                              (line  33)
+                                                              (line  30)
 * u8_ct_tolower:                         Case mappings of substrings.
-                                                              (line 120)
+                                                              (line 102)
 * u8_ct_totitle:                         Case mappings of substrings.
-                                                              (line 147)
+                                                              (line 123)
 * u8_ct_toupper:                         Case mappings of substrings.
-                                                              (line  93)
+                                                              (line  81)
 * u8_endswith:                           Searching for a substring.
-                                                              (line  31)
+                                                              (line  28)
 * u8_grapheme_breaks:                    Grapheme cluster breaks in a string.
-                                                              (line  43)
+                                                              (line  47)
 * u8_grapheme_next:                      Grapheme cluster breaks in a string.
                                                               (line   9)
 * u8_grapheme_prev:                      Grapheme cluster breaks in a string.
-                                                              (line  23)
-* u8_is_cased:                           Case detection.      (line  65)
-* u8_is_casefolded:                      Case detection.      (line  49)
-* u8_is_lowercase:                       Case detection.      (line  23)
-* u8_is_titlecase:                       Case detection.      (line  36)
+                                                              (line  25)
+* u8_is_cased:                           Case detection.      (line  53)
+* u8_is_casefolded:                      Case detection.      (line  40)
+* u8_is_lowercase:                       Case detection.      (line  20)
+* u8_is_titlecase:                       Case detection.      (line  30)
 * u8_is_uppercase:                       Case detection.      (line  10)
 * u8_mblen:                              Iterating.           (line   9)
 * u8_mbsnlen:                            Counting characters. (line   8)
 * u8_mbtouc:                             Iterating.           (line  19)
-* u8_mbtoucr:                            Iterating.           (line  50)
+* u8_mbtoucr:                            Iterating.           (line  47)
 * u8_mbtouc_unsafe:                      Iterating.           (line  37)
 * u8_move:                               Copying Unicode strings.
-                                                              (line  22)
+                                                              (line  31)
 * u8_next:                               Iterating over a NUL terminated Unicode string.
                                                               (line  22)
 * u8_normalize:                          Normalization of strings.
@@ -6365,34 +6498,36 @@ Index
 * u8_normcmp:                            Normalizing comparisons.
                                                               (line   9)
 * u8_normcoll:                           Normalizing comparisons.
-                                                              (line  43)
+                                                              (line  38)
 * u8_normxfrm:                           Normalizing comparisons.
-                                                              (line  25)
+                                                              (line  22)
+* u8_pcpy:                               Copying Unicode strings.
+                                                              (line  19)
 * u8_possible_linebreaks:                unilbrk.h.           (line  46)
 * u8_prev:                               Iterating over a NUL terminated Unicode string.
                                                               (line  32)
 * u8_set:                                Copying Unicode strings.
-                                                              (line  39)
-* u8_snprintf:                           unistdio.h.          (line  71)
-* u8_sprintf:                            unistdio.h.          (line  70)
+                                                              (line  45)
+* u8_snprintf:                           unistdio.h.          (line  69)
+* u8_sprintf:                            unistdio.h.          (line  68)
 * u8_startswith:                         Searching for a substring.
-                                                              (line  23)
+                                                              (line  20)
 * u8_stpcpy:                             Copying a NUL terminated Unicode string.
                                                               (line  18)
 * u8_stpncpy:                            Copying a NUL terminated Unicode string.
-                                                              (line  41)
+                                                              (line  40)
 * u8_strcat:                             Copying a NUL terminated Unicode string.
-                                                              (line  56)
+                                                              (line  54)
 * u8_strchr:                             Searching for a character in a NUL terminated Unicode string.
                                                               (line   8)
 * u8_strcmp:                             Comparing NUL terminated Unicode strings.
-                                                              (line   8)
+                                                              (line   9)
 * u8_strcoll:                            Comparing NUL terminated Unicode strings.
-                                                              (line  18)
+                                                              (line  19)
 * u8_strconv_from_encoding:              uniconv.h.           (line 137)
-* u8_strconv_from_locale:                uniconv.h.           (line 173)
-* u8_strconv_to_encoding:                uniconv.h.           (line 153)
-* u8_strconv_to_locale:                  uniconv.h.           (line 183)
+* u8_strconv_from_locale:                uniconv.h.           (line 167)
+* u8_strconv_to_encoding:                uniconv.h.           (line 150)
+* u8_strconv_to_locale:                  uniconv.h.           (line 177)
 * u8_strcpy:                             Copying a NUL terminated Unicode string.
                                                               (line   8)
 * u8_strcspn:                            Searching for a character in a NUL terminated Unicode string.
@@ -6405,9 +6540,9 @@ Index
 * u8_strmbtouc:                          Iterating over a NUL terminated Unicode string.
                                                               (line  15)
 * u8_strncat:                            Copying a NUL terminated Unicode string.
-                                                              (line  66)
+                                                              (line  64)
 * u8_strncmp:                            Comparing NUL terminated Unicode strings.
-                                                              (line  33)
+                                                              (line  34)
 * u8_strncpy:                            Copying a NUL terminated Unicode string.
                                                               (line  29)
 * u8_strnlen:                            Length.              (line  16)
@@ -6422,31 +6557,31 @@ Index
 * u8_strtok:                             Tokenizing.          (line   8)
 * u8_strwidth:                           uniwidth.h.          (line  37)
 * u8_tolower:                            Case mappings of strings.
-                                                              (line  44)
+                                                              (line  41)
 * u8_totitle:                            Case mappings of strings.
-                                                              (line  64)
+                                                              (line  58)
 * u8_toupper:                            Case mappings of strings.
                                                               (line  24)
 * u8_to_u16:                             Elementary string conversions.
                                                               (line   9)
 * u8_to_u32:                             Elementary string conversions.
-                                                              (line  17)
-* u8_u8_asnprintf:                       unistdio.h.          (line  98)
-* u8_u8_asprintf:                        unistdio.h.          (line  96)
-* u8_u8_snprintf:                        unistdio.h.          (line  93)
-* u8_u8_sprintf:                         unistdio.h.          (line  91)
-* u8_u8_vasnprintf:                      unistdio.h.          (line 108)
-* u8_u8_vasprintf:                       unistdio.h.          (line 106)
-* u8_u8_vsnprintf:                       unistdio.h.          (line 103)
-* u8_u8_vsprintf:                        unistdio.h.          (line 100)
+                                                              (line  16)
+* u8_u8_asnprintf:                       unistdio.h.          (line  93)
+* u8_u8_asprintf:                        unistdio.h.          (line  91)
+* u8_u8_snprintf:                        unistdio.h.          (line  89)
+* u8_u8_sprintf:                         unistdio.h.          (line  87)
+* u8_u8_vasnprintf:                      unistdio.h.          (line 101)
+* u8_u8_vasprintf:                       unistdio.h.          (line  99)
+* u8_u8_vsnprintf:                       unistdio.h.          (line  97)
+* u8_u8_vsprintf:                        unistdio.h.          (line  95)
 * u8_uctomb:                             Creating Unicode strings.
                                                               (line   9)
-* u8_vasnprintf:                         unistdio.h.          (line  85)
-* u8_vasprintf:                          unistdio.h.          (line  82)
-* u8_vsnprintf:                          unistdio.h.          (line  80)
-* u8_vsprintf:                           unistdio.h.          (line  77)
+* u8_vasnprintf:                         unistdio.h.          (line  81)
+* u8_vasprintf:                          unistdio.h.          (line  79)
+* u8_vsnprintf:                          unistdio.h.          (line  77)
+* u8_vsprintf:                           unistdio.h.          (line  75)
 * u8_width:                              uniwidth.h.          (line  27)
-* u8_width_linebreaks:                   unilbrk.h.           (line  65)
+* u8_width_linebreaks:                   unilbrk.h.           (line  63)
 * u8_wordbreaks:                         Word breaks in a string.
                                                               (line   8)
 * UCS-4:                                 Unicode.             (line  14)
@@ -6481,18 +6616,24 @@ Index
                                                               (line  80)
 * uc_digit_value:                        Digit value.         (line  10)
 * uc_fraction_t:                         Numeric value.       (line  12)
-* uc_general_category:                   Object oriented API. (line 227)
-* uc_general_category_and:               Object oriented API. (line 183)
-* uc_general_category_and_not:           Object oriented API. (line 191)
-* uc_general_category_byname:            Object oriented API. (line 216)
-* uc_general_category_long_name:         Object oriented API. (line 209)
-* uc_general_category_name:              Object oriented API. (line 202)
+* uc_general_category:                   Object oriented API. (line 221)
+* uc_general_category_and:               Object oriented API. (line 182)
+* uc_general_category_and_not:           Object oriented API. (line 189)
+* uc_general_category_byname:            Object oriented API. (line 211)
+* uc_general_category_long_name:         Object oriented API. (line 205)
+* uc_general_category_name:              Object oriented API. (line 199)
 * uc_general_category_or:                Object oriented API. (line 176)
 * uc_general_category_t:                 Object oriented API. (line   6)
 * uc_graphemeclusterbreak_property:      Grapheme cluster break property.
                                                               (line  37)
 * uc_grapheme_breaks:                    Grapheme cluster breaks in a string.
-                                                              (line  53)
+                                                              (line  55)
+* uc_indic_conjunct_break:               Indic conjunct break.
+                                                              (line  32)
+* uc_indic_conjunct_break_byname:        Indic conjunct break.
+                                                              (line  23)
+* uc_indic_conjunct_break_name:          Indic conjunct break.
+                                                              (line  19)
 * uc_is_alnum:                           Classifications like in ISO C.
                                                               (line  13)
 * uc_is_alpha:                           Classifications like in ISO C.
@@ -6508,7 +6649,7 @@ Index
                                                               (line   9)
 * uc_is_digit:                           Classifications like in ISO C.
                                                               (line  26)
-* uc_is_general_category:                Object oriented API. (line 232)
+* uc_is_general_category:                Object oriented API. (line 226)
 * uc_is_general_category_withtable:      Bit mask API.        (line  51)
 * uc_is_graph:                           Classifications like in ISO C.
                                                               (line  30)
@@ -6521,193 +6662,203 @@ Index
 * uc_is_print:                           Classifications like in ISO C.
                                                               (line  40)
 * uc_is_property:                        Properties as objects.
-                                                              (line 160)
+                                                              (line 165)
 * uc_is_property_alphabetic:             Properties as functions.
                                                               (line   9)
 * uc_is_property_ascii_hex_digit:        Properties as functions.
-                                                              (line  81)
+                                                              (line  83)
 * uc_is_property_bidi_arabic_digit:      Properties as functions.
-                                                              (line  67)
-* uc_is_property_bidi_arabic_right_to_left: Properties as functions.
-                                                              (line  63)
-* uc_is_property_bidi_block_separator:   Properties as functions.
                                                               (line  69)
-* uc_is_property_bidi_boundary_neutral:  Properties as functions.
-                                                              (line  73)
-* uc_is_property_bidi_common_separator:  Properties as functions.
-                                                              (line  68)
-* uc_is_property_bidi_control:           Properties as functions.
-                                                              (line  60)
-* uc_is_property_bidi_embedding_or_override: Properties as functions.
-                                                              (line  75)
-* uc_is_property_bidi_european_digit:    Properties as functions.
-                                                              (line  64)
-* uc_is_property_bidi_eur_num_separator: Properties as functions.
+* uc_is_property_bidi_arabic_right_to_left: Properties as functions.
                                                               (line  65)
-* uc_is_property_bidi_eur_num_terminator: Properties as functions.
-                                                              (line  66)
-* uc_is_property_bidi_hebrew_right_to_left: Properties as functions.
-                                                              (line  62)
-* uc_is_property_bidi_left_to_right:     Properties as functions.
-                                                              (line  61)
-* uc_is_property_bidi_non_spacing_mark:  Properties as functions.
-                                                              (line  72)
-* uc_is_property_bidi_other_neutral:     Properties as functions.
-                                                              (line  76)
-* uc_is_property_bidi_pdf:               Properties as functions.
-                                                              (line  74)
-* uc_is_property_bidi_segment_separator: Properties as functions.
-                                                              (line  70)
-* uc_is_property_bidi_whitespace:        Properties as functions.
+* uc_is_property_bidi_block_separator:   Properties as functions.
                                                               (line  71)
+* uc_is_property_bidi_boundary_neutral:  Properties as functions.
+                                                              (line  75)
+* uc_is_property_bidi_common_separator:  Properties as functions.
+                                                              (line  70)
+* uc_is_property_bidi_control:           Properties as functions.
+                                                              (line  62)
+* uc_is_property_bidi_embedding_or_override: Properties as functions.
+                                                              (line  77)
+* uc_is_property_bidi_european_digit:    Properties as functions.
+                                                              (line  66)
+* uc_is_property_bidi_eur_num_separator: Properties as functions.
+                                                              (line  67)
+* uc_is_property_bidi_eur_num_terminator: Properties as functions.
+                                                              (line  68)
+* uc_is_property_bidi_hebrew_right_to_left: Properties as functions.
+                                                              (line  64)
+* uc_is_property_bidi_left_to_right:     Properties as functions.
+                                                              (line  63)
+* uc_is_property_bidi_non_spacing_mark:  Properties as functions.
+                                                              (line  74)
+* uc_is_property_bidi_other_neutral:     Properties as functions.
+                                                              (line  78)
+* uc_is_property_bidi_pdf:               Properties as functions.
+                                                              (line  76)
+* uc_is_property_bidi_segment_separator: Properties as functions.
+                                                              (line  72)
+* uc_is_property_bidi_whitespace:        Properties as functions.
+                                                              (line  73)
 * uc_is_property_cased:                  Properties as functions.
-                                                              (line  30)
+                                                              (line  29)
 * uc_is_property_case_ignorable:         Properties as functions.
-                                                              (line  31)
+                                                              (line  30)
 * uc_is_property_changes_when_casefolded: Properties as functions.
-                                                              (line  35)
-* uc_is_property_changes_when_casemapped: Properties as functions.
-                                                              (line  36)
-* uc_is_property_changes_when_lowercased: Properties as functions.
-                                                              (line  32)
-* uc_is_property_changes_when_titlecased: Properties as functions.
                                                               (line  34)
-* uc_is_property_changes_when_uppercased: Properties as functions.
+* uc_is_property_changes_when_casemapped: Properties as functions.
+                                                              (line  35)
+* uc_is_property_changes_when_lowercased: Properties as functions.
+                                                              (line  31)
+* uc_is_property_changes_when_titlecased: Properties as functions.
                                                               (line  33)
+* uc_is_property_changes_when_uppercased: Properties as functions.
+                                                              (line  32)
 * uc_is_property_combining:              Properties as functions.
-                                                              (line 120)
+                                                              (line 125)
 * uc_is_property_composite:              Properties as functions.
-                                                              (line 121)
+                                                              (line 126)
 * uc_is_property_currency_symbol:        Properties as functions.
-                                                              (line 115)
+                                                              (line 120)
 * uc_is_property_dash:                   Properties as functions.
-                                                              (line 107)
+                                                              (line 112)
 * uc_is_property_decimal_digit:          Properties as functions.
-                                                              (line 122)
+                                                              (line 127)
 * uc_is_property_default_ignorable_code_point: Properties as functions.
                                                               (line  12)
 * uc_is_property_deprecated:             Properties as functions.
-                                                              (line  17)
+                                                              (line  16)
 * uc_is_property_diacritic:              Properties as functions.
-                                                              (line 124)
+                                                              (line 129)
 * uc_is_property_emoji:                  Properties as functions.
-                                                              (line  93)
-* uc_is_property_emoji_component:        Properties as functions.
-                                                              (line  97)
-* uc_is_property_emoji_modifier:         Properties as functions.
-                                                              (line  95)
-* uc_is_property_emoji_modifier_base:    Properties as functions.
                                                               (line  96)
-* uc_is_property_emoji_presentation:     Properties as functions.
-                                                              (line  94)
-* uc_is_property_extended_pictographic:  Properties as functions.
+* uc_is_property_emoji_component:        Properties as functions.
+                                                              (line 100)
+* uc_is_property_emoji_modifier:         Properties as functions.
                                                               (line  98)
+* uc_is_property_emoji_modifier_base:    Properties as functions.
+                                                              (line  99)
+* uc_is_property_emoji_presentation:     Properties as functions.
+                                                              (line  97)
+* uc_is_property_extended_pictographic:  Properties as functions.
+                                                              (line 101)
 * uc_is_property_extender:               Properties as functions.
-                                                              (line 125)
+                                                              (line 130)
 * uc_is_property_format_control:         Properties as functions.
-                                                              (line 106)
+                                                              (line 109)
 * uc_is_property_grapheme_base:          Properties as functions.
-                                                              (line  53)
-* uc_is_property_grapheme_extend:        Properties as functions.
                                                               (line  54)
+* uc_is_property_grapheme_extend:        Properties as functions.
+                                                              (line  55)
 * uc_is_property_grapheme_link:          Properties as functions.
-                                                              (line  56)
+                                                              (line  57)
 * uc_is_property_hex_digit:              Properties as functions.
-                                                              (line  80)
+                                                              (line  82)
 * uc_is_property_hyphen:                 Properties as functions.
-                                                              (line 108)
+                                                              (line 113)
 * uc_is_property_ideographic:            Properties as functions.
-                                                              (line  85)
+                                                              (line  87)
 * uc_is_property_ids_binary_operator:    Properties as functions.
-                                                              (line  88)
+                                                              (line  91)
 * uc_is_property_ids_trinary_operator:   Properties as functions.
-                                                              (line  89)
+                                                              (line  92)
+* uc_is_property_ids_unary_operator:     Properties as functions.
+                                                              (line  90)
+* uc_is_property_id_compat_math_continue: Properties as functions.
+                                                              (line  47)
+* uc_is_property_id_compat_math_start:   Properties as functions.
+                                                              (line  46)
 * uc_is_property_id_continue:            Properties as functions.
-                                                              (line  43)
+                                                              (line  42)
 * uc_is_property_id_start:               Properties as functions.
-                                                              (line  41)
+                                                              (line  40)
 * uc_is_property_ignorable_control:      Properties as functions.
-                                                              (line 126)
+                                                              (line 131)
 * uc_is_property_iso_control:            Properties as functions.
-                                                              (line 105)
+                                                              (line 108)
 * uc_is_property_join_control:           Properties as functions.
-                                                              (line  52)
+                                                              (line  53)
 * uc_is_property_left_of_pair:           Properties as functions.
-                                                              (line 119)
+                                                              (line 124)
 * uc_is_property_line_separator:         Properties as functions.
-                                                              (line 110)
+                                                              (line 115)
 * uc_is_property_logical_order_exception: Properties as functions.
-                                                              (line  18)
+                                                              (line  17)
 * uc_is_property_lowercase:              Properties as functions.
-                                                              (line  27)
+                                                              (line  26)
 * uc_is_property_math:                   Properties as functions.
-                                                              (line 116)
+                                                              (line 121)
+* uc_is_property_modifier_combining_mark: Properties as functions.
+                                                              (line  58)
 * uc_is_property_non_break:              Properties as functions.
-                                                              (line 104)
+                                                              (line 107)
 * uc_is_property_not_a_character:        Properties as functions.
                                                               (line  11)
 * uc_is_property_numeric:                Properties as functions.
-                                                              (line 123)
+                                                              (line 128)
 * uc_is_property_other_alphabetic:       Properties as functions.
                                                               (line  10)
 * uc_is_property_other_default_ignorable_code_point: Properties as functions.
                                                               (line  14)
 * uc_is_property_other_grapheme_extend:  Properties as functions.
-                                                              (line  55)
+                                                              (line  56)
 * uc_is_property_other_id_continue:      Properties as functions.
-                                                              (line  44)
+                                                              (line  43)
 * uc_is_property_other_id_start:         Properties as functions.
-                                                              (line  42)
+                                                              (line  41)
 * uc_is_property_other_lowercase:        Properties as functions.
-                                                              (line  28)
+                                                              (line  27)
 * uc_is_property_other_math:             Properties as functions.
-                                                              (line 117)
+                                                              (line 122)
 * uc_is_property_other_uppercase:        Properties as functions.
-                                                              (line  26)
-* uc_is_property_paired_punctuation:     Properties as functions.
-                                                              (line 118)
-* uc_is_property_paragraph_separator:    Properties as functions.
-                                                              (line 111)
-* uc_is_property_pattern_syntax:         Properties as functions.
-                                                              (line  48)
-* uc_is_property_pattern_white_space:    Properties as functions.
-                                                              (line  47)
-* uc_is_property_private_use:            Properties as functions.
-                                                              (line  20)
-* uc_is_property_punctuation:            Properties as functions.
-                                                              (line 109)
-* uc_is_property_quotation_mark:         Properties as functions.
-                                                              (line 112)
-* uc_is_property_radical:                Properties as functions.
-                                                              (line  87)
-* uc_is_property_regional_indicator:     Properties as functions.
-                                                              (line 127)
-* uc_is_property_sentence_terminal:      Properties as functions.
-                                                              (line 113)
-* uc_is_property_soft_dotted:            Properties as functions.
-                                                              (line  37)
-* uc_is_property_space:                  Properties as functions.
-                                                              (line 103)
-* uc_is_property_terminal_punctuation:   Properties as functions.
-                                                              (line 114)
-* uc_is_property_titlecase:              Properties as functions.
-                                                              (line  29)
-* uc_is_property_unassigned_code_value:  Properties as functions.
-                                                              (line  21)
-* uc_is_property_unified_ideograph:      Properties as functions.
-                                                              (line  86)
-* uc_is_property_uppercase:              Properties as functions.
                                                               (line  25)
-* uc_is_property_variation_selector:     Properties as functions.
+* uc_is_property_paired_punctuation:     Properties as functions.
+                                                              (line 123)
+* uc_is_property_paragraph_separator:    Properties as functions.
+                                                              (line 116)
+* uc_is_property_pattern_syntax:         Properties as functions.
+                                                              (line  49)
+* uc_is_property_pattern_white_space:    Properties as functions.
+                                                              (line  48)
+* uc_is_property_prepended_concatenation_mark: Properties as functions.
+                                                              (line 110)
+* uc_is_property_private_use:            Properties as functions.
                                                               (line  19)
+* uc_is_property_punctuation:            Properties as functions.
+                                                              (line 114)
+* uc_is_property_quotation_mark:         Properties as functions.
+                                                              (line 117)
+* uc_is_property_radical:                Properties as functions.
+                                                              (line  89)
+* uc_is_property_regional_indicator:     Properties as functions.
+                                                              (line 132)
+* uc_is_property_sentence_terminal:      Properties as functions.
+                                                              (line 118)
+* uc_is_property_soft_dotted:            Properties as functions.
+                                                              (line  36)
+* uc_is_property_space:                  Properties as functions.
+                                                              (line 106)
+* uc_is_property_terminal_punctuation:   Properties as functions.
+                                                              (line 119)
+* uc_is_property_titlecase:              Properties as functions.
+                                                              (line  28)
+* uc_is_property_unassigned_code_value:  Properties as functions.
+                                                              (line  20)
+* uc_is_property_unified_ideograph:      Properties as functions.
+                                                              (line  88)
+* uc_is_property_uppercase:              Properties as functions.
+                                                              (line  24)
+* uc_is_property_variation_selector:     Properties as functions.
+                                                              (line  18)
 * uc_is_property_white_space:            Properties as functions.
                                                               (line   8)
 * uc_is_property_xid_continue:           Properties as functions.
-                                                              (line  46)
-* uc_is_property_xid_start:              Properties as functions.
                                                               (line  45)
+* uc_is_property_xid_start:              Properties as functions.
+                                                              (line  44)
 * uc_is_property_zero_width:             Properties as functions.
-                                                              (line 102)
+                                                              (line 105)
 * uc_is_punct:                           Classifications like in ISO C.
                                                               (line  43)
 * uc_is_script:                          Scripts.             (line  30)
@@ -6719,9 +6870,9 @@ Index
                                                               (line  59)
 * uc_java_ident_category:                ISO C and Java syntax.
                                                               (line  42)
-* uc_joining_group:                      Joining group.       (line 132)
-* uc_joining_group_byname:               Joining group.       (line 123)
-* uc_joining_group_name:                 Joining group.       (line 120)
+* uc_joining_group:                      Joining group.       (line 133)
+* uc_joining_group_byname:               Joining group.       (line 124)
+* uc_joining_group_name:                 Joining group.       (line 121)
 * uc_joining_type:                       Joining type.        (line  54)
 * uc_joining_type_byname:                Joining type.        (line  45)
 * uc_joining_type_long_name:             Joining type.        (line  42)
@@ -6731,9 +6882,9 @@ Index
 * uc_mirror_char:                        Mirrored character.  (line  13)
 * uc_numeric_value:                      Numeric value.       (line  21)
 * uc_property_byname:                    Properties as objects.
-                                                              (line 138)
+                                                              (line 143)
 * uc_property_is_valid:                  Properties as objects.
-                                                              (line 153)
+                                                              (line 158)
 * uc_property_t:                         Properties as objects.
                                                               (line   8)
 * uc_script:                             Scripts.             (line  19)
@@ -6750,26 +6901,26 @@ Index
 * uint16_t:                              unitypes.h.          (line   9)
 * uint32_t:                              unitypes.h.          (line  10)
 * uint8_t:                               unitypes.h.          (line   8)
-* ulc_asnprintf:                         unistdio.h.          (line  49)
-* ulc_asprintf:                          unistdio.h.          (line  47)
+* ulc_asnprintf:                         unistdio.h.          (line  50)
+* ulc_asprintf:                          unistdio.h.          (line  48)
 * ulc_casecmp:                           Case insensitive comparison.
-                                                              (line  75)
+                                                              (line  63)
 * ulc_casecoll:                          Case insensitive comparison.
-                                                              (line 135)
+                                                              (line 109)
 * ulc_casexfrm:                          Case insensitive comparison.
-                                                              (line 105)
-* ulc_fprintf:                           unistdio.h.          (line 200)
+                                                              (line  86)
+* ulc_fprintf:                           unistdio.h.          (line 185)
 * ulc_grapheme_breaks:                   Grapheme cluster breaks in a string.
-                                                              (line  51)
-* ulc_possible_linebreaks:               unilbrk.h.           (line  53)
-* ulc_snprintf:                          unistdio.h.          (line  44)
-* ulc_sprintf:                           unistdio.h.          (line  42)
-* ulc_vasnprintf:                        unistdio.h.          (line  63)
+                                                              (line  53)
+* ulc_possible_linebreaks:               unilbrk.h.           (line  52)
+* ulc_snprintf:                          unistdio.h.          (line  45)
+* ulc_sprintf:                           unistdio.h.          (line  43)
+* ulc_vasnprintf:                        unistdio.h.          (line  62)
 * ulc_vasprintf:                         unistdio.h.          (line  59)
-* ulc_vfprintf:                          unistdio.h.          (line 201)
+* ulc_vfprintf:                          unistdio.h.          (line 186)
 * ulc_vsnprintf:                         unistdio.h.          (line  56)
 * ulc_vsprintf:                          unistdio.h.          (line  53)
-* ulc_width_linebreaks:                  unilbrk.h.           (line  76)
+* ulc_width_linebreaks:                  unilbrk.h.           (line  72)
 * ulc_wordbreaks:                        Word breaks in a string.
                                                               (line  11)
 * Unicode:                               Unicode.             (line   6)
@@ -6803,9 +6954,9 @@ Index
 * uninorm_filter_create:                 Normalization of streams.
                                                               (line  16)
 * uninorm_filter_flush:                  Normalization of streams.
-                                                              (line  33)
+                                                              (line  32)
 * uninorm_filter_free:                   Normalization of streams.
-                                                              (line  43)
+                                                              (line  42)
 * uninorm_filter_write:                  Normalization of streams.
                                                               (line  27)
 * uninorm_is_compat_decomposing:         Normalization of strings.
@@ -6849,87 +7000,90 @@ Node: Unicode and i18n7937
 Node: Locale encodings9599
 Node: In-memory representation11864
 Node: char * strings13862
-Node: Unicode strings19350
-Node: Conventions20533
-Node: unitypes.h22825
-Node: unistr.h23922
-Node: Elementary string checks24487
-Node: Elementary string conversions25109
-Node: Elementary string functions26987
-Node: Iterating27392
-Node: Creating Unicode strings30222
-Node: Copying Unicode strings31158
-Node: Comparing Unicode strings32771
-Node: Searching for a character34326
-Node: Counting characters35125
-Node: Elementary string functions with memory allocation35808
-Node: Elementary string functions on NUL terminated strings36430
-Node: Iterating over a NUL terminated Unicode string37029
-Node: Length39297
-Node: Copying a NUL terminated Unicode string40355
-Node: Comparing NUL terminated Unicode strings43459
-Node: Duplicating a NUL terminated Unicode string45555
-Node: Searching for a character in a NUL terminated Unicode string46324
-Node: Searching for a substring49088
-Node: Tokenizing50611
-Node: uniconv.h51484
-Node: unistdio.h59497
-Node: uniname.h67750
-Node: unictype.h69156
-Node: General category70084
-Node: Object oriented API71139
-Node: Bit mask API80980
-Node: Canonical combining class83275
-Node: Bidi class87510
-Node: Decimal digit value91305
-Node: Digit value91862
-Node: Numeric value92423
-Node: Mirrored character93325
-Node: Arabic shaping94018
-Node: Joining type94491
-Node: Joining group96641
-Node: Properties102453
-Node: Properties as objects103144
-Node: Properties as functions110625
-Node: Scripts117142
-Node: Blocks118547
-Node: ISO C and Java syntax119890
-Node: Classifications like in ISO C121608
-Node: uniwidth.h124420
-Node: unigbrk.h126466
-Node: Grapheme cluster breaks in a string127960
-Node: Grapheme cluster break property130979
-Node: uniwbrk.h133225
-Node: Word breaks in a string133763
-Node: Word break property134855
-Node: unilbrk.h136183
-Node: uninorm.h140735
-Node: Decomposition of characters141372
-Node: Composition of characters145153
-Node: Normalization of strings145866
-Node: Normalizing comparisons148039
-Node: Normalization of streams150537
-Node: unicase.h152662
-Node: Case mappings of characters153351
-Node: Case mappings of strings155500
-Node: Case mappings of substrings159139
-Node: Case insensitive comparison166409
-Node: Case detection172102
-Node: uniregex.h175416
-Node: Using the library175643
-Node: Installation176054
-Node: Compiler options176542
-Node: Include files178182
-Node: Autoconf macro179435
-Node: Reporting problems181076
-Node: More functionality181886
-Node: The wchar_t mess182338
-Node: The char32_t problem184688
-Node: Licenses187063
-Node: GNU GPL189536
-Node: GNU LGPL227285
-Node: GNU FDL235769
-Node: Index261080
+Node: Unicode strings19357
+Node: Conventions20540
+Ref: Conventions-Footnote-123718
+Node: unitypes.h23922
+Node: unistr.h25019
+Node: Elementary string checks25584
+Node: Elementary string conversions26206
+Node: Elementary string functions28084
+Node: Iterating28489
+Node: Creating Unicode strings31319
+Node: Copying Unicode strings32255
+Node: Comparing Unicode strings34331
+Node: Searching for a character35886
+Node: Counting characters36685
+Node: Elementary string functions with memory allocation37368
+Node: Elementary string functions on NUL terminated strings37990
+Node: Iterating over a NUL terminated Unicode string38589
+Node: Length40857
+Node: Copying a NUL terminated Unicode string41915
+Node: Comparing NUL terminated Unicode strings45019
+Node: Duplicating a NUL terminated Unicode string47162
+Node: Searching for a character in a NUL terminated Unicode string47931
+Node: Searching for a substring50695
+Node: Tokenizing52218
+Node: uniconv.h53091
+Node: unistdio.h61371
+Node: uniname.h69700
+Node: unictype.h71106
+Node: General category72055
+Node: Object oriented API73110
+Node: Bit mask API82951
+Node: Canonical combining class85246
+Node: Bidi class89481
+Node: Decimal digit value93276
+Node: Digit value93833
+Node: Numeric value94394
+Node: Mirrored character95296
+Node: Arabic shaping96510
+Node: Joining type96983
+Node: Joining group99133
+Node: Properties104993
+Node: Properties as objects105693
+Node: Properties as functions113491
+Node: Other attributes120365
+Node: Indic conjunct break120620
+Node: Scripts121911
+Node: Blocks123322
+Node: ISO C and Java syntax124665
+Node: Classifications like in ISO C126383
+Node: uniwidth.h129195
+Node: unigbrk.h131241
+Node: Grapheme cluster breaks in a string132735
+Node: Grapheme cluster break property135924
+Node: uniwbrk.h138250
+Node: Word breaks in a string138788
+Node: Word break property139880
+Node: unilbrk.h141208
+Node: uninorm.h145760
+Node: Decomposition of characters146397
+Node: Composition of characters150178
+Node: Normalization of strings150891
+Node: Normalizing comparisons153064
+Node: Normalization of streams155562
+Node: unicase.h157687
+Node: Case mappings of characters158376
+Node: Case mappings of strings160525
+Node: Case mappings of substrings164163
+Node: Case insensitive comparison171433
+Node: Case detection177271
+Node: uniregex.h180585
+Node: Using the library180812
+Node: Installation181223
+Node: Compiler options181711
+Node: Include files183351
+Node: Autoconf macro184991
+Node: Reporting problems186632
+Node: More functionality187442
+Node: The wchar_t mess187894
+Node: The char32_t problem190321
+Node: Licenses192696
+Node: GNU GPL195169
+Node: GNU LGPL232918
+Node: GNU FDL241402
+Node: Index266713
 
 End Tag Table
 

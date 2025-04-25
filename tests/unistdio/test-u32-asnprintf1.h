@@ -1,9 +1,9 @@
 /* Test of u32_[v]asnprintf() function.
-   Copyright (C) 2007, 2009-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -57,4 +57,59 @@ test_function (uint32_t * (*my_asnprintf) (uint32_t *, size_t *, const char *, .
       if (result != buf)
         free (result);
     }
+
+  /* Verify that u32_[v]asnprintf() rejects a width > 2 GiB, < 4 GiB.  */
+  {
+    size_t length;
+    uint32_t *s = my_asnprintf (NULL, &length, "x%03000000000dy\n", -17);
+    ASSERT (s == NULL);
+    ASSERT (errno == EOVERFLOW);
+  }
+  {
+    static const uint32_t arg[] = { '@', 0 };
+    size_t length;
+    uint32_t *s = my_asnprintf (NULL, &length, "x%03000000000llUy\n", arg);
+    ASSERT (s == NULL);
+    ASSERT (errno == EOVERFLOW);
+  }
+
+  /* Verify that u32_[v]asnprintf() rejects a width > 4 GiB.  */
+  {
+    size_t length;
+    uint32_t *s =
+      my_asnprintf (NULL, &length,
+                    "x%04294967306dy\n", /* 2^32 + 10 */
+                    -17);
+    ASSERT (s == NULL);
+    ASSERT (errno == EOVERFLOW);
+  }
+  {
+    static const uint32_t arg[] = { '@', 0 };
+    size_t length;
+    uint32_t *s =
+      my_asnprintf (NULL, &length,
+                    "x%04294967306llUy\n", /* 2^32 + 10 */
+                    arg);
+    ASSERT (s == NULL);
+    ASSERT (errno == EOVERFLOW);
+  }
+  {
+    size_t length;
+    uint32_t *s =
+      my_asnprintf (NULL, &length,
+                    "x%018446744073709551626dy\n", /* 2^64 + 10 */
+                    -17);
+    ASSERT (s == NULL);
+    ASSERT (errno == EOVERFLOW);
+  }
+  {
+    static const uint32_t arg[] = { '@', 0 };
+    size_t length;
+    uint32_t *s =
+      my_asnprintf (NULL, &length,
+                    "x%018446744073709551626llUy\n", /* 2^64 + 10 */
+                    arg);
+    ASSERT (s == NULL);
+    ASSERT (errno == EOVERFLOW);
+  }
 }

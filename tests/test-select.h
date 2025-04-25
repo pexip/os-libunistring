@@ -1,9 +1,9 @@
 /* Test of select() substitute.
-   Copyright (C) 2008-2022 Free Software Foundation, Inc.
+   Copyright (C) 2008-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -24,7 +24,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <sys/ioctl.h>
 #include <errno.h>
 
@@ -38,8 +37,10 @@
 # include <sys/wait.h>
 #endif
 
-#define TEST_PORT       12345
-
+/* Tell GCC not to warn about the specific edge cases tested here.  */
+#if _GL_GNUC_PREREQ (13, 0)
+# pragma GCC diagnostic ignored "-Wanalyzer-fd-use-without-check"
+#endif
 
 typedef int (*select_fn) (int, fd_set *, fd_set *, fd_set *, struct timeval *);
 

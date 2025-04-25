@@ -1,5 +1,5 @@
 /* Counting the multibyte characters in a string.
-   Copyright (C) 2007-2022 Free Software Foundation, Inc.
+   Copyright (C) 2007-2024 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2007.
 
    This file is free software: you can redistribute it and/or modify
@@ -22,7 +22,11 @@
 
 #include <stdlib.h>
 
-#include "mbiter.h"
+#if GNULIB_MCEL_PREFER
+# include "mcel.h"
+#else
+# include "mbiterf.h"
+#endif
 
 /* Return the number of multibyte characters in the character string starting
    at STRING and ending at STRING + LEN.  */
@@ -31,12 +35,23 @@ mbsnlen (const char *string, size_t len)
 {
   if (MB_CUR_MAX > 1)
     {
-      size_t count;
-      mbi_iterator_t iter;
+      size_t count = 0;
 
-      count = 0;
-      for (mbi_init (iter, string, len); mbi_avail (iter); mbi_advance (iter))
+      const char *string_end = string + len;
+
+#if GNULIB_MCEL_PREFER
+      for (; string < string_end; string += mcel_scan (string, string_end).len)
         count++;
+#else
+      mbif_state_t state;
+      const char *iter;
+      for (mbif_init (state), iter = string; mbif_avail (state, iter, string_end); )
+        {
+          mbchar_t cur = mbif_next (state, iter, string_end);
+          count++;
+          iter += mb_len (cur);
+        }
+#endif
 
       return count;
     }
